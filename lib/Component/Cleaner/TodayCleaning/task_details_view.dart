@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -9,6 +10,13 @@ class TaskDetailsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Map<String, dynamic> taskData = Get.arguments;
+    if (taskData.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('No task data available')),
+      );
+    }
+
     final controller = Get.find<CleanupScheduleController>();
 
     return Scaffold(
@@ -52,11 +60,6 @@ class TaskDetailsView extends StatelessWidget {
         ],
       ),
       body: Obx(() {
-        final taskData = controller.selectedTaskData.value;
-        if (taskData == null) {
-          return const Center(child: Text('No task selected'));
-        }
-
         final taskId = taskData['id'] as int;
         final status = controller.getTaskStatus(taskId);
         final eta = controller.getTaskETA(taskId);
@@ -64,30 +67,24 @@ class TaskDetailsView extends StatelessWidget {
         return SingleChildScrollView(
           child: Column(
             children: [
-              // Status Header
               _buildStatusHeader(taskData, status, eta, controller),
-
               SizedBox(height: 16 * 0.9.h),
-
-              // Owner Info Card
               _buildOwnerInfoCard(taskData),
-
               SizedBox(height: 16 * 0.9.h),
-
-              // Plant Details Card
-              _buildPlantDetailsCard(taskData),
-
+              _buildPlantDetailsCard(taskData, status),
               SizedBox(height: 16 * 0.9.h),
-
-              // Panel Information
               _buildPanelInformation(),
-
-              SizedBox(height: 100 * 0.9.h), // Space for bottom button
+              SizedBox(height: 100 * 0.9.h),
             ],
           ),
         );
       }),
-      bottomNavigationBar: _buildBottomButton(controller),
+      bottomNavigationBar: Obx(() {
+        final taskId = taskData['id'] as int;
+        final status = controller.getTaskStatus(taskId);
+        final eta = controller.getTaskETA(taskId);
+        return _buildBottomButton(controller, taskData, status, eta);
+      }),
     );
   }
 
@@ -125,7 +122,6 @@ class TaskDetailsView extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Status Badge
           Container(
             padding: EdgeInsets.symmetric(horizontal: 12 * 0.9.w, vertical: 6 * 0.9.h),
             decoration: BoxDecoration(
@@ -141,9 +137,7 @@ class TaskDetailsView extends StatelessWidget {
               ),
             ),
           ),
-
           SizedBox(width: 8 * 0.9.w),
-
           Container(
             padding: EdgeInsets.symmetric(horizontal: 12 * 0.9.w, vertical: 6 * 0.9.h),
             decoration: BoxDecoration(
@@ -159,9 +153,7 @@ class TaskDetailsView extends StatelessWidget {
               ),
             ),
           ),
-
           SizedBox(width: 12 * 0.9.w),
-
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -182,10 +174,7 @@ class TaskDetailsView extends StatelessWidget {
               ),
             ],
           ),
-
           const Spacer(),
-
-          // Solar Panel Icon
           Icon(
             Icons.solar_power,
             size: 32 * 0.9.w,
@@ -222,12 +211,9 @@ class TaskDetailsView extends StatelessWidget {
               color: Colors.black,
             ),
           ),
-
           SizedBox(height: 16 * 0.9.h),
-
           Row(
             children: [
-              // Profile Avatar
               CircleAvatar(
                 radius: 24 * 0.9.r,
                 backgroundColor: Colors.grey[200],
@@ -237,9 +223,7 @@ class TaskDetailsView extends StatelessWidget {
                   color: Colors.grey[600],
                 ),
               ),
-
               SizedBox(width: 12 * 0.9.w),
-
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -255,8 +239,6 @@ class TaskDetailsView extends StatelessWidget {
                   ],
                 ),
               ),
-
-              // Call Button
               GestureDetector(
                 onTap: () => _makePhoneCall('+918903373561'),
                 child: Container(
@@ -279,11 +261,7 @@ class TaskDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _buildPlantDetailsCard(Map<String, dynamic> taskData) {
-    final taskId = taskData['id'] as int;
-    final controller = Get.find<CleanupScheduleController>();
-    final status = controller.getTaskStatus(taskId);
-
+  Widget _buildPlantDetailsCard(Map<String, dynamic> taskData, String status) {
     Color statusColor;
     String statusText;
 
@@ -319,16 +297,14 @@ class TaskDetailsView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '${taskData['plant_location'] ?? 'Abc Plant Name'}',
+            taskData['plant_location'] ?? 'Abc Plant Name',
             style: TextStyle(
               fontSize: 18 * 0.9.sp,
               fontWeight: FontWeight.w600,
               color: Colors.black,
             ),
           ),
-
           SizedBox(height: 8 * 0.9.h),
-
           Text(
             'Auto Clean: ${_formatTime(taskData['cleaning_start_time'])}',
             style: TextStyle(
@@ -336,9 +312,7 @@ class TaskDetailsView extends StatelessWidget {
               color: Colors.grey[600],
             ),
           ),
-
           SizedBox(height: 4 * 0.9.h),
-
           Row(
             children: [
               Text(
@@ -358,10 +332,7 @@ class TaskDetailsView extends StatelessWidget {
               ),
             ],
           ),
-
           SizedBox(height: 16 * 0.9.h),
-
-          // Location Info
           Row(
             children: [
               Text(
@@ -390,11 +361,9 @@ class TaskDetailsView extends StatelessWidget {
               ),
             ],
           ),
-
           SizedBox(height: 4 * 0.9.h),
-
           Text(
-            '${taskData['plant_location'] ?? 'A-2-1 Pune Mahanagar(411021)'}',
+            taskData['plant_location'] ?? 'A-2-1 Pune Mahanagar(411021)',
             style: TextStyle(
               fontSize: 12 * 0.9.sp,
               color: Colors.grey[600],
@@ -457,100 +426,91 @@ class TaskDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomButton(CleanupScheduleController controller) {
-    return Obx(() {
-      final taskData = controller.selectedTaskData.value;
-      if (taskData == null) return const SizedBox.shrink();
+  Widget _buildBottomButton(CleanupScheduleController controller, Map<String, dynamic> taskData, String status, int? eta) {
+    final taskId = taskData['id'] as int;
 
-      final taskId = taskData['id'] as int;
-      final status = controller.getTaskStatus(taskId);
-      final eta = controller.getTaskETA(taskId);
-
-      if (status == 'ongoing' && eta != null) {
-        // Show ETA countdown for ongoing tasks
-        return Container(
-          padding: EdgeInsets.all(16 * 0.9.w),
-          child: SafeArea(
-            child: SizedBox(
-              width: double.infinity,
-              child: Container(
-                padding: EdgeInsets.all(16 * 0.9.w),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF4ECDC4),
-                  borderRadius: BorderRadius.circular(12 * 0.9.r),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.access_time,
-                      color: Colors.white,
-                      size: 20 * 0.9.w,
-                    ),
-                    SizedBox(width: 8 * 0.9.w),
-                    Text(
-                      'ETA: ${controller.formatETA(eta)}',
-                      style: TextStyle(
-                        fontSize: 16 * 0.9.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const Spacer(),
-                    GestureDetector(
-                      onTap: () => controller.completeTask(taskId),
-                      child: Container(
-                        padding: EdgeInsets.all(8 * 0.9.w),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(8 * 0.9.r),
-                        ),
-                        child: Icon(
-                          Icons.close,
-                          color: Colors.white,
-                          size: 20 * 0.9.w,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      }
-
-      if (status == 'completed') {
-        return const SizedBox.shrink();
-      }
-
-      // Enable Maintenance Mode button for pending tasks
+    if (status == 'ongoing' && eta != null) {
       return Container(
         padding: EdgeInsets.all(16 * 0.9.w),
         child: SafeArea(
           child: SizedBox(
             width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => controller.startTask(taskId),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                padding: EdgeInsets.symmetric(vertical: 16 * 0.9.h),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12 * 0.9.r),
-                ),
+            child: Container(
+              padding: EdgeInsets.all(16 * 0.9.w),
+              decoration: BoxDecoration(
+                color: const Color(0xFF4ECDC4),
+                borderRadius: BorderRadius.circular(12 * 0.9.r),
               ),
-              child: Text(
-                'Enable Maintenance Mode',
-                style: TextStyle(
-                  fontSize: 16 * 0.9.sp,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.access_time,
+                    color: Colors.white,
+                    size: 20 * 0.9.w,
+                  ),
+                  SizedBox(width: 8 * 0.9.w),
+                  Text(
+                    'ETA: ${controller.formatETA(eta)}',
+                    style: TextStyle(
+                      fontSize: 16 * 0.9.sp,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: () => controller.completeTask(taskId),
+                    child: Container(
+                      padding: EdgeInsets.all(8 * 0.9.w),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8 * 0.9.r),
+                      ),
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 20 * 0.9.w,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
         ),
       );
-    });
+    }
+
+    if (status == 'completed') {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      padding: EdgeInsets.all(16 * 0.9.w),
+      child: SafeArea(
+        child: SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () => controller.startTask(taskId),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
+              padding: EdgeInsets.symmetric(vertical: 16 * 0.9.h),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12 * 0.9.r),
+              ),
+            ),
+            child: Text(
+              'Enable Maintenance Mode',
+              style: TextStyle(
+                fontSize: 16 * 0.9.sp,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   String _formatTime(String? timeString) {
@@ -594,7 +554,6 @@ class TaskDetailsView extends StatelessWidget {
   }
 
   void _openLocation(Map<String, dynamic> taskData) {
-    // For now, just show a snackbar
     Get.snackbar(
       'Location',
       'Opening location: ${taskData['plant_location']}',

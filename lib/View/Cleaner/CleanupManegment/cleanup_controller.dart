@@ -15,30 +15,43 @@ class CleaningManagementController extends GetxController {
   final errorMessage = ''.obs;
   final selectedTaskId = 0.obs;
 
-  final taskStatus = 'pending'.obs;
+  final taskStatus = ''.obs;
   final maintenanceETA = 120.obs; // Default 120 minutes
   final isMaintenanceModeEnabled = false.obs;
 
+  // 1. FILTER METHODS - These should return correct counts based on API response
   List<Map<String, dynamic>> get pendingCleanups {
     if (todaysSchedules.value == null) return [];
-    return todaysSchedules.value!.where((schedule) =>
-    reportData.value?['status'] == 'pending' ||
-        reportData.value == null
+    print('All schedules: ${todaysSchedules.value?.map((s) => {'id': s['id'], 'status': s['status']}).toList()}');
+
+    final pending = todaysSchedules.value!.where((schedule) =>
+    schedule['status'] == 'pending'
     ).toList();
+
+    print('Pending cleanups: ${pending.length} items');
+    return pending;
   }
 
   List<Map<String, dynamic>> get ongoingCleanups {
     if (todaysSchedules.value == null) return [];
-    return todaysSchedules.value!.where((schedule) =>
-    reportData.value?['status'] == 'cleaning'
+
+    final ongoing = todaysSchedules.value!.where((schedule) =>
+    schedule['status'] == 'cleaning'
     ).toList();
+
+    print('Ongoing cleanups: ${ongoing.length} items');
+    return ongoing;
   }
 
   List<Map<String, dynamic>> get completedCleanups {
     if (todaysSchedules.value == null) return [];
-    return todaysSchedules.value!.where((schedule) =>
-    reportData.value?['status'] == 'done'
+
+    final completed = todaysSchedules.value!.where((schedule) =>
+    schedule['status'] == 'done'
     ).toList();
+
+    print('Completed cleanups: ${completed.length} items');
+    return completed;
   }
 
   int get totalPanels {
@@ -62,6 +75,8 @@ class CleaningManagementController extends GetxController {
     super.onInit();
     fetchTodaysSchedules();
   }
+
+  RxInt currentScheduleId = 0.obs;
 
   Future<void> fetchTodaysSchedules() async {
     try {
@@ -90,7 +105,19 @@ class CleaningManagementController extends GetxController {
       if (response.success && response.data != null) {
         todaysSchedules.value = List<Map<String, dynamic>>.from(response.data!);
         if (todaysSchedules.value!.isNotEmpty) {
-          await fetchReportData(todaysSchedules.value!.first['id']);
+          // Update taskStatus based on selected task if any
+
+            final selectedTask = todaysSchedules.value!.firstWhere((schedule) => schedule['id'] == selectedTaskId.value,
+              orElse: () => <String, dynamic>{},
+            );
+            if (selectedTask.isNotEmpty) {
+              taskStatus.value = selectedTask['status'] ?? 'pending';
+            }
+
+            final status = todaysSchedules.value?.first['status'] ?? 'pending';
+            print('Fetched schedules with status: $status');
+
+
         }
       } else {
         throw Exception(response.errorMessage ?? 'Failed to fetch schedules');
@@ -121,6 +148,8 @@ class CleaningManagementController extends GetxController {
 
       if (taskData != null && taskData.isNotEmpty) {
         taskDetails.value = taskData;
+        // Update task status from the schedule data
+        taskStatus.value = taskData['status'] ?? 'pending';
         await fetchReportData(scheduleId);
       }
     } catch (e) {
@@ -137,7 +166,7 @@ class CleaningManagementController extends GetxController {
     }
   }
 
-  int? _currentReportId;
+  int? currentReportId;
 
   Future<void> fetchReportData(int scheduleId) async {
     try {
@@ -156,8 +185,18 @@ class CleaningManagementController extends GetxController {
 
       if (response.success && response.data != null) {
         reportData.value = response.data!;
-        taskStatus.value = reportData.value?['status'] ?? 'pending';
-        _currentReportId = reportData.value?['id'];
+        // Keep the status from todaysSchedules as primary source
+        final scheduleStatus = todaysSchedules.value?.firstWhere(
+              (schedule) => schedule['id'] == scheduleId,
+          orElse: () => <String, dynamic>{},
+        )['status'];
+
+        if (scheduleStatus != null) {
+          taskStatus.value = scheduleStatus;
+        } else {
+          taskStatus.value = reportData.value?['status'] ?? 'pending';
+        }
+        currentReportId = reportData.value?['id'];
       } else {
         throw Exception(response.errorMessage ?? 'Failed to fetch report data');
       }
@@ -172,12 +211,25 @@ class CleaningManagementController extends GetxController {
 
       await Future.delayed(const Duration(seconds: 1));
 
+      // Update the status in todaysSchedules
+      if (todaysSchedules.value != null && selectedTaskId.value > 0) {
+        final scheduleIndex = todaysSchedules.value!.indexWhere(
+              (schedule) => schedule['id'] == selectedTaskId.value,
+        );
+
+        if (scheduleIndex != -1) {
+          todaysSchedules.value![scheduleIndex]['status'] = newStatus;
+          todaysSchedules.refresh(); // Trigger reactive update
+        }
+      }
+
       if (reportData.value != null) {
         final updatedReport = Map<String, dynamic>.from(reportData.value!);
         updatedReport['status'] = newStatus;
         reportData.value = updatedReport;
-        taskStatus.value = newStatus;
       }
+
+      taskStatus.value = newStatus;
 
       Get.snackbar(
         'Success',
@@ -282,12 +334,12 @@ class CleaningManagementController extends GetxController {
     try {
       isMaintenanceModeLoading.value = true;
 
-      if (_currentReportId == null) {
+      if (currentReportId == null) {
         throw Exception('Report ID not found');
       }
 
       final response = await ApiService.put<Map<String, dynamic>>(
-        endpoint: putTodayReport(_currentReportId!),
+        endpoint: putTodayReport(currentReportId!),
         body: {
           'status': finalStatus,
         },
@@ -301,6 +353,18 @@ class CleaningManagementController extends GetxController {
       );
 
       if (response.success) {
+        // Update the status in todaysSchedules
+        if (todaysSchedules.value != null && selectedTaskId.value > 0) {
+          final scheduleIndex = todaysSchedules.value!.indexWhere(
+                (schedule) => schedule['id'] == selectedTaskId.value,
+          );
+
+          if (scheduleIndex != -1) {
+            todaysSchedules.value![scheduleIndex]['status'] = finalStatus;
+            todaysSchedules.refresh(); // Trigger reactive update
+          }
+        }
+
         await fetchReportData(selectedTaskId.value);
 
         String title = finalStatus == 'done' ? 'Cleaning Completed' : 'Cleaning Failed';
@@ -336,7 +400,7 @@ class CleaningManagementController extends GetxController {
 
   Future<void> enableMaintenanceMode() async {
     try {
-      if (_currentReportId == null) {
+      if (currentReportId == null) {
         throw Exception('Report ID not found');
       }
 
@@ -344,7 +408,7 @@ class CleaningManagementController extends GetxController {
         isMaintenanceModeLoading.value = true;
 
         final response = await ApiService.put<Map<String, dynamic>>(
-          endpoint: putTodayReport(_currentReportId!),
+          endpoint: putTodayReport(currentReportId!),
           body: {
             'status': 'cleaning',
           },
@@ -359,6 +423,19 @@ class CleaningManagementController extends GetxController {
 
         if (response.success) {
           isMaintenanceModeEnabled.value = true;
+
+          // Update the status in todaysSchedules
+          if (todaysSchedules.value != null && selectedTaskId.value > 0) {
+            final scheduleIndex = todaysSchedules.value!.indexWhere(
+                  (schedule) => schedule['id'] == selectedTaskId.value,
+            );
+
+            if (scheduleIndex != -1) {
+              todaysSchedules.value![scheduleIndex]['status'] = 'cleaning';
+              todaysSchedules.refresh(); // Trigger reactive update
+            }
+          }
+
           await fetchReportData(selectedTaskId.value);
 
           Get.snackbar(
@@ -395,6 +472,7 @@ class CleaningManagementController extends GetxController {
   void navigateToTaskDetails(Map<String, dynamic> taskData) {
     taskDetails.value = taskData;
     selectedTaskId.value = taskData['id'];
+    taskStatus.value = taskData['status'] ?? 'pending'; // Set status from schedule data
     fetchReportData(taskData['id']);
     Get.toNamed(AppRoutes.clenupDetailsPage);
   }
@@ -499,4 +577,5 @@ class CleaningManagementController extends GetxController {
     }
   }
 }
+
 

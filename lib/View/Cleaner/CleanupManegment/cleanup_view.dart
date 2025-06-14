@@ -65,7 +65,7 @@ class CleaningManagementView extends StatelessWidget {
           ),
           border: InputBorder.none,
           contentPadding:
-              EdgeInsets.symmetric(horizontal: 12.8.w, vertical: 9.6.h),
+          EdgeInsets.symmetric(horizontal: 12.8.w, vertical: 9.6.h),
         ),
       ),
     );
@@ -174,7 +174,7 @@ class CleaningManagementView extends StatelessWidget {
     return Obx(() {
       final areaName = controller.todaysSchedules.value?.isNotEmpty == true
           ? controller.todaysSchedules.value!.first['area_name'] ??
-              'Unknown Area'
+          'Unknown Area'
           : 'No Area';
 
       Color statusColor;
@@ -268,8 +268,15 @@ class CleaningManagementView extends StatelessWidget {
   Widget _buildTaskCard(CleaningManagementController controller, Map<String, dynamic> task) {
     return Obx(() {
       // Get the current status from reportData
-      final status = controller.reportData.value?['status'] ?? 'pending';
+      // Get the task ID
+      final taskId = task['id'];
 
+      // Find the matching task in todaysSchedules
+      final matchingTask = controller.todaysSchedules.value
+          ?.firstWhere((item) => item['id'] == taskId, orElse: () => {});
+
+      // Get status or default
+      final status = matchingTask?['status'] ?? 'pending';
       // Determine card background color based on status
       Color cardBackgroundColor;
       Color statusBadgeColor;
@@ -314,7 +321,10 @@ class CleaningManagementView extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: () => controller.navigateToTaskDetails(task),
+            onTap: ()  {
+              controller.fetchReportData(task['id']);
+              controller.navigateToTaskDetails(task);
+            },
             borderRadius: BorderRadius.circular(12.8.r),
             child: Stack(
               children: [
@@ -545,3 +555,5 @@ class CleaningManagementView extends StatelessWidget {
     );
   }
 }
+
+

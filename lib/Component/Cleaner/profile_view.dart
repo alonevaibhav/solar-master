@@ -33,11 +33,11 @@ class ProfileView extends GetView<ProfileController> {
               ),
             ),
 
-            _buildMenuOption(
-              icon: Icons.list_alt,
-              title: 'Assigned Plants',
-              onTap: controller.goToAssignedPlants,
-            ),
+            // _buildMenuOption(
+            //   icon: Icons.list_alt,
+            //   title: 'Assigned Plants',
+            //   onTap: controller.goToAssignedPlants,
+            // ),
 
             _buildMenuOption(
               icon: Icons.info_outline,
@@ -51,11 +51,11 @@ class ProfileView extends GetView<ProfileController> {
               onTap: controller.goToHelpAndSupport,
             ),
 
-            _buildMenuOption(
-              icon: Icons.history,
-              title: 'Clean-up History',
-              onTap: controller.goToCleanupHistory,
-            ),
+            // _buildMenuOption(
+            //   icon: Icons.history,
+            //   title: 'Clean-up History',
+            //   onTap: controller.goToCleanupHistory,
+            // ),
 
             SizedBox(height: 14.4.h),
 

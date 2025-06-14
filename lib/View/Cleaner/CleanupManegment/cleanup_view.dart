@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -66,7 +64,8 @@ class CleaningManagementView extends StatelessWidget {
             size: 16.w,
           ),
           border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: 12.8.w, vertical: 9.6.h),
+          contentPadding:
+              EdgeInsets.symmetric(horizontal: 12.8.w, vertical: 9.6.h),
         ),
       ),
     );
@@ -174,7 +173,8 @@ class CleaningManagementView extends StatelessWidget {
   Widget _buildAreaSection(CleaningManagementController controller) {
     return Obx(() {
       final areaName = controller.todaysSchedules.value?.isNotEmpty == true
-          ? controller.todaysSchedules.value!.first['area_name'] ?? 'Unknown Area'
+          ? controller.todaysSchedules.value!.first['area_name'] ??
+              'Unknown Area'
           : 'No Area';
 
       Color statusColor;
@@ -307,7 +307,7 @@ class CleaningManagementView extends StatelessWidget {
             BoxShadow(
               color: Colors.black.withOpacity(0.08),
               blurRadius: 6.4,
-              offset: Offset(0, 3.2),
+              offset: const Offset(0, 3.2),
             ),
           ],
         ),
@@ -316,107 +316,140 @@ class CleaningManagementView extends StatelessWidget {
           child: InkWell(
             onTap: () => controller.navigateToTaskDetails(task),
             borderRadius: BorderRadius.circular(12.8.r),
-            child: Padding(
-              padding: EdgeInsets.all(16.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Stack(
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(16.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Icon(
-                            Icons.access_time,
-                            color: controller.getStatusColor(status),
-                            size: 16.w,
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.access_time,
+                                color: controller.getStatusColor(status),
+                                size: 16.w,
+                              ),
+                              SizedBox(width: 6.4.w),
+                              Text(
+                                controller.formatTime(
+                                    task['cleaning_start_time'] ?? '08:00:00'),
+                                style: TextStyle(
+                                  color: controller.getStatusColor(status),
+                                  fontSize: 12.8.sp,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
-                          SizedBox(width: 6.4.w),
-                          Text(
-                            controller.formatTime(task['cleaning_start_time'] ?? '08:00:00'),
-                            style: TextStyle(
-                              color: controller.getStatusColor(status),
-                              fontSize: 12.8.sp,
-                              fontWeight: FontWeight.w500,
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 9.6.w, vertical: 3.2.h),
+                            decoration: BoxDecoration(
+                              color: statusBadgeColor,
+                              borderRadius: BorderRadius.circular(9.6.r),
+                              border: Border.all(
+                                  color: controller.getStatusColor(status),
+                                  width: 0.5),
+                            ),
+                            child: Text(
+                              status == 'pending'
+                                  ? 'Cleaning Pending'
+                                  : status == 'ongoing'
+                                  ? 'In Progress'
+                                  : status == 'done'
+                                  ? 'Completed'
+                                  : status.toUpperCase(),
+                              style: TextStyle(
+                                color: controller.getStatusColor(status),
+                                fontSize: 9.6.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ],
                       ),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 9.6.w, vertical: 3.2.h),
-                        decoration: BoxDecoration(
-                          color: statusBadgeColor,
-                          borderRadius: BorderRadius.circular(9.6.r),
-                          border: Border.all(color: controller.getStatusColor(status), width: 0.5),
+                      SizedBox(height: 12.8.h),
+                      Text(
+                        task['plant_location'] ?? 'Unknown Location',
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w600,
                         ),
-                        child: Text(
-                          status == 'pending' ? 'Cleaning Pending' :
-                          status == 'ongoing' ? 'In Progress' :
-                          status == 'done' ? 'Completed' : status.toUpperCase(),
-                          style: TextStyle(
-                            color: controller.getStatusColor(status),
-                            fontSize: 9.6.sp,
-                            fontWeight: FontWeight.w600,
+                      ),
+                      SizedBox(height: 6.4.h),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.location_on_outlined,
+                            color: Colors.grey.shade600,
+                            size: 12.w,
                           ),
-                        ),
+                          SizedBox(width: 4.w),
+                          Expanded(
+                            child: Text(
+                              '${task['area_name'] ?? 'Unknown Area'}, ${task['taluka_name'] ?? 'Unknown Taluka'}',
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                                fontSize: 11.2.sp,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 3.2.h),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.solar_power_outlined,
+                            color: Colors.grey.shade600,
+                            size: 12.w,
+                          ),
+                          SizedBox(width: 4.w),
+                          Text(
+                            'Panels: ${task['plant_total_panels'] ?? 0} | ${task['plant_capacity_w'] ?? 0}kW',
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 11.2.sp,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  SizedBox(height: 12.8.h),
-                  Text(
-                    task['plant_location'] ?? 'Unknown Location',
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w600,
+                ),
+                if (status == 'cleaning')
+                  Positioned(
+                    bottom: 8,
+                    right: 8,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: Obx(() => Text(
+                        controller.formattedETA,
+                        style: TextStyle(
+                          color: Colors.blue.shade600,
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )),
                     ),
                   ),
-                  SizedBox(height: 6.4.h),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.location_on_outlined,
-                        color: Colors.grey.shade600,
-                        size: 12.w,
-                      ),
-                      SizedBox(width: 4.w),
-                      Expanded(
-                        child: Text(
-                          '${task['area_name'] ?? 'Unknown Area'}, ${task['taluka_name'] ?? 'Unknown Taluka'}',
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 11.2.sp,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 3.2.h),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.solar_power_outlined,
-                        color: Colors.grey.shade600,
-                        size: 12.w,
-                      ),
-                      SizedBox(width: 4.w),
-                      Text(
-                        'Panels: ${task['plant_total_panels'] ?? 0} | ${task['plant_capacity_w'] ?? 0}kW',
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 11.2.sp,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+              ],
             ),
           ),
         ),
       );
     });
   }
+
 
   void _showPendingCleanups(CleaningManagementController controller) {
     Get.bottomSheet(
@@ -455,9 +488,12 @@ class CleaningManagementView extends StatelessWidget {
               return Column(
                 children: pendingTasks.map((task) {
                   return ListTile(
-                    leading: Icon(Icons.cleaning_services, color: Colors.red.shade400, size: 16.w),
-                    title: Text(task['plant_location'] ?? 'Unknown', style: TextStyle(fontSize: 12.8.sp)),
-                    subtitle: Text('${task['plant_total_panels']} panels', style: TextStyle(fontSize: 11.2.sp)),
+                    leading: Icon(Icons.cleaning_services,
+                        color: Colors.red.shade400, size: 16.w),
+                    title: Text(task['plant_location'] ?? 'Unknown',
+                        style: TextStyle(fontSize: 12.8.sp)),
+                    subtitle: Text('${task['plant_total_panels']} panels',
+                        style: TextStyle(fontSize: 11.2.sp)),
                     onTap: () {
                       Get.back();
                       controller.navigateToTaskDetails(task);
@@ -509,9 +545,12 @@ class CleaningManagementView extends StatelessWidget {
               return Column(
                 children: completedTasks.map((task) {
                   return ListTile(
-                    leading: Icon(Icons.check_circle, color: Colors.green.shade400, size: 16.w),
-                    title: Text(task['plant_location'] ?? 'Unknown', style: TextStyle(fontSize: 12.8.sp)),
-                    subtitle: Text('${task['plant_total_panels']} panels', style: TextStyle(fontSize: 11.2.sp)),
+                    leading: Icon(Icons.check_circle,
+                        color: Colors.green.shade400, size: 16.w),
+                    title: Text(task['plant_location'] ?? 'Unknown',
+                        style: TextStyle(fontSize: 12.8.sp)),
+                    subtitle: Text('${task['plant_total_panels']} panels',
+                        style: TextStyle(fontSize: 11.2.sp)),
                     onTap: () {
                       Get.back();
                       controller.navigateToTaskDetails(task);

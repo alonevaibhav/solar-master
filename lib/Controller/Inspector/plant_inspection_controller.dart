@@ -1,5 +1,3 @@
-
-import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -52,6 +50,7 @@ class PlantInspectionController extends GetxController {
     inspectorReviewController = TextEditingController();
     clientReviewController = TextEditingController();
     formKey = GlobalKey<FormState>();
+    getCheckList();
 
     // Set initial values only if data is not loaded from API
     if (!isDataLoaded.value) {
@@ -182,8 +181,8 @@ class PlantInspectionController extends GetxController {
         case 'failed':
           failedCount++;
           break;
-          case 'success':
-            successCount++;
+        case 'success':
+          successCount++;
           break;
       }
     }
@@ -203,6 +202,36 @@ class PlantInspectionController extends GetxController {
       'todaysInspections': todaysInspections.value,
     };
   }
+
+  Future<void> getCheckList() async {
+    try {
+      String? uid = await ApiService.getUid();
+
+      if (uid == null) {
+        errorMessageDashboard.value = 'User ID not found';
+        return;
+      }
+
+      // Make the GET API call using ApiService
+      final response = await ApiService.get<dynamic>(
+        endpoint: getInspectorCheckList((int.parse(uid))),
+        fromJson: (json) => json,
+      );
+
+      if (response.success == true) {
+        print('Checklist fetched successfully: ${response.data}');
+        // Handle the checklist data as needed
+      } else {
+        print('Failed to fetch checklist: ${response.errorMessage}');
+      }
+    } catch (e) {
+      print('An error occurred while fetching the checklist: $e');
+    }
+  }
+
+// Add this method to the ApiService class if not already present
+  static String getInspectorCheckList(int inspectorId) =>
+      "/api/inspector/checklist/inspector/$inspectorId";
 
   Future<void> fetchInspectionItems() async {
     try {
@@ -261,7 +290,7 @@ class PlantInspectionController extends GetxController {
   Color getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'completed':
-      case 'done':  // Added this case
+      case 'done': // Added this case
         return const Color(0xFF48BB78); // Professional green
       case 'pending':
         return const Color(0xFFA0AEC0); // Professional grey
@@ -277,7 +306,7 @@ class PlantInspectionController extends GetxController {
   String getStatusDisplayText(String status) {
     switch (status.toLowerCase()) {
       case 'completed':
-      case 'done':  // Added this case
+      case 'done': // Added this case
         return 'Completed';
       case 'pending':
         return 'Pending';

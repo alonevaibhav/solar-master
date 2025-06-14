@@ -1,6 +1,3 @@
-
-
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -23,7 +20,8 @@ class _StartInspectionState extends State<StartInspection> {
   @override
   void initState() {
     super.initState();
-    controllerTag = "inspection_${inspectionData['id'] ?? DateTime.now().millisecondsSinceEpoch}";
+    controllerTag =
+        "inspection_${inspectionData['id'] ?? DateTime.now().millisecondsSinceEpoch}";
     controller = Get.put(PlantInspectionController(), tag: controllerTag!);
 
     // Use addPostFrameCallback to ensure the widget tree is fully built
@@ -150,7 +148,8 @@ class _StartInspectionState extends State<StartInspection> {
                             ),
                             TextSpan(
                               text: inspectionData['time'] ?? 'Not set',
-                              style: const TextStyle(fontWeight: FontWeight.bold),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
@@ -198,7 +197,8 @@ class _StartInspectionState extends State<StartInspection> {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    inspectionData['plant_address'] ?? 'Unknown Location',
+                                    inspectionData['plant_address'] ??
+                                        'Unknown Location',
                                     style: TextStyle(
                                       fontSize: 12 * 0.9.sp,
                                       color: Colors.grey[600],
@@ -265,7 +265,8 @@ class _StartInspectionState extends State<StartInspection> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    inspectionData['cleaner_name'] ?? 'Cleaner Name',
+                                    inspectionData['cleaner_name'] ??
+                                        'Cleaner Name',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16 * 0.9.sp,
@@ -283,7 +284,8 @@ class _StartInspectionState extends State<StartInspection> {
                         readOnly: true,
                         decoration: InputDecoration(
                           labelText: 'Date',
-                          prefixIcon: Icon(Icons.calendar_today, size: 20 * 0.9.sp),
+                          prefixIcon:
+                              Icon(Icons.calendar_today, size: 20 * 0.9.sp),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12 * 0.9.r),
                           ),
@@ -295,7 +297,8 @@ class _StartInspectionState extends State<StartInspection> {
                         readOnly: true,
                         decoration: InputDecoration(
                           labelText: 'Time',
-                          prefixIcon: Icon(Icons.access_time, size: 20 * 0.9.sp),
+                          prefixIcon:
+                              Icon(Icons.access_time, size: 20 * 0.9.sp),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12 * 0.9.r),
                           ),
@@ -303,26 +306,26 @@ class _StartInspectionState extends State<StartInspection> {
                       ),
                       SizedBox(height: 16 * 0.9.h),
                       Obx(() => CustomDropdownField<String>(
-                        value: controller!.selectedStatus.value.isEmpty
-                            ? null
-                            : controller!.selectedStatus.value,
-                        labelText: 'Status',
-                        prefixIcon: Icons.flag,
-                        items: controller!.statusOptions,
-                        itemLabelBuilder: (status) => status,
-                        isRequired: true,
-                        onChanged: (value) {
-                          if (value != null) {
-                            controller!.selectedStatus.value = value;
-                          }
-                        },
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please select status';
-                          }
-                          return null;
-                        },
-                      )),
+                            value: controller!.selectedStatus.value.isEmpty
+                                ? null
+                                : controller!.selectedStatus.value,
+                            labelText: 'Status',
+                            prefixIcon: Icons.flag,
+                            items: controller!.statusOptions,
+                            itemLabelBuilder: (status) => status,
+                            isRequired: true,
+                            onChanged: (value) {
+                              if (value != null) {
+                                controller!.selectedStatus.value = value;
+                              }
+                            },
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please select status';
+                              }
+                              return null;
+                            },
+                          )),
                       SizedBox(height: 16 * 0.9.h),
                       Text(
                         'Upload Inspection Photos',
@@ -356,7 +359,8 @@ class _StartInspectionState extends State<StartInspection> {
                                       padding: EdgeInsets.all(12 * 0.9.r),
                                       decoration: BoxDecoration(
                                         color: Colors.blue.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(12 * 0.9.r),
+                                        borderRadius:
+                                            BorderRadius.circular(12 * 0.9.r),
                                       ),
                                       child: Icon(
                                         Icons.add_a_photo,
@@ -403,7 +407,9 @@ class _StartInspectionState extends State<StartInspection> {
                                   ),
                                 ),
                                 GestureDetector(
-                                  onTap: isUploading ? null : controller!.uploadImage,
+                                  onTap: isUploading
+                                      ? null
+                                      : controller!.uploadImage,
                                   child: Container(
                                     padding: EdgeInsets.symmetric(
                                       horizontal: 12 * 0.9.w,
@@ -411,7 +417,8 @@ class _StartInspectionState extends State<StartInspection> {
                                     ),
                                     decoration: BoxDecoration(
                                       color: Colors.blue,
-                                      borderRadius: BorderRadius.circular(20 * 0.9.r),
+                                      borderRadius:
+                                          BorderRadius.circular(20 * 0.9.r),
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
@@ -440,25 +447,31 @@ class _StartInspectionState extends State<StartInspection> {
                             GridView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 3,
                                 crossAxisSpacing: 8 * 0.9.w,
                                 mainAxisSpacing: 8 * 0.9.h,
                                 childAspectRatio: 1,
                               ),
-                              itemCount: imagePaths.length + (isUploading ? 1 : 0),
+                              itemCount:
+                                  imagePaths.length + (isUploading ? 1 : 0),
                               itemBuilder: (context, index) {
                                 if (isUploading && index == imagePaths.length) {
                                   return Container(
                                     decoration: BoxDecoration(
                                       color: Colors.grey[200],
-                                      borderRadius: BorderRadius.circular(12 * 0.9.r),
-                                      border: Border.all(color: Colors.grey[300]!),
+                                      borderRadius:
+                                          BorderRadius.circular(12 * 0.9.r),
+                                      border:
+                                          Border.all(color: Colors.grey[300]!),
                                     ),
                                     child: const Center(
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
-                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                Colors.blue),
                                       ),
                                     ),
                                   );
@@ -466,16 +479,20 @@ class _StartInspectionState extends State<StartInspection> {
 
                                 final imagePath = imagePaths[index];
                                 return GestureDetector(
-                                  onTap: () => controller!.viewImageFullScreen(imagePath),
+                                  onTap: () => controller!
+                                      .viewImageFullScreen(imagePath),
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12 * 0.9.r),
-                                      border: Border.all(color: Colors.grey[300]!),
+                                      borderRadius:
+                                          BorderRadius.circular(12 * 0.9.r),
+                                      border:
+                                          Border.all(color: Colors.grey[300]!),
                                     ),
                                     child: Stack(
                                       children: [
                                         ClipRRect(
-                                          borderRadius: BorderRadius.circular(12 * 0.9.r),
+                                          borderRadius:
+                                              BorderRadius.circular(12 * 0.9.r),
                                           child: Image.file(
                                             File(imagePath),
                                             fit: BoxFit.cover,
@@ -487,12 +504,17 @@ class _StartInspectionState extends State<StartInspection> {
                                           top: 4 * 0.9.h,
                                           right: 4 * 0.9.w,
                                           child: GestureDetector(
-                                            onTap: () => controller!.removeImage(index),
+                                            onTap: () =>
+                                                controller!.removeImage(index),
                                             child: Container(
-                                              padding: EdgeInsets.all(4 * 0.9.r),
+                                              padding:
+                                                  EdgeInsets.all(4 * 0.9.r),
                                               decoration: BoxDecoration(
-                                                color: Colors.red.withOpacity(0.8),
-                                                borderRadius: BorderRadius.circular(12 * 0.9.r),
+                                                color:
+                                                    Colors.red.withOpacity(0.8),
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        12 * 0.9.r),
                                               ),
                                               child: Icon(
                                                 Icons.close,
@@ -508,8 +530,11 @@ class _StartInspectionState extends State<StartInspection> {
                                           child: Container(
                                             padding: EdgeInsets.all(4 * 0.9.r),
                                             decoration: BoxDecoration(
-                                              color: Colors.black.withOpacity(0.6),
-                                              borderRadius: BorderRadius.circular(12 * 0.9.r),
+                                              color:
+                                                  Colors.black.withOpacity(0.6),
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      12 * 0.9.r),
                                             ),
                                             child: Icon(
                                               Icons.zoom_in,
@@ -535,8 +560,10 @@ class _StartInspectionState extends State<StartInspection> {
                         decoration: InputDecoration(
                           labelText: 'Inspector Review *',
                           hintText: 'Describe inspection findings...',
-                          hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14 * 0.9.sp),
-                          prefixIcon: Icon(Icons.rate_review, size: 20 * 0.9.sp),
+                          hintStyle: TextStyle(
+                              color: Colors.grey[400], fontSize: 14 * 0.9.sp),
+                          prefixIcon:
+                              Icon(Icons.rate_review, size: 20 * 0.9.sp),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12 * 0.9.r),
                           ),
@@ -560,7 +587,8 @@ class _StartInspectionState extends State<StartInspection> {
                         decoration: InputDecoration(
                           labelText: 'Client Review (Optional)',
                           hintText: 'Add client feedback...',
-                          hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14 * 0.9.sp),
+                          hintStyle: TextStyle(
+                              color: Colors.grey[400], fontSize: 14 * 0.9.sp),
                           prefixIcon: Icon(Icons.comment, size: 20 * 0.9.sp),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12 * 0.9.r),
@@ -579,29 +607,30 @@ class _StartInspectionState extends State<StartInspection> {
                         width: double.infinity,
                         height: 50 * 0.9.h,
                         child: Obx(() => ElevatedButton(
-                          onPressed: controller!.isSubmitting.value
-                              ? null
-                              : () => controller!.updateInspectionReport(),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12 * 0.9.r),
-                            ),
-                            disabledBackgroundColor: Colors.grey,
-                          ),
-                          child: controller!.isSubmitting.value
-                              ? const CircularProgressIndicator(color: Colors.white)
-                              : Text(
-                            'Submit Inspection Report',
-                            style: TextStyle(
-                              fontSize: 16 * 0.9.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        )),
+                              onPressed: controller!.isSubmitting.value
+                                  ? null
+                                  : () => controller!.updateInspectionReport(),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.black,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(12 * 0.9.r),
+                                ),
+                                disabledBackgroundColor: Colors.grey,
+                              ),
+                              child: controller!.isSubmitting.value
+                                  ? const CircularProgressIndicator(
+                                      color: Colors.white)
+                                  : Text(
+                                      'Submit Inspection Report',
+                                      style: TextStyle(
+                                        fontSize: 16 * 0.9.sp,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                            )),
                       ),
-
                       SizedBox(height: 24 * 0.9.h),
                     ],
                   ),
@@ -614,4 +643,3 @@ class _StartInspectionState extends State<StartInspection> {
     );
   }
 }
-

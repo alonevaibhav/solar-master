@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solar_app/View/Inspector/plant_inspection_view.dart';

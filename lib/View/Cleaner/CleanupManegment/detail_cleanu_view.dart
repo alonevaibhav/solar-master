@@ -20,7 +20,8 @@ class DetailsViewTask extends StatelessWidget {
                 padding: EdgeInsets.all(7.2.w), // Reduced from 8.w
                 decoration: BoxDecoration(
                   color: Colors.blue.shade500,
-                  borderRadius: BorderRadius.circular(7.2.r), // Reduced from 8.r
+                  borderRadius:
+                      BorderRadius.circular(7.2.r), // Reduced from 8.r
                 ),
                 child: Icon(
                   Icons.arrow_back,
@@ -269,13 +270,18 @@ class DetailsViewTask extends StatelessWidget {
               Obx(() {
                 final status = controller.taskStatus.value;
                 return Container(
-                  padding: EdgeInsets.symmetric(horizontal: 7.2.w, vertical: 1.8.h), // Reduced from 8.w and 2.h
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 7.2.w,
+                      vertical: 1.8.h), // Reduced from 8.w and 2.h
                   decoration: BoxDecoration(
                     color: controller.getStatusColor(status).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(7.2.r), // Reduced from 8.r
+                    borderRadius:
+                        BorderRadius.circular(7.2.r), // Reduced from 8.r
                   ),
                   child: Text(
-                    status == 'pending' ? 'Cleaning Pending' : status.toUpperCase(),
+                    status == 'pending'
+                        ? 'Cleaning Pending'
+                        : status.toUpperCase(),
                     style: TextStyle(
                       color: controller.getStatusColor(status),
                       fontSize: 10.8.sp, // Reduced from 12.sp
@@ -377,7 +383,8 @@ class DetailsViewTask extends StatelessWidget {
                 padding: EdgeInsets.all(14.4.w), // Reduced from 16.w
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(10.8.r), // Reduced from 12.r
+                  borderRadius:
+                      BorderRadius.circular(10.8.r), // Reduced from 12.r
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.05),
@@ -401,15 +408,17 @@ class DetailsViewTask extends StatelessWidget {
                       width: 21.6.w, // Reduced from 24.w
                       height: 21.6.h, // Reduced from 24.h
                       decoration: BoxDecoration(
-                        color: isCompleted ? Colors.green.shade400 : Colors.grey.shade300,
+                        color: isCompleted
+                            ? Colors.green.shade400
+                            : Colors.grey.shade300,
                         shape: BoxShape.circle,
                       ),
                       child: isCompleted
                           ? Icon(
-                        Icons.check,
-                        color: Colors.white,
-                        size: 14.4.w, // Reduced from 16.w
-                      )
+                              Icons.check,
+                              color: Colors.white,
+                              size: 14.4.w, // Reduced from 16.w
+                            )
                           : null,
                     ),
                   ],
@@ -465,21 +474,21 @@ class DetailsViewTask extends StatelessWidget {
           ),
           child: controller.isMaintenanceModeLoading.value
               ? SizedBox(
-            width: 18.w, // Reduced from 20.w
-            height: 18.h, // Reduced from 20.h
-            child: CircularProgressIndicator(
-              color: Colors.white,
-              strokeWidth: 2,
-            ),
-          )
+                  width: 18.w, // Reduced from 20.w
+                  height: 18.h, // Reduced from 20.h
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                )
               : Text(
-            controller.maintenanceButtonText,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 14.4.sp, // Reduced from 16.sp
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+                  controller.maintenanceButtonText,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14.4.sp, // Reduced from 16.sp
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
         ),
       );
     });

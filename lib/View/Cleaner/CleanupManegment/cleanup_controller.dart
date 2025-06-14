@@ -1,8 +1,8 @@
-
-
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import '../../../API Service/api_service.dart';
 import '../../../Route Manager/app_routes.dart';
+import '../../../utils/constants.dart';
 
 class CleaningManagementController extends GetxController {
   // Reactive variables for API data
@@ -34,7 +34,7 @@ class CleaningManagementController extends GetxController {
   List<Map<String, dynamic>> get ongoingCleanups {
     if (todaysSchedules.value == null) return [];
     return todaysSchedules.value!.where((schedule) =>
-    reportData.value?['status'] == 'ongoing'
+    reportData.value?['status'] == 'cleaning'
     ).toList();
   }
 
@@ -67,60 +67,42 @@ class CleaningManagementController extends GetxController {
     fetchTodaysSchedules();
   }
 
+
+
+
   Future<void> fetchTodaysSchedules() async {
     try {
       isLoading.value = true;
       errorMessage.value = '';
 
+      // Retrieve inspectorId from SharedPreferences
+      final inspectorId = await ApiService.getUid();
+
+      if (inspectorId == null) {
+        throw Exception('Inspector ID not found');
+      }
+
       await Future.delayed(const Duration(seconds: 1));
 
-      final response = {
-        "message": "Today's cleaner schedules retrieved successfully",
-        "success": true,
-        "data": [
-          {
-            "id": 2,
-            "cleaner_id": 3,
-            "inspector_id": 8,
-            "plant_id": 25,
-            "week": "2",
-            "day": "sa",
-            "schedule_date": null,
-            "cleaning_start_time": "08:00:00",
-            "inspection_time": "10:00:00",
-            "assignedBy": null,
-            "duration": 120,
-            "notes": "",
-            "isActive": 1,
-            "cleaner_name": "Alice Smith",
-            "inspector_name": "John Doe",
-            "plant_user_id": 3,
-            "plant_dist_id": 28,
-            "plant_taluka_id": 13,
-            "plant_area_id": 4,
-            "plant_total_panels": 32,
-            "plant_capacity_w": 5.5,
-            "plant_location": "Building A, Floor 1",
-            "plant_latlng": null,
-            "plant_isActive": 0,
-            "plant_isDeleted": 0,
-            "plant_under_maintenance": 0,
-            "plant_info": "",
-            "distributor_name": null,
-            "taluka_name": "Pune City",
-            "area_name": "Baner"
+      // Make GET request using ApiService
+      final response = await ApiService.get<List<dynamic>>(
+        endpoint: getTodayScheduleCleaner(int.parse(inspectorId)),
+        fromJson: (json) {
+          if (json['success'] == true) {
+            return List<dynamic>.from(json['data'] ?? []);
+          } else {
+            throw Exception('Failed to load schedules');
           }
-        ],
-        "errors": []
-      };
+        },
+      );
 
-      if (response['success'] == true) {
-        todaysSchedules.value = List<Map<String, dynamic>>.from(response['data'] as Iterable<dynamic>);
+      if (response.success && response.data != null) {
+        todaysSchedules.value = List<Map<String, dynamic>>.from(response.data!);
         if (todaysSchedules.value!.isNotEmpty) {
           await fetchReportData(todaysSchedules.value!.first['id']);
         }
       } else {
-        throw Exception(response['message'] ?? 'Failed to fetch schedules');
+        throw Exception(response.errorMessage ?? 'Failed to fetch schedules');
       }
     } catch (e) {
       errorMessage.value = e.toString();
@@ -135,6 +117,7 @@ class CleaningManagementController extends GetxController {
       isLoading.value = false;
     }
   }
+
 
   Future<void> fetchTaskDetails(int scheduleId) async {
     try {
@@ -164,41 +147,37 @@ class CleaningManagementController extends GetxController {
     }
   }
 
+  int? _currentReportId;
+
+
   Future<void> fetchReportData(int scheduleId) async {
     try {
-      await Future.delayed(const Duration(milliseconds: 500));
+      String endpoint = getTodayReport(scheduleId);
 
-      final response = {
-        "message": "Report fetched successfully",
-        "success": true,
-        "data": {
-          "id": 32,
-          "schedule_id": scheduleId,
-          "plant_id": 25,
-          "date": "2023-10-13T18:30:00.000Z",
-          "time": "05:08:45",
-          "cleaning_date": "2023-10-13T18:30:00.000Z",
-          "cleaning_time": "05:08:45",
-          "status": "pending",
-          "inspected_by": 8,
-          "inspector_schedule": null,
-          "createdAt": "2023-10-14T05:08:45.000Z",
-          "updatedAt": "2023-10-14T05:08:45.000Z",
-          "inspector_review": null,
-          "client_review": null,
-          "ratings": null
+      final response = await ApiService.get<Map<String, dynamic>>(
+        endpoint: endpoint,
+        fromJson: (json) {
+          if (json['success'] == true) {
+            return json['data'] as Map<String, dynamic>;
+          } else {
+            throw Exception('Failed to load report');
+          }
         },
-        "errors": []
-      };
+      );
 
-      if (response['success'] == true) {
-        reportData.value = response['data'] as Map<String, dynamic>;
+      if (response.success && response.data != null) {
+        reportData.value = response.data!;
         taskStatus.value = reportData.value?['status'] ?? 'pending';
+        _currentReportId = reportData.value?['id'];
+
+      } else {
+        throw Exception(response.errorMessage ?? 'Failed to fetch report data');
       }
     } catch (e) {
       errorMessage.value = e.toString();
     }
   }
+
 
   Future<void> updateTaskStatus(String newStatus) async {
     try {
@@ -234,34 +213,200 @@ class CleaningManagementController extends GetxController {
     }
   }
 
-  Future<void> enableMaintenanceMode() async {
+  // Add this method to show completion dialog
+  void _showCompletionDialog() {
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        title: Text(
+          'Complete Cleaning Task',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        content: Text(
+          'How would you like to mark this cleaning task?',
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey.shade600,
+          ),
+        ),
+        actions: [
+          // Cancel Button
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontSize: 14,
+              ),
+            ),
+          ),
+
+          // Failed Button
+          TextButton(
+            onPressed: () {
+              Get.back();
+              _updateTaskStatusToFinal('failed');
+            },
+            style: TextButton.styleFrom(
+              backgroundColor: Colors.red.shade50,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              'Failed',
+              style: TextStyle(
+                color: Colors.red.shade600,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+
+          // Completed Button
+          ElevatedButton(
+            onPressed: () {
+              Get.back();
+              _updateTaskStatusToFinal('done');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green.shade500,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              'Completed',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+      barrierDismissible: false,
+    );
+  }
+
+// Add this helper method to handle the final status update
+  Future<void> _updateTaskStatusToFinal(String finalStatus) async {
     try {
       isMaintenanceModeLoading.value = true;
 
-      if (taskStatus.value == 'pending') {
-        await updateTaskStatus('ongoing');
-        isMaintenanceModeEnabled.value = true;
+      if (_currentReportId == null) {
+        throw Exception('Report ID not found');
+      }
+
+      // Make PUT API call
+      final response = await ApiService.put<Map<String, dynamic>>(
+        endpoint: putTodayReport(_currentReportId!),
+        body: {
+          'status': finalStatus,
+        },
+        fromJson: (json) {
+          if (json['success'] == true) {
+            return json['data'] as Map<String, dynamic>;
+          } else {
+            throw Exception(json['message'] ?? 'Failed to update status');
+          }
+        },
+      );
+
+      if (response.success) {
+        // Refresh data after successful PUT call
+        await fetchReportData(selectedTaskId.value);
+
+        // Show success message based on final status
+        String title = finalStatus == 'done' ? 'Cleaning Completed' : 'Cleaning Failed';
+        String message = finalStatus == 'done'
+            ? 'Task has been completed successfully'
+            : 'Task has been marked as failed';
+        Color backgroundColor = finalStatus == 'done' ? Colors.green : Colors.red;
 
         Get.snackbar(
-          'Maintenance Started',
-          'Task is now in progress. ETA: ${maintenanceETA.value} hours',
+          title,
+          message,
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.blue,
+          backgroundColor: backgroundColor,
           colorText: Colors.white,
           duration: const Duration(seconds: 3),
         );
-      } else if (taskStatus.value == 'ongoing') {
-        await updateTaskStatus('done');
-        isMaintenanceModeEnabled.value = false;
-
-        Get.snackbar(
-          'Maintenance Completed',
-          'Task has been completed successfully',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
+      } else {
+        throw Exception(response.errorMessage ?? 'Failed to update status');
       }
+    } catch (e) {
+      errorMessage.value = e.toString();
+      Get.snackbar(
+        'Error',
+        'Failed to update task status: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isMaintenanceModeLoading.value = false;
+    }
+  }
+
+// Updated enableMaintenanceMode method
+  Future<void> enableMaintenanceMode() async {
+    try {
+      if (_currentReportId == null) {
+        throw Exception('Report ID not found');
+      }
+
+      if (taskStatus.value == 'pending') {
+        // Start cleaning - direct API call
+        isMaintenanceModeLoading.value = true;
+
+        final response = await ApiService.put<Map<String, dynamic>>(
+          endpoint: putTodayReport(_currentReportId!),
+          body: {
+            'status': 'cleaning',
+          },
+          fromJson: (json) {
+            if (json['success'] == true) {
+              return json['data'] as Map<String, dynamic>;
+            } else {
+              throw Exception(json['message'] ?? 'Failed to update status');
+            }
+          },
+        );
+
+        if (response.success) {
+          isMaintenanceModeEnabled.value = true;
+          await fetchReportData(selectedTaskId.value);
+
+          Get.snackbar(
+            'Cleaning Started',
+            'Task is now in progress. ETA: ${maintenanceETA.value} hours',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.blue,
+            colorText: Colors.white,
+            duration: const Duration(seconds: 3),
+          );
+        } else {
+          throw Exception(response.errorMessage ?? 'Failed to update status');
+        }
+
+      } else if (taskStatus.value == 'cleaning') {
+        // Show completion dialog for user to choose
+        _showCompletionDialog();
+        return; // Exit early, dialog will handle the rest
+
+      } else {
+        return; // No action needed for completed tasks
+      }
+
     } catch (e) {
       errorMessage.value = e.toString();
       Get.snackbar(
@@ -275,6 +420,82 @@ class CleaningManagementController extends GetxController {
       isMaintenanceModeLoading.value = false;
     }
   }
+
+
+
+
+
+
+
+
+
+
+// 3. Add this method to constants.dart
+  // Future<void> enableMaintenanceMode() async {
+  //   try {
+  //     isMaintenanceModeLoading.value = true;
+  //
+  //     if (_currentReportId == null) {
+  //       throw Exception('Report ID not found');
+  //     }
+  //
+  //     String newStatus;
+  //     if (taskStatus.value == 'pending') {
+  //       newStatus = 'cleaning';
+  //       isMaintenanceModeEnabled.value = true;
+  //     } else if (taskStatus.value == 'cleaning') {  // ✅ Fixed: was 'ongoing', now 'cleaning'
+  //       newStatus = 'done';
+  //       isMaintenanceModeEnabled.value = false;
+  //     } else {
+  //       return; // No action needed for completed tasks
+  //     }
+  //
+  //     // Make PUT API call
+  //     final response = await ApiService.put<Map<String, dynamic>>(
+  //       endpoint: putTodayReport(_currentReportId!),
+  //       body: {
+  //         'status': newStatus,
+  //       },
+  //       fromJson: (json) {
+  //         if (json['success'] == true) {
+  //           return json['data'] as Map<String, dynamic>;
+  //         } else {
+  //           throw Exception(json['message'] ?? 'Failed to update status');
+  //         }
+  //       },
+  //     );
+  //
+  //     if (response.success) {
+  //       // ✅ Refresh data after successful PUT call
+  //       await fetchReportData(selectedTaskId.value);
+  //
+  //       // Show success message
+  //       Get.snackbar(
+  //         newStatus == 'cleaning' ? 'Cleaning Started' : 'Cleaning Completed',
+  //         newStatus == 'cleaning'
+  //             ? 'Task is now in progress. ETA: ${maintenanceETA.value} hours'
+  //             : 'Task has been completed successfully',
+  //         snackPosition: SnackPosition.BOTTOM,
+  //         backgroundColor: newStatus == 'cleaning' ? Colors.blue : Colors.green,  // ✅ Fixed: was checking 'ongoing'
+  //         colorText: Colors.white,
+  //         duration: const Duration(seconds: 3),
+  //       );
+  //     } else {
+  //       throw Exception(response.errorMessage ?? 'Failed to update status');
+  //     }
+  //   } catch (e) {
+  //     errorMessage.value = e.toString();
+  //     Get.snackbar(
+  //       'Error',
+  //       'Failed to update maintenance status: ${e.toString()}',
+  //       snackPosition: SnackPosition.BOTTOM,
+  //       backgroundColor: Colors.red,
+  //       colorText: Colors.white,
+  //     );
+  //   } finally {
+  //     isMaintenanceModeLoading.value = false;
+  //   }
+  // }
 
   void navigateToTaskDetails(Map<String, dynamic> taskData) {
     taskDetails.value = taskData;
@@ -291,7 +512,7 @@ class CleaningManagementController extends GetxController {
     switch (status.toLowerCase()) {
       case 'pending':
         return Colors.orange;
-      case 'ongoing':
+      case 'cleaning':
         return Colors.blue;
       case 'done':
         return Colors.green;
@@ -308,8 +529,8 @@ class CleaningManagementController extends GetxController {
     switch (cardType.toLowerCase()) {
       case 'pending':
         return currentStatus == 'pending' ? Colors.orange.shade400 : Colors.red.shade400;
-      case 'ongoing':
-        return currentStatus == 'ongoing' ? Colors.blue.shade400 : Colors.grey.shade400;
+      case 'cleaning':
+        return currentStatus == 'cleaning' ? Colors.blue.shade400 : Colors.grey.shade400;
       case 'completed':
         return currentStatus == 'done' ? Colors.green.shade400 : Colors.green.shade300;
       default:
@@ -323,7 +544,7 @@ class CleaningManagementController extends GetxController {
 
     if (taskStatus.value == 'done') {
       completed = total;
-    } else if (taskStatus.value == 'ongoing') {
+    } else if (taskStatus.value == 'cleaning') {
       completed = (total * 0.5).round();
     }
 
@@ -343,14 +564,14 @@ class CleaningManagementController extends GetxController {
   }
 
   bool get shouldShowMaintenanceButton {
-    return taskStatus.value == 'pending' || taskStatus.value == 'ongoing';
+    return taskStatus.value == 'pending' || taskStatus.value == 'cleaning';
   }
 
   String get maintenanceButtonText {
     switch (taskStatus.value) {
       case 'pending':
         return 'Start Cleaning';
-      case 'ongoing':
+      case 'cleaning':
         return 'Complete Cleaning (ETA: ${maintenanceETA.value}h)';
       default:
         return 'Task Completed';
@@ -361,7 +582,7 @@ class CleaningManagementController extends GetxController {
     switch (taskStatus.value) {
       case 'pending':
         return Colors.blue.shade500;
-      case 'ongoing':
+      case 'cleaning':
         return Colors.green.shade500;
       default:
         return Colors.grey.shade400;

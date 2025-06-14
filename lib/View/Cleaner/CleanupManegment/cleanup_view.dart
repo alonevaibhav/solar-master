@@ -182,7 +182,7 @@ class CleaningManagementView extends StatelessWidget {
         case 'pending':
           statusColor = Colors.orange;
           break;
-        case 'ongoing':
+        case 'cleaning':
           statusColor = Colors.blue;
           break;
         case 'done':
@@ -281,7 +281,7 @@ class CleaningManagementView extends StatelessWidget {
           statusBadgeColor = Colors.orange.shade100;
           borderColor = Colors.orange.shade200;
           break;
-        case 'ongoing':
+        case 'cleaning':
           cardBackgroundColor = Colors.blue.shade50;
           statusBadgeColor = Colors.blue.shade100;
           borderColor = Colors.blue.shade200;

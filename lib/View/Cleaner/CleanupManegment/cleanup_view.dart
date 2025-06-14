@@ -422,26 +422,6 @@ class CleaningManagementView extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (status == 'cleaning')
-                  Positioned(
-                    bottom: 8,
-                    right: 8,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      child: Obx(() => Text(
-                        controller.formattedETA,
-                        style: TextStyle(
-                          color: Colors.blue.shade600,
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )),
-                    ),
-                  ),
               ],
             ),
           ),

@@ -13,6 +13,9 @@ String getCleanerPlantsInfoUrl(int inspectorId) => "/api/plant/cleaner/$inspecto
 
 String getTodayScheduleCleaner(int inspectorId) => "/schedules/cleaner-schedules/today/$inspectorId";
 
+String getTodayReport(int scheduleId) => "/api/report/cleaner-reports/cleaner/schedule/$scheduleId";
+
+String putTodayReport(int reportId) => "/api/report/cleaner-reports/cleaner/$reportId";
 
 
 /// ** INSPECTOR URLs ***

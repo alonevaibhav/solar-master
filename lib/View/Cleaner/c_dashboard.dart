@@ -7,6 +7,8 @@ import '../../Component/Cleaner/today_inspections_view.dart';
 import '../../Controller/Cleaner/profile_controller.dart';
 import '../../Controller/Cleaner/today_inspections_controller.dart';
 import '../../utils/exit.dart';
+import 'CleanupManegment/cleanup_view.dart';
+import 'CleanupManegment/cleanup_controller.dart';
 import 'cleaner_bottom_nevigation.dart';
 
 class CleanerDashboardView extends StatefulWidget {
@@ -62,11 +64,13 @@ class CleanerHomeTab extends StatelessWidget {
   Widget build(BuildContext context) {
 
     // final TodayInspectionsController controller = Get.put(TodayInspectionsController());
-    final CleanupScheduleController controller = Get.put(CleanupScheduleController());
+    // final CleanupScheduleController controller = Get.put(CleanupScheduleController());
+    final CleaningManagementController controller = Get.put(CleaningManagementController());
 
     return Scaffold(
       // body: TodayInspectionsView(),
-      body: CleanupScheduleView(),
+      // body: CleanupScheduleView(),
+      body: CleaningManagementView(),
     );
   }
 }

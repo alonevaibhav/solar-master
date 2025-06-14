@@ -69,7 +69,7 @@ class TaskDetailsView extends StatelessWidget {
             children: [
               _buildStatusHeader(taskData, status, eta, controller),
               SizedBox(height: 16 * 0.9.h),
-              _buildOwnerInfoCard(taskData),
+              // _buildOwnerInfoCard(taskData),
               SizedBox(height: 16 * 0.9.h),
               _buildPlantDetailsCard(taskData, status),
               SizedBox(height: 16 * 0.9.h),
@@ -427,7 +427,6 @@ class TaskDetailsView extends StatelessWidget {
   }
 
   Widget _buildBottomButton(CleanupScheduleController controller, Map<String, dynamic> taskData, String status, int? eta) {
-    final taskId = taskData['id'] as int;
 
     if (status == 'ongoing' && eta != null) {
       return Container(
@@ -459,7 +458,7 @@ class TaskDetailsView extends StatelessWidget {
                   ),
                   const Spacer(),
                   GestureDetector(
-                    onTap: () => controller.completeTask(taskId),
+                    // onTap: () => controller.completeTask(taskId),
                     child: Container(
                       padding: EdgeInsets.all(8 * 0.9.w),
                       decoration: BoxDecoration(
@@ -491,7 +490,8 @@ class TaskDetailsView extends StatelessWidget {
         child: SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: () => controller.startTask(taskId),
+            // onPressed: () => controller.startTask(taskId),
+            onPressed: () => null,
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.black,
               padding: EdgeInsets.symmetric(vertical: 16 * 0.9.h),

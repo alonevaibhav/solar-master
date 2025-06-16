@@ -9,8 +9,7 @@ import '../../utils/constants.dart';
 import 'all_inspection_controller.dart';
 
 class PlantInspectionController extends GetxController {
-  final AllInspectionsController allInspectionsController =
-      Get.put(AllInspectionsController());
+  final AllInspectionsController allInspectionsController = Get.put(AllInspectionsController());
 
   final isLoadingDashboard = false.obs;
   final errorMessageDashboard = Rxn<String>();
@@ -203,8 +202,13 @@ class PlantInspectionController extends GetxController {
     };
   }
 
+// Add this to your controller (PlantInspectionController)
+  final checklistItems = <Map<String, dynamic>>[].obs;
+  final isLoadingChecklist = false.obs;
+
   Future<void> getCheckList() async {
     try {
+      isLoadingChecklist.value = true;
       String? uid = await ApiService.getUid();
 
       if (uid == null) {
@@ -212,20 +216,29 @@ class PlantInspectionController extends GetxController {
         return;
       }
 
-      // Make the GET API call using ApiService
-      final response = await ApiService.get<dynamic>(
-        endpoint: getInspectorCheckList((int.parse(uid))),
-        fromJson: (json) => json,
+      final response = await ApiService.get<Map<String, dynamic>>(
+        endpoint: getInspectorCheckList(int.parse(uid)),
+        fromJson: (json) => json as Map<String, dynamic>,
       );
 
-      if (response.success == true) {
-        print('Checklist fetched successfully: ${response.data}');
-        // Handle the checklist data as needed
+      if (response.success == true && response.data != null) {
+        final data = response.data!['data'] as List<dynamic>;
+        checklistItems.value = data.map((item) => Map<String, dynamic>.from(item as Map)).toList();
+        print('Checklist loaded: ${checklistItems.length} items');
       } else {
         print('Failed to fetch checklist: ${response.errorMessage}');
       }
     } catch (e) {
       print('An error occurred while fetching the checklist: $e');
+    } finally {
+      isLoadingChecklist.value = false;
+    }
+  }
+
+  void toggleChecklistItem(int index) {
+    if (index >= 0 && index < checklistItems.length) {
+      checklistItems[index]['completed'] = checklistItems[index]['completed'] == 1 ? 0 : 1;
+      checklistItems.refresh();
     }
   }
 

@@ -327,6 +327,11 @@ class _StartInspectionState extends State<StartInspection> {
                             },
                           )),
                       SizedBox(height: 16 * 0.9.h),
+
+                      buildChecklistSection(controller!),
+
+                      //------------I Need Checklist Here --------------------//
+
                       Text(
                         'Upload Inspection Photos',
                         style: TextStyle(
@@ -641,5 +646,274 @@ class _StartInspectionState extends State<StartInspection> {
         );
       }),
     );
+  }
+
+  // Replace the comment section in your view with this widget:
+  Widget buildChecklistSection(
+      PlantInspectionController plantInspectionController) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              'Inspection Checklist',
+              style: TextStyle(
+                fontSize: 18 * 0.9.sp,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Spacer(),
+            Obx(() => Text(
+                  '${plantInspectionController.checklistItems.where((item) => item['completed'] == 1).length}/${plantInspectionController.checklistItems.length} Complete',
+                  style: TextStyle(
+                    fontSize: 14 * 0.9.sp,
+                    color: Colors.blue,
+                    fontWeight: FontWeight.w500,
+                  ),
+                )),
+          ],
+        ),
+        SizedBox(height: 12 * 0.9.h),
+        Obx(() {
+          if (plantInspectionController.isLoadingChecklist.value) {
+            return Container(
+              height: 100 * 0.9.h,
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          if (plantInspectionController.checklistItems.isEmpty) {
+            return Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(20 * 0.9.r),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(12 * 0.9.r),
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.checklist_outlined,
+                    size: 48 * 0.9.r,
+                    color: Colors.grey[400],
+                  ),
+                  SizedBox(height: 8 * 0.9.h),
+                  Text(
+                    'No Checklist Items',
+                    style: TextStyle(
+                      fontSize: 16 * 0.9.sp,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Text(
+                    'Checklist items will appear here',
+                    style: TextStyle(
+                      fontSize: 12 * 0.9.sp,
+                      color: Colors.grey[500],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12 * 0.9.r),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 8 * 0.9.r,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                // Progress Bar
+                Container(
+                  margin: EdgeInsets.all(16 * 0.9.r),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Progress',
+                            style: TextStyle(
+                              fontSize: 12 * 0.9.sp,
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Text(
+                            '${((plantInspectionController.checklistItems.where((item) => item['completed'] == 1).length / plantInspectionController.checklistItems.length) * 100).toInt()}%',
+                            style: TextStyle(
+                              fontSize: 12 * 0.9.sp,
+                              color: Colors.blue,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8 * 0.9.h),
+                      LinearProgressIndicator(
+                        value: plantInspectionController.checklistItems
+                                .where((item) => item['completed'] == 1)
+                                .length /
+                            plantInspectionController.checklistItems.length,
+                        backgroundColor: Colors.grey[200],
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                        minHeight: 6 * 0.9.h,
+                      ),
+                    ],
+                  ),
+                ),
+                Divider(height: 1, color: Colors.grey[200]),
+                // Checklist Items
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: plantInspectionController.checklistItems.length,
+                  separatorBuilder: (context, index) => Divider(
+                    height: 1,
+                    color: Colors.grey[100],
+                    indent: 16 * 0.9.w,
+                    endIndent: 16 * 0.9.w,
+                  ),
+                  itemBuilder: (context, index) {
+                    final item =
+                        plantInspectionController.checklistItems[index];
+                    final isCompleted = item['completed'] == 1;
+
+                    return InkWell(
+                      onTap: () =>
+                          plantInspectionController.toggleChecklistItem(index),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16 * 0.9.w,
+                          vertical: 12 * 0.9.h,
+                        ),
+                        child: Row(
+                          children: [
+                            // Custom Checkbox
+                            AnimatedContainer(
+                              duration: Duration(milliseconds: 200),
+                              width: 24 * 0.9.w,
+                              height: 24 * 0.9.h,
+                              decoration: BoxDecoration(
+                                color: isCompleted
+                                    ? Colors.blue
+                                    : Colors.transparent,
+                                border: Border.all(
+                                  color: isCompleted
+                                      ? Colors.blue
+                                      : Colors.grey[400]!,
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.circular(4 * 0.9.r),
+                              ),
+                              child: isCompleted
+                                  ? Icon(
+                                      Icons.check,
+                                      size: 16 * 0.9.r,
+                                      color: Colors.white,
+                                    )
+                                  : null,
+                            ),
+                            SizedBox(width: 12 * 0.9.w),
+
+                            // Item Details
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item['item_name'] ?? 'Unknown Item',
+                                    style: TextStyle(
+                                      fontSize: 15 * 0.9.sp,
+                                      fontWeight: FontWeight.w500,
+                                      color: isCompleted
+                                          ? Colors.grey[600]
+                                          : Colors.black87,
+                                      decoration: isCompleted
+                                          ? TextDecoration.lineThrough
+                                          : null,
+                                    ),
+                                  ),
+                                  if (item['info'] != null) ...[
+                                    SizedBox(height: 2 * 0.9.h),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 8 * 0.9.w,
+                                        vertical: 2 * 0.9.h,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: _getTypeColor(item['info'])
+                                            .withOpacity(0.1),
+                                        borderRadius:
+                                            BorderRadius.circular(12 * 0.9.r),
+                                        border: Border.all(
+                                          color: _getTypeColor(item['info'])
+                                              .withOpacity(0.3),
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        item['info'],
+                                        style: TextStyle(
+                                          fontSize: 10 * 0.9.sp,
+                                          color: _getTypeColor(item['type']),
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+
+                            // Status Indicator
+                            Container(
+                              width: 8 * 0.9.w,
+                              height: 8 * 0.9.h,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: isCompleted
+                                    ? Colors.green
+                                    : Colors.grey[300],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          );
+        }),
+        SizedBox(height: 24 * 0.9.h),
+      ],
+    );
+  }
+
+// Helper method for type colors
+  Color _getTypeColor(String type) {
+    switch (type.toLowerCase()) {
+      case ' a':
+        return Colors.blue;
+      case ' b':
+        return Colors.green;
+      case 'd':
+        return Colors.orange;
+      default:
+        return Colors.blue;
+    }
   }
 }

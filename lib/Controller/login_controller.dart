@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../API Service/api_service.dart';
 import '../Model/login_model.dart';
 import '../Route Manager/app_routes.dart';
-import '../View/Auth/token_manager.dart';
+import '../utils/token_manager.dart';
 import '../utils/constants.dart';
 
 class LoginController extends GetxController {

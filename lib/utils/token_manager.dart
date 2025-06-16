@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../Controller/login_controller.dart';
-import '../../Route Manager/app_routes.dart';
+import '../Controller/login_controller.dart';
+import '../Route Manager/app_routes.dart';
 
 class TokenManager {
   static const String _tokenKey = 'user_token';

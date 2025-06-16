@@ -7,7 +7,7 @@ import 'Route Manager/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'View/Auth/token_manager.dart';
+import 'utils/token_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

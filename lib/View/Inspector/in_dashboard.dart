@@ -30,7 +30,6 @@ class _InDashboardState extends State<InDashboard> {
     const InspectorProfileTab(),
   ];
 
-
   @override
   Widget build(BuildContext context) {
     return DoubleBackToExit(
@@ -59,7 +58,7 @@ class InspectorReportsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AreaInspectionController controller =
-    Get.put(AreaInspectionController());
+        Get.put(AreaInspectionController());
 
     return Scaffold(
       body: AreaInspectionView(),
@@ -87,7 +86,8 @@ class InspectorHomeTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PlantInspectionController controller = Get.put(PlantInspectionController());
+    final PlantInspectionController controller =
+        Get.put(PlantInspectionController());
     // final ShimmerController controller = Get.put(ShimmerController());
     return Scaffold(
       body: PlantInspectionView(),
@@ -106,8 +106,8 @@ class InspectorAlertsTab extends StatelessWidget {
     return Scaffold(
         body:
 
-        // AlertsView()
-        ScheduleContentView());
+            // AlertsView()
+            ScheduleContentView());
   }
 }
 

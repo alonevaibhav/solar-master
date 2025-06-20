@@ -1,5 +1,7 @@
 // import 'package:get/get.dart';
 // import 'package:flutter/material.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
+// import 'dart:async';
 // import '../../../API Service/api_service.dart';
 // import '../../../Route Manager/app_routes.dart';
 // import '../../../utils/constants.dart';
@@ -17,16 +19,31 @@
 //
 //   final taskStatus = ''.obs;
 //   final maintenanceETA = 120.obs; // Default 120 minutes
+//   final remainingETA = 0.obs; // Remaining ETA in seconds
 //   final isMaintenanceModeEnabled = false.obs;
+//   final isETAActive = false.obs;
+//
+//   // Timer and SharedPreferences
+//   Timer? _etaTimer;
+//   SharedPreferences? _prefs;
+//
+//   // SharedPreferences keys
+//   static const String _etaStartTimeKey = 'eta_start_time';
+//   static const String _etaDurationKey = 'eta_duration';
+//   static const String _taskIdKey = 'current_task_id';
+//   static const String _etaActiveKey = 'eta_active';
 //
 //   // 1. FILTER METHODS - These should return correct counts based on API response
 //   List<Map<String, dynamic>> get pendingCleanups {
 //     if (todaysSchedules.value == null) return [];
-//     print('All schedules: ${todaysSchedules.value?.map((s) => {'id': s['id'], 'status': s['status']}).toList()}');
+//     print('All schedules: ${todaysSchedules.value?.map((s) => {
+//           'id': s['id'],
+//           'status': s['status']
+//         }).toList()}');
 //
-//     final pending = todaysSchedules.value!.where((schedule) =>
-//     schedule['status'] == 'pending'
-//     ).toList();
+//     final pending = todaysSchedules.value!
+//         .where((schedule) => schedule['status'] == 'pending')
+//         .toList();
 //
 //     print('Pending cleanups: ${pending.length} items');
 //     return pending;
@@ -35,9 +52,9 @@
 //   List<Map<String, dynamic>> get ongoingCleanups {
 //     if (todaysSchedules.value == null) return [];
 //
-//     final ongoing = todaysSchedules.value!.where((schedule) =>
-//     schedule['status'] == 'cleaning'
-//     ).toList();
+//     final ongoing = todaysSchedules.value!
+//         .where((schedule) => schedule['status'] == 'cleaning')
+//         .toList();
 //
 //     print('Ongoing cleanups: ${ongoing.length} items');
 //     return ongoing;
@@ -46,9 +63,9 @@
 //   List<Map<String, dynamic>> get completedCleanups {
 //     if (todaysSchedules.value == null) return [];
 //
-//     final completed = todaysSchedules.value!.where((schedule) =>
-//     schedule['status'] == 'done'
-//     ).toList();
+//     final completed = todaysSchedules.value!
+//         .where((schedule) => schedule['status'] == 'done')
+//         .toList();
 //
 //     print('Completed cleanups: ${completed.length} items');
 //     return completed;
@@ -73,7 +90,114 @@
 //   @override
 //   void onInit() {
 //     super.onInit();
+//     _initSharedPreferences();
 //     fetchTodaysSchedules();
+//   }
+//
+//   @override
+//   void onClose() {
+//     _etaTimer?.cancel();
+//     super.onClose();
+//   }
+//
+//   // Initialize SharedPreferences
+//   Future<void> _initSharedPreferences() async {
+//     _prefs = await SharedPreferences.getInstance();
+//     await _restoreETAState();
+//   }
+//
+//   // Restore ETA state when app reopens
+//   Future<void> _restoreETAState() async {
+//     if (_prefs == null) return;
+//
+//     final isActive = _prefs!.getBool(_etaActiveKey) ?? false;
+//     final savedTaskId = _prefs!.getInt(_taskIdKey) ?? 0;
+//     final startTime = _prefs!.getInt(_etaStartTimeKey) ?? 0;
+//     final duration = _prefs!.getInt(_etaDurationKey) ?? 0;
+//
+//     if (isActive && savedTaskId > 0 && startTime > 0) {
+//       final currentTime = DateTime.now().millisecondsSinceEpoch;
+//       final elapsedSeconds = ((currentTime - startTime) / 1000).floor();
+//       final remainingSeconds = (duration * 60) - elapsedSeconds;
+//
+//       if (remainingSeconds > 0) {
+//         selectedTaskId.value = savedTaskId;
+//         remainingETA.value = remainingSeconds;
+//         isETAActive.value = true;
+//         isMaintenanceModeEnabled.value = true;
+//         taskStatus.value = 'cleaning';
+//         _startETATimer();
+//       } else {
+//         // ETA expired, clean up
+//         await _clearETAData();
+//       }
+//     }
+//   }
+//
+//   // Start ETA timer
+//   void _startETATimer() {
+//     _etaTimer?.cancel();
+//
+//     _etaTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+//       if (remainingETA.value > 0) {
+//         remainingETA.value--;
+//       } else {
+//         // ETA completed
+//         timer.cancel();
+//         _onETACompleted();
+//       }
+//     });
+//   }
+//
+//   // Handle ETA completion
+//   void _onETACompleted() async {
+//     isETAActive.value = false;
+//     await _clearETAData();
+//
+//     // Show completion notification
+//     Get.snackbar(
+//       'ETA Completed',
+//       'Estimated cleaning time has finished. Please complete the task.',
+//       snackPosition: SnackPosition.TOP,
+//       backgroundColor: Colors.orange,
+//       colorText: Colors.white,
+//       duration: const Duration(seconds: 5),
+//     );
+//   }
+//
+//   // Save ETA data
+//   Future<void> _saveETAState() async {
+//     if (_prefs == null) return;
+//
+//     await _prefs!
+//         .setInt(_etaStartTimeKey, DateTime.now().millisecondsSinceEpoch);
+//     await _prefs!.setInt(_etaDurationKey, maintenanceETA.value);
+//     await _prefs!.setInt(_taskIdKey, selectedTaskId.value);
+//     await _prefs!.setBool(_etaActiveKey, true);
+//   }
+//
+//   // Clear ETA data
+//   Future<void> _clearETAData() async {
+//     if (_prefs == null) return;
+//
+//     await _prefs!.remove(_etaStartTimeKey);
+//     await _prefs!.remove(_etaDurationKey);
+//     await _prefs!.remove(_taskIdKey);
+//     await _prefs!.setBool(_etaActiveKey, false);
+//
+//     isETAActive.value = false;
+//     remainingETA.value = 0;
+//   }
+//
+//   // Format time for display
+//   String get formattedRemainingTime {
+//     if (remainingETA.value <= 0) return "00:00:00";
+//
+//     final hours = (remainingETA.value / 3600).floor();
+//     final minutes = ((remainingETA.value % 3600) / 60).floor();
+//     final seconds = remainingETA.value % 60;
+//
+//     return "${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}";
 //   }
 //
 //   RxInt currentScheduleId = 0.obs;
@@ -106,18 +230,16 @@
 //         todaysSchedules.value = List<Map<String, dynamic>>.from(response.data!);
 //         if (todaysSchedules.value!.isNotEmpty) {
 //           // Update taskStatus based on selected task if any
+//           final selectedTask = todaysSchedules.value!.firstWhere(
+//             (schedule) => schedule['id'] == selectedTaskId.value,
+//             orElse: () => <String, dynamic>{},
+//           );
+//           if (selectedTask.isNotEmpty) {
+//             taskStatus.value = selectedTask['status'] ?? 'pending';
+//           }
 //
-//             final selectedTask = todaysSchedules.value!.firstWhere((schedule) => schedule['id'] == selectedTaskId.value,
-//               orElse: () => <String, dynamic>{},
-//             );
-//             if (selectedTask.isNotEmpty) {
-//               taskStatus.value = selectedTask['status'] ?? 'pending';
-//             }
-//
-//             final status = todaysSchedules.value?.first['status'] ?? 'pending';
-//             print('Fetched schedules with status: $status');
-//
-//
+//           final status = todaysSchedules.value?.first['status'] ?? 'pending';
+//           print('Fetched schedules with status: $status');
 //         }
 //       } else {
 //         throw Exception(response.errorMessage ?? 'Failed to fetch schedules');
@@ -142,7 +264,7 @@
 //       selectedTaskId.value = scheduleId;
 //
 //       final taskData = todaysSchedules.value?.firstWhere(
-//             (schedule) => schedule['id'] == scheduleId,
+//         (schedule) => schedule['id'] == scheduleId,
 //         orElse: () => <String, dynamic>{},
 //       );
 //
@@ -187,7 +309,7 @@
 //         reportData.value = response.data!;
 //         // Keep the status from todaysSchedules as primary source
 //         final scheduleStatus = todaysSchedules.value?.firstWhere(
-//               (schedule) => schedule['id'] == scheduleId,
+//           (schedule) => schedule['id'] == scheduleId,
 //           orElse: () => <String, dynamic>{},
 //         )['status'];
 //
@@ -214,7 +336,7 @@
 //       // Update the status in todaysSchedules
 //       if (todaysSchedules.value != null && selectedTaskId.value > 0) {
 //         final scheduleIndex = todaysSchedules.value!.indexWhere(
-//               (schedule) => schedule['id'] == selectedTaskId.value,
+//           (schedule) => schedule['id'] == selectedTaskId.value,
 //         );
 //
 //         if (scheduleIndex != -1) {
@@ -353,10 +475,14 @@
 //       );
 //
 //       if (response.success) {
+//         // Clear ETA when task is completed/failed
+//         _etaTimer?.cancel();
+//         await _clearETAData();
+//
 //         // Update the status in todaysSchedules
 //         if (todaysSchedules.value != null && selectedTaskId.value > 0) {
 //           final scheduleIndex = todaysSchedules.value!.indexWhere(
-//                 (schedule) => schedule['id'] == selectedTaskId.value,
+//             (schedule) => schedule['id'] == selectedTaskId.value,
 //           );
 //
 //           if (scheduleIndex != -1) {
@@ -367,11 +493,13 @@
 //
 //         await fetchReportData(selectedTaskId.value);
 //
-//         String title = finalStatus == 'done' ? 'Cleaning Completed' : 'Cleaning Failed';
+//         String title =
+//             finalStatus == 'done' ? 'Cleaning Completed' : 'Cleaning Failed';
 //         String message = finalStatus == 'done'
 //             ? 'Task has been completed successfully'
 //             : 'Task has been marked as failed';
-//         Color backgroundColor = finalStatus == 'done' ? Colors.green : Colors.red;
+//         Color backgroundColor =
+//             finalStatus == 'done' ? Colors.green : Colors.red;
 //
 //         Get.snackbar(
 //           title,
@@ -423,11 +551,19 @@
 //
 //         if (response.success) {
 //           isMaintenanceModeEnabled.value = true;
+//           isETAActive.value = true;
+//           remainingETA.value = maintenanceETA.value * 60; // Convert to seconds
+//
+//           // Save ETA state
+//           await _saveETAState();
+//
+//           // Start timer
+//           _startETATimer();
 //
 //           // Update the status in todaysSchedules
 //           if (todaysSchedules.value != null && selectedTaskId.value > 0) {
 //             final scheduleIndex = todaysSchedules.value!.indexWhere(
-//                   (schedule) => schedule['id'] == selectedTaskId.value,
+//               (schedule) => schedule['id'] == selectedTaskId.value,
 //             );
 //
 //             if (scheduleIndex != -1) {
@@ -472,7 +608,8 @@
 //   void navigateToTaskDetails(Map<String, dynamic> taskData) {
 //     taskDetails.value = taskData;
 //     selectedTaskId.value = taskData['id'];
-//     taskStatus.value = taskData['status'] ?? 'pending'; // Set status from schedule data
+//     taskStatus.value =
+//         taskData['status'] ?? 'pending'; // Set status from schedule data
 //     fetchReportData(taskData['id']);
 //     Get.toNamed(AppRoutes.clenupDetailsPage);
 //   }
@@ -501,11 +638,17 @@
 //
 //     switch (cardType.toLowerCase()) {
 //       case 'pending':
-//         return currentStatus == 'pending' ? Colors.orange.shade400 : Colors.red.shade400;
+//         return currentStatus == 'pending'
+//             ? Colors.orange.shade400
+//             : Colors.red.shade400;
 //       case 'cleaning':
-//         return currentStatus == 'cleaning' ? Colors.blue.shade400 : Colors.grey.shade400;
+//         return currentStatus == 'cleaning'
+//             ? Colors.blue.shade400
+//             : Colors.grey.shade400;
 //       case 'completed':
-//         return currentStatus == 'done' ? Colors.green.shade400 : Colors.green.shade300;
+//         return currentStatus == 'done'
+//             ? Colors.green.shade400
+//             : Colors.green.shade300;
 //       default:
 //         return Colors.grey.shade400;
 //     }
@@ -541,6 +684,10 @@
 //   }
 //
 //   String get maintenanceButtonText {
+//     if (isETAActive.value) {
+//       return 'Complete Cleaning (${formattedRemainingTime})';
+//     }
+//
 //     switch (taskStatus.value) {
 //       case 'pending':
 //         return 'Start Cleaning';
@@ -577,8 +724,6 @@
 //     }
 //   }
 // }
-//
-//
 
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -618,11 +763,14 @@ class CleaningManagementController extends GetxController {
   // 1. FILTER METHODS - These should return correct counts based on API response
   List<Map<String, dynamic>> get pendingCleanups {
     if (todaysSchedules.value == null) return [];
-    print('All schedules: ${todaysSchedules.value?.map((s) => {'id': s['id'], 'status': s['status']}).toList()}');
+    print('All schedules: ${todaysSchedules.value?.map((s) => {
+      'id': s['id'],
+      'status': s['status']
+    }).toList()}');
 
-    final pending = todaysSchedules.value!.where((schedule) =>
-    schedule['status'] == 'pending'
-    ).toList();
+    final pending = todaysSchedules.value!
+        .where((schedule) => schedule['status'] == 'pending')
+        .toList();
 
     print('Pending cleanups: ${pending.length} items');
     return pending;
@@ -631,9 +779,9 @@ class CleaningManagementController extends GetxController {
   List<Map<String, dynamic>> get ongoingCleanups {
     if (todaysSchedules.value == null) return [];
 
-    final ongoing = todaysSchedules.value!.where((schedule) =>
-    schedule['status'] == 'cleaning'
-    ).toList();
+    final ongoing = todaysSchedules.value!
+        .where((schedule) => schedule['status'] == 'cleaning')
+        .toList();
 
     print('Ongoing cleanups: ${ongoing.length} items');
     return ongoing;
@@ -642,9 +790,9 @@ class CleaningManagementController extends GetxController {
   List<Map<String, dynamic>> get completedCleanups {
     if (todaysSchedules.value == null) return [];
 
-    final completed = todaysSchedules.value!.where((schedule) =>
-    schedule['status'] == 'done'
-    ).toList();
+    final completed = todaysSchedules.value!
+        .where((schedule) => schedule['status'] == 'done')
+        .toList();
 
     print('Completed cleanups: ${completed.length} items');
     return completed;
@@ -686,6 +834,7 @@ class CleaningManagementController extends GetxController {
   }
 
   // Restore ETA state when app reopens
+// Restore ETA state when app reopens
   Future<void> _restoreETAState() async {
     if (_prefs == null) return;
 
@@ -695,23 +844,31 @@ class CleaningManagementController extends GetxController {
     final duration = _prefs!.getInt(_etaDurationKey) ?? 0;
 
     if (isActive && savedTaskId > 0 && startTime > 0) {
-      final currentTime = DateTime.now().millisecondsSinceEpoch;
-      final elapsedSeconds = ((currentTime - startTime) / 1000).floor();
-      final remainingSeconds = (duration * 60) - elapsedSeconds;
+      // Only restore if the saved task matches the current selected task
+      if (savedTaskId == selectedTaskId.value) {
+        final currentTime = DateTime.now().millisecondsSinceEpoch;
+        final elapsedSeconds = ((currentTime - startTime) / 1000).floor();
+        final remainingSeconds = (duration * 60) - elapsedSeconds;
 
-      if (remainingSeconds > 0) {
-        selectedTaskId.value = savedTaskId;
-        remainingETA.value = remainingSeconds;
-        isETAActive.value = true;
-        isMaintenanceModeEnabled.value = true;
-        taskStatus.value = 'cleaning';
-        _startETATimer();
-      } else {
-        // ETA expired, clean up
-        await _clearETAData();
+        if (remainingSeconds > 0) {
+          remainingETA.value = remainingSeconds;
+          isETAActive.value = true;
+          isMaintenanceModeEnabled.value = true;
+          taskStatus.value = 'cleaning';
+          _startETATimer();
+        } else {
+          await _clearETAData();
+        }
       }
     }
   }
+
+  bool get isCurrentTaskETAActive {
+    return isETAActive.value &&
+        _prefs?.getInt(_taskIdKey) == selectedTaskId.value;
+  }
+
+
 
   // Start ETA timer
   void _startETATimer() {
@@ -748,7 +905,8 @@ class CleaningManagementController extends GetxController {
   Future<void> _saveETAState() async {
     if (_prefs == null) return;
 
-    await _prefs!.setInt(_etaStartTimeKey, DateTime.now().millisecondsSinceEpoch);
+    await _prefs!
+        .setInt(_etaStartTimeKey, DateTime.now().millisecondsSinceEpoch);
     await _prefs!.setInt(_etaDurationKey, maintenanceETA.value);
     await _prefs!.setInt(_taskIdKey, selectedTaskId.value);
     await _prefs!.setBool(_etaActiveKey, true);
@@ -777,7 +935,6 @@ class CleaningManagementController extends GetxController {
 
     return "${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}";
   }
-
 
   RxInt currentScheduleId = 0.obs;
 
@@ -809,7 +966,8 @@ class CleaningManagementController extends GetxController {
         todaysSchedules.value = List<Map<String, dynamic>>.from(response.data!);
         if (todaysSchedules.value!.isNotEmpty) {
           // Update taskStatus based on selected task if any
-          final selectedTask = todaysSchedules.value!.firstWhere((schedule) => schedule['id'] == selectedTaskId.value,
+          final selectedTask = todaysSchedules.value!.firstWhere(
+                (schedule) => schedule['id'] == selectedTaskId.value,
             orElse: () => <String, dynamic>{},
           );
           if (selectedTask.isNotEmpty) {
@@ -1071,11 +1229,13 @@ class CleaningManagementController extends GetxController {
 
         await fetchReportData(selectedTaskId.value);
 
-        String title = finalStatus == 'done' ? 'Cleaning Completed' : 'Cleaning Failed';
+        String title =
+        finalStatus == 'done' ? 'Cleaning Completed' : 'Cleaning Failed';
         String message = finalStatus == 'done'
             ? 'Task has been completed successfully'
             : 'Task has been marked as failed';
-        Color backgroundColor = finalStatus == 'done' ? Colors.green : Colors.red;
+        Color backgroundColor =
+        finalStatus == 'done' ? Colors.green : Colors.red;
 
         Get.snackbar(
           title,
@@ -1182,9 +1342,20 @@ class CleaningManagementController extends GetxController {
   }
 
   void navigateToTaskDetails(Map<String, dynamic> taskData) {
+    // Clear ETA if switching to a different task
+    if (selectedTaskId.value != taskData['id'] && isETAActive.value) {
+      _etaTimer?.cancel();
+      isETAActive.value = false;
+      remainingETA.value = 0;
+    }
+
     taskDetails.value = taskData;
     selectedTaskId.value = taskData['id'];
-    taskStatus.value = taskData['status'] ?? 'pending'; // Set status from schedule data
+    taskStatus.value = taskData['status'] ?? 'pending';
+
+    // Restore ETA state for this specific task
+    _restoreETAState();
+
     fetchReportData(taskData['id']);
     Get.toNamed(AppRoutes.clenupDetailsPage);
   }
@@ -1213,11 +1384,17 @@ class CleaningManagementController extends GetxController {
 
     switch (cardType.toLowerCase()) {
       case 'pending':
-        return currentStatus == 'pending' ? Colors.orange.shade400 : Colors.red.shade400;
+        return currentStatus == 'pending'
+            ? Colors.orange.shade400
+            : Colors.red.shade400;
       case 'cleaning':
-        return currentStatus == 'cleaning' ? Colors.blue.shade400 : Colors.grey.shade400;
+        return currentStatus == 'cleaning'
+            ? Colors.blue.shade400
+            : Colors.grey.shade400;
       case 'completed':
-        return currentStatus == 'done' ? Colors.green.shade400 : Colors.green.shade300;
+        return currentStatus == 'done'
+            ? Colors.green.shade400
+            : Colors.green.shade300;
       default:
         return Colors.grey.shade400;
     }
@@ -1293,3 +1470,4 @@ class CleaningManagementController extends GetxController {
     }
   }
 }
+

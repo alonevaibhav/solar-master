@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../API Service/api_service.dart';
+import '../../../../Route Manager/app_routes.dart';
 
 class TicketRaisingController extends GetxController {
   final Map<String, dynamic>? plantData;
@@ -23,31 +24,10 @@ class TicketRaisingController extends GetxController {
 
   final List<String> ticketTypes = ['software', 'hardware', 'accounts'];
   final List<String> priorities = ['1', '2', '3', '4', '5'];
-  final List<String> departments = [
-    'services',
-    'technical',
-    'account'
-  ]; // Department list
-
-  final Map<String, String> priorityLabels = {
-    '1': 'Critical',
-    '2': 'High',
-    '3': 'Medium',
-    '4': 'Low',
-    '5': 'Very Low'
-  };
-
-  final Map<String, String> ticketTypeLabels = {
-    'software': 'Software Issue',
-    'hardware': 'Hardware Issue',
-    'accounts': 'Account Related'
-  };
-
-  final Map<String, String> departmentLabels = {
-    'services': 'Services',
-    'technical': 'Technical',
-    'accounts': 'Accounts'
-  };
+  final List<String> departments = ['services', 'technical', 'account']; // Department list
+  final Map<String, String> priorityLabels = {'1': 'Critical', '2': 'High', '3': 'Medium', '4': 'Low', '5': 'Very Low'};
+  final Map<String, String> ticketTypeLabels = {'software': 'Software Issue', 'hardware': 'Hardware Issue', 'accounts': 'Account Related'};
+  final Map<String, String> departmentLabels = {'services': 'Services', 'technical': 'Technical', 'accounts': 'Accounts'};
 
   final uploadedImagePaths = <String>[].obs;
   final isUploadingImage = false.obs;
@@ -365,18 +345,24 @@ class TicketRaisingController extends GetxController {
         fromJson: (json) => json as Map<String, dynamic>,
       );
 
-      if (response.success ) {
-        Get.snackbar(
-          'Success',
-          'Ticket #${response.data!['id']} has been created successfully',
-          backgroundColor: Colors.green.withOpacity(0.1),
-          colorText: Colors.green,
-          icon: const Icon(Icons.check_circle_outline, color: Colors.green),
-          duration: const Duration(seconds: 3),
-          snackPosition: SnackPosition.BOTTOM,
+      if (response.success == true) {
+        print('Success response: ${response.data}');
+
+        Get.showSnackbar(
+          GetSnackBar(
+            title: 'Success',
+            message: 'Ticket created successfully',
+            backgroundColor: Colors.green,
+            icon: Icon(Icons.check_circle_outline, color: Colors.white),
+            duration: Duration(seconds: 3),
+            snackPosition: SnackPosition.TOP,
+            margin: EdgeInsets.all(16),
+            borderRadius: 8,
+            isDismissible: true,
+          ),
         );
 
-        Get.back(result: response.data);
+        Get.offNamed(AppRoutes.inspectorPlantInfo);
       } else {
         Get.snackbar(
           'Error',

@@ -1,5 +1,3 @@
-
-
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -68,7 +66,8 @@ class LoginController extends GetxController {
 
       if (userName != null) currentUserName.value = userName;
       if (username != null) currentUsername.value = username;
-      if (distributorName != null) currentDistributorName.value = distributorName;
+      if (distributorName != null)
+        currentDistributorName.value = distributorName;
     } catch (e) {
       print('Error loading saved user data: $e');
     }
@@ -193,8 +192,7 @@ class LoginController extends GetxController {
         } else {
           throw Exception(loginResponse.message ?? 'Login failed');
         }
-      } else {
-        throw Exception(response.errorMessage ?? 'Login failed');
+
       }
     } catch (e) {
       String errorMsg = e.toString().replaceAll('Exception: ', '');
@@ -234,8 +232,8 @@ class LoginController extends GetxController {
       await prefs.setString('user_name', loginData.profile.name);
       await prefs.setString('username', loginData.profile.username);
       await prefs.setInt('user_id', loginData.profile.id);
-      await prefs.setString('distributor_name', loginData.profile.distributorName);
-
+      await prefs.setString(
+          'distributor_name', loginData.profile.distributorName);
     } catch (e) {
       print('Error saving user profile data: $e');
     }
@@ -300,7 +298,9 @@ class LoginController extends GetxController {
 
       Get.snackbar(
         sessionExpired ? 'Session Expired' : 'Success',
-        sessionExpired ? 'Your session has expired. Please log in again.' : 'Logged out successfully',
+        sessionExpired
+            ? 'Your session has expired. Please log in again.'
+            : 'Logged out successfully',
         backgroundColor: sessionExpired
             ? Colors.orange.withOpacity(0.1)
             : Colors.green.withOpacity(0.1),

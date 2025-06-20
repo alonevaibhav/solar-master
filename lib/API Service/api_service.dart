@@ -507,13 +507,11 @@ class MultipartFiles {
       case 'doc':
         return MediaType('application', 'msword');
       case 'docx':
-        return MediaType('application',
-            'vnd.openxmlformats-officedocument.wordprocessingml.document');
+        return MediaType('application', 'vnd.openxmlformats-officedocument.wordprocessingml.document');
       case 'xls':
         return MediaType('application', 'vnd.ms-excel');
       case 'xlsx':
-        return MediaType('application',
-            'vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        return MediaType('application', 'vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 
       // Videos
       case 'mp4':

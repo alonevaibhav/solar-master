@@ -18,8 +18,7 @@ void main() async {
   String initialRoute = AppRoutes.login;
 
   try {
-    final hasValidToken =
-        await TokenManager.hasToken() && !await TokenManager.isTokenExpired();
+    final hasValidToken = await TokenManager.hasToken() && !await TokenManager.isTokenExpired();
 
     if (hasValidToken) {
       final role = await TokenManager.getUserRole();

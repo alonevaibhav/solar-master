@@ -126,6 +126,7 @@ class LoginController extends GetxController {
   Future<void> login() async {
     try {
       errorMessage.value = '';
+      print("djfhdjf");
 
       if (!formKey.currentState!.validate()) {
         return;

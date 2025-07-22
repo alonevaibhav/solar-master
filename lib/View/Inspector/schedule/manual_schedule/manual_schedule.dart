@@ -459,7 +459,6 @@
 // }
 
 
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -699,7 +698,7 @@ class ManualSchedule extends StatelessWidget {
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    'Parameters ${50} to ${49 + controller.numberOfBoxes.value} • Tap any cell to edit',
+                    'Parameters ${450} to ${449 + controller.numberOfBoxes.value} • Tap any cell to edit',
                     style: TextStyle(
                       fontSize: 12.sp,
                       color: Colors.grey[600],
@@ -807,9 +806,9 @@ class ManualSchedule extends StatelessWidget {
                 // Build columns in each row
                 for (int col = 0; col < columnsPerRow; col++)
                       () {
-                    final paramIndex = 50 + (row * columnsPerRow) + col;
+                    final paramIndex = 450 + (row * columnsPerRow) + col;
                     // Only show if this parameter index is within the active range
-                    if (paramIndex < 50 + numberOfBoxes) {
+                    if (paramIndex < 450 + numberOfBoxes) {
                       return Expanded(
                         child: Container(
                           margin: EdgeInsets.all(1.w),
@@ -851,15 +850,7 @@ class ManualSchedule extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Box ${paramIndex - 49}',
-                style: TextStyle(
-                  fontSize: 9.sp,
-                  fontWeight: FontWeight.w500,
-                  color: isModified ? Colors.orange[800] : Colors.grey[600],
-                ),
-              ),
-              Text(
-                '($paramIndex)',
+                '$paramIndex',
                 style: TextStyle(
                   fontSize: 8.sp,
                   color: isModified ? Colors.orange[700] : Colors.grey[500],
@@ -900,7 +891,7 @@ class ManualSchedule extends StatelessWidget {
     Get.dialog(
       AlertDialog(
         title: Text(
-          'Edit Box ${paramIndex - 49} (Parameter $paramIndex)',
+          'Edit Box ${paramIndex - 449} (Parameter $paramIndex)',
           style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
         ),
         content: Column(

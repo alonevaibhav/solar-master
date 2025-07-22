@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import '../../../../Controller/Inspector/automatic_controller.dart';
+import '../../../../Controller/Inspector/manual_controller.dart';
 
-class ModbusParametersView extends StatelessWidget {
-  const ModbusParametersView({Key? key}) : super(key: key);
+class ManualSchedule extends StatelessWidget {
+  const ManualSchedule({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final controller =Get.put(ModbusParametersController());
+    final controller =Get.put(ManualController());
 
 
     return Scaffold(
@@ -22,7 +22,7 @@ class ModbusParametersView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Modbus Parameters',
+              'Manual Parameters',
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.w600,
@@ -196,7 +196,7 @@ class ModbusParametersView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Parameters 50-99',
+                    'Parameters 450-499',
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
@@ -283,7 +283,7 @@ class ModbusParametersView extends StatelessWidget {
     );
   }
 
-  Widget _buildParametersGrid(ModbusParametersController controller) {
+  Widget _buildParametersGrid(ManualController controller) {
     return Column(
       children: [
         // Build 10 rows
@@ -298,7 +298,7 @@ class ModbusParametersView extends StatelessWidget {
                       margin: EdgeInsets.all(1.w),
                       child: _buildParameterCell(
                         controller,
-                        50 + (row * 5) + col, // Calculate parameter index
+                        450 + (row * 5) + col, // Calculate parameter index
                       ),
                     ),
                   ),
@@ -309,7 +309,7 @@ class ModbusParametersView extends StatelessWidget {
     );
   }
 
-  Widget _buildParameterCell(ModbusParametersController controller, int paramIndex) {
+  Widget _buildParameterCell(ManualController controller, int paramIndex) {
     return Obx(() {
       final value = controller.getParameterValue(paramIndex);
       final isModified = controller.isParameterModified(paramIndex);
@@ -366,7 +366,7 @@ class ModbusParametersView extends StatelessWidget {
     });
   }
 
-  void _showEditDialog(ModbusParametersController controller, int paramIndex) {
+  void _showEditDialog(ManualController controller, int paramIndex) {
     final currentValue = controller.getParameterValue(paramIndex);
     final textController = TextEditingController(text: currentValue.toString());
 
@@ -441,7 +441,7 @@ class ModbusParametersView extends StatelessWidget {
     );
   }
 
-  void _updateParameter(ModbusParametersController controller, int paramIndex, String newValueStr) {
+  void _updateParameter(ManualController controller, int paramIndex, String newValueStr) {
     final newValue = int.tryParse(newValueStr);
 
     if (newValue == null) {

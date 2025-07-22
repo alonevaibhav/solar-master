@@ -147,6 +147,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:solar_app/Services/init.dart';
 import 'API Service/api_service.dart';
 import 'Route Manager/app_bindings.dart';
 import 'Route Manager/app_routes.dart';
@@ -160,6 +161,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await ApiService.init();
+  await AppInitializer.initialize();
 
   // Initialize MQTT Service with binary data parsing
   late final SolarMQTTService mqttService;

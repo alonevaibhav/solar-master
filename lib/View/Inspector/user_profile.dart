@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import '../../Controller/Inspector/automatic_controller.dart';
 import '../../Controller/Inspector/user_profile_controller.dart';
 import '../../Controller/login_controller.dart';
 
 class UserProfile extends GetView<IUserProfile> {
   const UserProfile({Key? key}) : super(key: key);
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +46,12 @@ class UserProfile extends GetView<IUserProfile> {
               _buildMenuOption(
                 icon: Icons.schedule,
                 title: ' Automatic Schedule ',
-                onTap: controller.automaticSchedule,
+                onTap: () {
+                  // final mcontroller = Get.put(ModbusParametersController());
+                  // controller.automaticSchedule();
+
+                  controller.automaticSchedule();
+                },
               ),
               _buildMenuOption(
                 icon: Icons.schedule,

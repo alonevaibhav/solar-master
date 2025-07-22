@@ -23,6 +23,7 @@ import '../Component/Cleaner/TodayCleaning/task_details_view.dart';
 import '../View/Inspector/assigned_plant_view.dart';
 import '../View/Inspector/in_dashboard.dart';
 import '../View/Inspector/schedule/AutomaticSchedule/automatic_schedule.dart';
+import '../View/Inspector/schedule/manual_schedule/manual_schedule.dart';
 import '../View/Inspector/user_profile.dart';
 import '../View/User/u_dashboard.dart';
 import 'app_bindings.dart';
@@ -220,6 +221,13 @@ class AppRoutes {
     GetPage(
       name: automaticSchedule,
       page: () => ModbusParametersView(),
+      binding: AppBindings(),
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: manualSchedule,
+      page: () => ManualSchedule(),
       binding: AppBindings(),
       transition: Transition.rightToLeft,
       transitionDuration: const Duration(milliseconds: 300),

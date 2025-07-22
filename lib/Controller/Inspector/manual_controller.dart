@@ -3,13 +3,13 @@ import 'dart:typed_data';
 
 import '../../Services/data_parser.dart';
 
-class ModbusParametersController extends GetxController {
+class ManualController extends GetxController {
   // Reactive state variables
   final isLoading = false.obs;
   final errorMessage = ''.obs;
   final parametersData = Rxn<Map<String, dynamic>>();
 
-  // Store individual parameter values (index 50-99)
+  // Store individual parameter values (index 450-499)
   final parameterValues = <int, RxInt>{}.obs;
 
   // Track which parameters have been modified
@@ -22,8 +22,8 @@ class ModbusParametersController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Initialize parameters 50-99 with default values
-    for (int i = 50; i < 100; i++) {
+    // Initialize parameters 450-499 with default values
+    for (int i = 450; i < 500; i++) {
       parameterValues[i] = 0.obs;
     }
     loadInitialData();
@@ -72,7 +72,7 @@ class ModbusParametersController extends GetxController {
   }
 
   /// Parse Modbus message from MQTT using real parser
-  void parseModbusMessage(String topic, Uint8List payloadBytes) {
+  void parseManualMessage(String topic, Uint8List payloadBytes) {
     try {
       // Extract IMEI from topic
       currentImei.value = ModbusDataParser.extractImei(topic);
@@ -81,8 +81,8 @@ class ModbusParametersController extends GetxController {
       // Parse all parameters using the real parser
       final allParameters = ModbusDataParser.parseParameters(payloadBytes);
 
-      // Update only parameters 50-99 from the parsed data
-      for (int i = 50; i < 100; i++) {
+      // Update only parameters 450-499 from the parsed data
+      for (int i = 450; i < 500; i++) {
         if (parameterValues.containsKey(i) && i < allParameters.length) {
           parameterValues[i]!.value = allParameters[i];
         }
@@ -98,9 +98,9 @@ class ModbusParametersController extends GetxController {
         ),
       };
 
-      print('📊 Updated parameters 50-99 for IMEI: ${currentImei.value}');
-      print('Parameters 50-99 values:');
-      for (int i = 50; i < 100; i++) {
+      print('📊 Updated parameters 450-499 for IMEI: ${currentImei.value}');
+      print('Parameters 450-499 values:');
+      for (int i = 450; i < 500; i++) {
         if (parameterValues.containsKey(i)) {
           print('    Parameter $i = ${parameterValues[i]!.value}');
         }
@@ -185,7 +185,7 @@ class ModbusParametersController extends GetxController {
       isLoading.value = true;
 
       // Reset parameters to 0 (or fetch original values from server if available)
-      for (int i = 50; i < 100; i++) {
+      for (int i = 450; i < 500; i++) {
         if (parameterValues.containsKey(i)) {
           parameterValues[i]!.value = 0;
         }
@@ -220,3 +220,4 @@ class ModbusParametersController extends GetxController {
   /// Get total count of modified parameters
   int get modifiedCount => modifiedParameters.length;
 }
+

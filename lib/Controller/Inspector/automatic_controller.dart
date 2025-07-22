@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:typed_data';
@@ -244,6 +245,7 @@ class ModbusParametersController extends GetxController {
       isLoading.value = true;
       errorMessage.value = '';
 
+
       // First get the authentication token
       final token = await getToken();
       if (token == null || token.isEmpty) {
@@ -276,7 +278,7 @@ class ModbusParametersController extends GetxController {
 
       // Make the POST request
       final response = await http.post(
-        Uri.parse('https://3nxc7762-3000.inc1.devtunnels.ms/api/mqtt/publish/862360073414729'),
+        Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/862360073414729'),
         headers: headers,
         body: jsonEncode(requestBody),
       ).timeout(const Duration(seconds: 30));
@@ -297,6 +299,7 @@ class ModbusParametersController extends GetxController {
           'Success',
           'Parameters updated successfully',
           snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
           duration: const Duration(seconds: 2),
         );
       } else {

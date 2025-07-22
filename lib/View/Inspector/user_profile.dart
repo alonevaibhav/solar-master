@@ -12,63 +12,75 @@ class UserProfile extends GetView<IUserProfile> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildProfileCard(),
-            SizedBox(height: 14.4.h),
-            Padding(
-              padding: EdgeInsets.only(left: 14.4.w, bottom: 7.2.h),
-              child: Text(
-                'General Information',
-                style: TextStyle(
-                  fontSize: 12.6.sp,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildProfileCard(),
+              SizedBox(height: 14.4.h),
+              Padding(
+                padding: EdgeInsets.only(left: 14.4.w, bottom: 7.2.h),
+                child: Text(
+                  'General Information',
+                  style: TextStyle(
+                    fontSize: 12.6.sp,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black87,
+                  ),
                 ),
               ),
-            ),
-            _buildMenuOption(
-              icon: Icons.list_alt,
-              title: 'Assigned Plants',
-              onTap: controller.goToAssignedPlants,
-            ),
-            _buildMenuOption(
-              icon: Icons.list_alt,
-              title: ' Plants Info ',
-              onTap: controller.goToPlantInfo,
-            ),
-            _buildMenuOption(
-              icon: Icons.headset_mic,
-              title: 'Help & Support',
-              onTap: controller.goToHelpAndSupport,
-            ),
-            SizedBox(height: 14.4.h),
-            Padding(
-              padding: EdgeInsets.only(left: 14.4.w, bottom: 7.2.h),
-              child: Text(
-                'Account ',
-                style: TextStyle(
-                  fontSize: 12.6.sp,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
+              _buildMenuOption(
+                icon: Icons.list_alt,
+                title: 'Assigned Plants',
+                onTap: controller.goToAssignedPlants,
+              ),
+              _buildMenuOption(
+                icon: Icons.list_alt,
+                title: ' Plants Info ',
+                onTap: controller.goToPlantInfo,
+              ),
+              _buildMenuOption(
+                icon: Icons.schedule,
+                title: ' Automatic Schedule ',
+                onTap: controller.automaticSchedule,
+              ),
+              _buildMenuOption(
+                icon: Icons.schedule,
+                title: ' Manual Schedule ',
+                onTap: controller.manualSchedule,
+              ),
+              _buildMenuOption(
+                icon: Icons.headset_mic,
+                title: 'Help & Support',
+                onTap: controller.goToHelpAndSupport,
+              ),
+              SizedBox(height: 14.4.h),
+              Padding(
+                padding: EdgeInsets.only(left: 14.4.w, bottom: 7.2.h),
+                child: Text(
+                  'Account ',
+                  style: TextStyle(
+                    fontSize: 12.6.sp,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black87,
+                  ),
                 ),
               ),
-            ),
-            _buildActionButton(
-              icon: Icons.logout,
-              title: 'Logout',
-              color: Colors.orange,
-              onTap: controller.logout,
-            ),
-            SizedBox(height: 5.4.h),
-            _buildActionButton(
-              icon: Icons.delete_outline,
-              title: 'Delete Account',
-              color: Colors.red,
-              onTap: controller.showDeleteConfirmation,
-            ),
-          ],
+              _buildActionButton(
+                icon: Icons.logout,
+                title: 'Logout',
+                color: Colors.orange,
+                onTap: controller.logout,
+              ),
+              SizedBox(height: 5.4.h),
+              _buildActionButton(
+                icon: Icons.delete_outline,
+                title: 'Delete Account',
+                color: Colors.red,
+                onTap: controller.showDeleteConfirmation,
+              ),
+            ],
+          ),
         ),
       ),
     );

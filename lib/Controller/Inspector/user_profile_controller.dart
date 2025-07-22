@@ -65,6 +65,12 @@ class IUserProfile extends GetxController {
   void goToPlantInfo() {
     Get.toNamed(AppRoutes.inspectorPlantInfo);
   }
+ void manualSchedule() {
+    Get.toNamed(AppRoutes.manualSchedule);
+  }
+ void automaticSchedule() {
+    Get.toNamed(AppRoutes.automaticSchedule);
+  }
 
   // Navigate to help and support screen
   void goToHelpAndSupport() {

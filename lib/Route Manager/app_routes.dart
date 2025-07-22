@@ -22,6 +22,7 @@ import '../View/Cleaner/c_dashboard.dart';
 import '../Component/Cleaner/TodayCleaning/task_details_view.dart';
 import '../View/Inspector/assigned_plant_view.dart';
 import '../View/Inspector/in_dashboard.dart';
+import '../View/Inspector/schedule/AutomaticSchedule/automatic_schedule.dart';
 import '../View/Inspector/user_profile.dart';
 import '../View/User/u_dashboard.dart';
 import 'app_bindings.dart';
@@ -65,6 +66,12 @@ class AppRoutes {
   static const inspectorCreateTicket = '/inspector/inspectorCreateTicket';
 
   static const  inspectorTicketChat = '/inspectorTicketChat/ticket-chat';
+
+
+  //mqtt route
+
+  static const manualSchedule = '/manualSchedule';
+  static const automaticSchedule = '/automaticSchedule';
 
 
   // All of your pages
@@ -210,5 +217,15 @@ class AppRoutes {
       transition: Transition.rightToLeft,
       transitionDuration: const Duration(milliseconds: 300),
     ),
+    GetPage(
+      name: automaticSchedule,
+      page: () => ModbusParametersView(),
+      binding: AppBindings(),
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+
+
+
   ];
 }

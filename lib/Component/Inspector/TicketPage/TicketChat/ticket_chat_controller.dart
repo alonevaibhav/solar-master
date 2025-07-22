@@ -520,8 +520,7 @@ class TicketChatController extends GetxController {
   Timer? _pollingTimer;
 
   final String initialTicketId;
-  final ticketIdInspector =
-      ''.obs; // Assuming you're using GetX for state management
+  final ticketIdInspector = ''.obs; // Assuming you're using GetX for state management
 
   TicketChatController({required this.initialTicketId}) {
     ticketIdInspector.value = initialTicketId; // Store the initialTicketId

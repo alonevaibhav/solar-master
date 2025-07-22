@@ -80,10 +80,8 @@ class ApiService {
     required T Function(dynamic) fromJson,
     bool includeToken = true,
   }) async {
-    final uri =
-        Uri.parse('$baseUrl$endpoint').replace(queryParameters: queryParams);
-    final headers =
-        await _getHeaders(includeToken: includeToken); // ✅ FIXED: Added await
+    final uri = Uri.parse('$baseUrl$endpoint').replace(queryParameters: queryParams);
+    final headers = await _getHeaders(includeToken: includeToken); // ✅ FIXED: Added await
 
     return _sendRequest<T>(
       method: 'GET',

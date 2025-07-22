@@ -154,21 +154,16 @@ class LoginController extends GetxController {
           final loginData = loginResponse.data!;
           final token = loginData.token;
 
-          // Save token first
           await ApiService.setToken(token);
 
-          // Decode token to get 'id'
           Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
           String userId = decodedToken['id'];
           await ApiService.setUid(userId);
 
-          // Save token and expiration time using TokenManager
           await TokenManager.saveToken(token, expirationTime: loginData.expirationTime);
 
-          // Save user profile data to SharedPreferences and update observables
           await _saveUserProfileData(loginData);
 
-          // Debug logging
           final storedToken = await ApiService.getToken();
           final storedUid = await ApiService.getUid();
 
@@ -176,14 +171,13 @@ class LoginController extends GetxController {
           print('UID from decoded token: $storedUid');
           log('User Profile: ${loginData.profile.name} (${loginData.profile.username})');
           print('Distributor: ${loginData.profile.distributorName}');
-
           log('Token: $storedToken');
           log('UID: $storedUid');
           log('Profile: ${loginData.profile.toJson()}');
 
           Get.snackbar(
             'Success',
-            'Welcome ${loginData.profile.name}!', // Use profile name in welcome message
+            'Welcome ${loginData.profile.name}!',
             backgroundColor: Colors.green.withOpacity(0.1),
             colorText: Colors.green,
             duration: const Duration(seconds: 2),
@@ -191,10 +185,31 @@ class LoginController extends GetxController {
 
           _navigateByRole(UserRole.fromString(loginData.role));
         } else {
-          throw Exception(loginResponse.message ?? 'Login failed');
+          // Handle login failure even if no exception was thrown
+          final errorMsg = loginResponse.message ?? 'Login failed';
+          errorMessage.value = errorMsg;
+          Get.snackbar(
+            'Login Failed',
+            errorMsg,
+            backgroundColor: Colors.red.withOpacity(0.1),
+            colorText: Colors.red,
+            duration: const Duration(seconds: 3),
+          );
         }
 
+      } else {
+        // API response itself failed (network, etc.)
+        final errorMsg = response.errorMessage ?? 'Something went wrong with the server';
+        errorMessage.value = errorMsg;
+        Get.snackbar(
+          'Error',
+          errorMsg,
+          backgroundColor: Colors.red.withOpacity(0.1),
+          colorText: Colors.red,
+          duration: const Duration(seconds: 3),
+        );
       }
+
     } catch (e) {
       String errorMsg = e.toString().replaceAll('Exception: ', '');
       errorMessage.value = errorMsg;
@@ -209,6 +224,7 @@ class LoginController extends GetxController {
       isLoading.value = false;
     }
   }
+
 
   /// Save user profile data to SharedPreferences and update observables
   Future<void> _saveUserProfileData(LoginData loginData) async {

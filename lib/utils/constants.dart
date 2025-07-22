@@ -54,6 +54,10 @@ String raiseTicket = "/api/tickets/create/inspector";
 
 
 
+String mqttPost = "mqtt/publish";
+
+
+
 
 
 

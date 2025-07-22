@@ -115,7 +115,7 @@ class AppRoutes {
     ),
     GetPage(
       name: cleanerHelp,
-      page: () => HelpSupportView(),
+      page: () => InfoPage(),
       binding: AppBindings(),
     ),
     GetPage(

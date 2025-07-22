@@ -59,8 +59,8 @@ class UserProfile extends GetView<IUserProfile> {
                 onTap: controller.manualSchedule,
               ),
               _buildMenuOption(
-                icon: Icons.headset_mic,
-                title: 'Help & Support',
+                icon: Icons.info_outline,
+                title: 'Info Page',
                 onTap: controller.goToHelpAndSupport,
               ),
               SizedBox(height: 14.4.h),

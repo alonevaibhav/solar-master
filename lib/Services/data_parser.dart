@@ -34,11 +34,11 @@ class ModbusDataParser {
         varIndex++;
 
         // Show first 10 parameters, then summarize
-        // if (varIndex >= 10) {
-        //   final totalParams = (payloadBytes.length / 2).floor();
-        //   print('   ... and ${totalParams - 10} more parameters (total: $totalParams parameters)');
-        //   break;
-        // }
+        if (varIndex >= 1) {
+          final totalParams = (payloadBytes.length / 2).floor();
+          print('   ... and ${totalParams - 10} more parameters (total: $totalParams parameters)');
+          break;
+        }
       }
 
       print(''); // Empty line for readability

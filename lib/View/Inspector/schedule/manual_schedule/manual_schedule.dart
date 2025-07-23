@@ -11,7 +11,19 @@ class ManualSchedule extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+
+
+    final Map<String, dynamic>? plantData = Get.arguments;
+    print('Received plant data: $plantData');
+    final String? uuid = plantData?['uuid']?.toString();
+    print('UUID: $uuid');
+
     final controller = Get.put(ManualController());
+
+    // Set UUID after creation
+    controller.setUuid(uuid);
+    controller.printUuidInfo();
 
     return Scaffold(
       backgroundColor: Colors.grey[50],

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,15 +9,18 @@ class ModbusParametersView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     final Map<String, dynamic>? plantData = Get.arguments;
     print('Received plant data: $plantData');
     final String? uuid = plantData?['uuid']?.toString();
     print('UUID: $uuid');
-    final controller = Get.put(ModbusParametersController(uuid: uuid));
 
+    final controller = Get.put(ModbusParametersController());
 
+    // Set UUID after creation
+    controller.setUuid(uuid);
+    controller.printUuidInfo();
 
-    // final controller = Get.put(ModbusParametersController());
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -38,34 +40,36 @@ class ModbusParametersView extends StatelessWidget {
               ),
             ),
             Obx(() => Text(
-              'IMEI: ${controller.currentImei.value} | Boxes: ${controller.numberOfBoxes.value}',
-              style: TextStyle(
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey[600],
-              ),
-            )),
+                  'IMEI: ${controller.currentImei.value} | Boxes: ${controller.numberOfBoxes.value}',
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.grey[600],
+                  ),
+                )),
           ],
         ),
         actions: [
-          Obx(() => controller.modifiedCount > 0
-              ? Container(
-            margin: EdgeInsets.only(right: 8.w),
-            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-            decoration: BoxDecoration(
-              color: Colors.orange[100],
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: Text(
-              '${controller.modifiedCount} modified',
-              style: TextStyle(
-                fontSize: 11.sp,
-                color: Colors.orange[800],
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          )
-              : SizedBox(),
+          Obx(
+            () => controller.modifiedCount > 0
+                ? Container(
+                    margin: EdgeInsets.only(right: 8.w),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                    decoration: BoxDecoration(
+                      color: Colors.orange[100],
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: Text(
+                      '${controller.modifiedCount} modified',
+                      style: TextStyle(
+                        fontSize: 11.sp,
+                        color: Colors.orange[800],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  )
+                : SizedBox(),
           ),
           PopupMenuButton<String>(
             onSelected: (value) {
@@ -174,7 +178,8 @@ class ModbusParametersView extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
                   ),
                 ),
               ],
@@ -353,7 +358,7 @@ class ModbusParametersView extends StatelessWidget {
               children: [
                 // Build columns in each row
                 for (int col = 0; col < columnsPerRow; col++)
-                      () {
+                  () {
                     final paramIndex = 50 + (row * columnsPerRow) + col;
                     // Only show if this parameter index is within the active range
                     if (paramIndex < 50 + numberOfBoxes) {
@@ -375,7 +380,8 @@ class ModbusParametersView extends StatelessWidget {
     );
   }
 
-  Widget _buildParameterCell(ModbusParametersController controller, int paramIndex) {
+  Widget _buildParameterCell(
+      ModbusParametersController controller, int paramIndex) {
     return Obx(() {
       final value = controller.getParameterValue(paramIndex);
       final isModified = controller.isParameterModified(paramIndex);
@@ -397,7 +403,6 @@ class ModbusParametersView extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-
               Text(
                 '$paramIndex',
                 style: TextStyle(
@@ -508,7 +513,8 @@ class ModbusParametersView extends StatelessWidget {
     );
   }
 
-  void _updateParameter(ModbusParametersController controller, int paramIndex, String newValueStr) {
+  void _updateParameter(ModbusParametersController controller, int paramIndex,
+      String newValueStr) {
     final newValue = int.tryParse(newValueStr);
 
     if (newValue == null) {

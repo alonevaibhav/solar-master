@@ -3,10 +3,23 @@ import 'package:flutter/material.dart';
 import '../../Controller/Inspector/manual_controller.dart';
 import '../../Controller/Inspector/slot_controller.dart';
 
-// Rest of your InfoPage widget code remains the same...
+
 class InfoPage extends StatelessWidget {
   final ManualController controller = Get.find<ManualController>();
   final SlotController slotController = Get.put(SlotController());
+
+  InfoPage({Key? key}) : super(key: key) {
+    // Initialize in constructor
+    final Map<String, dynamic>? plantData = Get.arguments;
+
+    print('Received plant data: $plantData');
+    final String? uuid = plantData?['uuid']?.toString();
+    print('UUID: $uuid');
+
+    // Set UUID after creation
+    slotController.setUuid(uuid);
+    slotController.printUuidInfo();
+  }
 
   @override
   Widget build(BuildContext context) {

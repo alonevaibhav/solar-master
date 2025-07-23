@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../API Service/Model/Request/plant_model.dart';
 import '../../API Service/api_service.dart';
 import '../../Route Manager/app_routes.dart';
+import '../../Services/init.dart';
 import '../../utils/constants.dart';
 
 class PlantInfoController extends GetxController {
@@ -89,10 +90,39 @@ class PlantInfoController extends GetxController {
   }
 
   // View plant details
-  void viewPlantDetails(int plantId) {
-    final plant = plants.firstWhere((plant) => plant['id'] == plantId);
-    selectedPlant.value = plant;
-    Get.toNamed(AppRoutes.inspectorDetailsSection, arguments: plant);
+  // void viewPlantDetails(int plantId) {
+  //   final plant = plants.firstWhere((plant) => plant['id'] == plantId);
+  //   selectedPlant.value = plant;
+  //   Get.toNamed(AppRoutes.inspectorDetailsSection, arguments: plant);
+  // }
+
+  Future<void> viewPlantDetails(int plantId) async {
+    try {
+      final plant = plants.firstWhere((plant) => plant['id'] == plantId);
+      selectedPlant.value = plant;
+
+      // Get UUID from the selected plant
+      final uuid = plant['uuid']?.toString();
+
+      if (uuid != null) {
+        print('Initializing MQTT for plant UUID: $uuid');
+        // Initialize/reinitialize MQTT with the selected plant's UUID
+        await AppInitializer.reinitializeWithUUID(uuid);
+        print('✅ MQTT successfully initialized for UUID: $uuid');
+      } else {
+        print('⚠️ No UUID found for selected plant');
+      }
+
+      // Navigate to plant details with plant data
+      Get.toNamed(AppRoutes.inspectorDetailsSection, arguments: plant);
+
+    } catch (e) {
+      print('❌ Error in viewPlantDetails: $e');
+      // Still navigate even if MQTT initialization fails
+      final plant = plants.firstWhere((plant) => plant['id'] == plantId);
+      selectedPlant.value = plant;
+      Get.toNamed(AppRoutes.inspectorDetailsSection, arguments: plant);
+    }
   }
 
   // Refresh plants data

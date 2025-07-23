@@ -11,6 +11,29 @@ import 'package:http/http.dart' as http;
 
 
 class ManualController extends GetxController {
+
+
+  String? uuid;
+
+  ManualController();
+
+  void setUuid(String? newUuid) {
+    uuid = newUuid;
+    print("UUID set to: $uuid");
+  }
+
+
+
+  void printUuidInfo() {
+    print("=== UUID Information ===");
+    print("UUID: ${uuid ?? 'NULL'}");
+    print("Is UUID null: ${uuid == null}");
+    print("Is UUID empty: ${uuid?.isEmpty ?? true}");
+    print("UUID length: ${uuid?.length ?? 0}");
+    print("========================");
+  }
+
+
   // Reactive state variables
   final isLoading = false.obs;
   final errorMessage = ''.obs;
@@ -257,7 +280,7 @@ class ManualController extends GetxController {
 
       // Make the POST request
       final response = await http.post(
-        Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/862360073414729'),
+        Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/$uuid'),
         headers: headers,
         body: jsonEncode(requestBody),
       ).timeout(const Duration(seconds: 30));

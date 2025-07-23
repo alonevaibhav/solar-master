@@ -8,12 +8,24 @@ import 'dart:typed_data';
 import '../../Services/data_parser.dart';
 import 'package:http/http.dart' as http;
 
-
 class ModbusParametersController extends GetxController {
+  String? uuid;
 
-  final String? uuid;
+  ModbusParametersController();
 
-  ModbusParametersController({this.uuid});
+  void setUuid(String? newUuid) {
+    uuid = newUuid;
+    print("UUID set to: $uuid");
+  }
+
+  void printUuidInfo() {
+    print("=== UUID Information ===");
+    print("UUID: ${uuid ?? 'NULL'}");
+    print("Is UUID null: ${uuid == null}");
+    print("Is UUID empty: ${uuid?.isEmpty ?? true}");
+    print("UUID length: ${uuid?.length ?? 0}");
+    print("========================");
+  }
 
   // Reactive state variables
   final isLoading = false.obs;
@@ -36,6 +48,9 @@ class ModbusParametersController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
+    print("here is the  initialized with UUID: ${uuid ?? 'null'}");
+
     // Initialize parameters 50-99 with default values
     for (int i = 50; i < 100; i++) {
       parameterValues[i] = 0.obs;
@@ -190,7 +205,6 @@ class ModbusParametersController extends GetxController {
     }
   }
 
-
   /// Save all modified parameters
   Future<void> saveParameters() async {
     if (modifiedParameters.isEmpty) {
@@ -205,7 +219,6 @@ class ModbusParametersController extends GetxController {
     try {
       isLoading.value = true;
       errorMessage.value = '';
-
 
       // First get the authentication token
       final token = await getToken();
@@ -238,13 +251,16 @@ class ModbusParametersController extends GetxController {
       };
 
       // Make the POST request
-      final response = await http.post(
-        Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/$uuid'),
+      final response = await http
+          .post(
+            Uri.parse(
+                'https://smartsolarcleaner.com/api/api/mqtt/publish/$uuid'),
 
-        // Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/862360073414729'),
-        headers: headers,
-        body: jsonEncode(requestBody),
-      ).timeout(const Duration(seconds: 30));
+            // Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/862360073414729'),
+            headers: headers,
+            body: jsonEncode(requestBody),
+          )
+          .timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
         // Update main data structure with only active parameters
@@ -269,7 +285,7 @@ class ModbusParametersController extends GetxController {
         // More detailed error handling
         String errorMessage = 'Failed to save parameters';
         if (response.statusCode == 401) {
-          errorMessage =  'Something went Wrong: ${response.body}';
+          errorMessage = 'Something went Wrong: ${response.body}';
         } else if (response.statusCode == 400) {
           errorMessage = 'Invalid request: ${response.body}';
         } else {

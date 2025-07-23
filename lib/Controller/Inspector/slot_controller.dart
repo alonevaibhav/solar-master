@@ -9,6 +9,29 @@ import '../../Controller/Inspector/manual_controller.dart';
 
 class SlotController extends GetxController {
 
+
+  String? uuid;
+
+  SlotController();
+
+  void setUuid(String? newUuid) {
+    uuid = newUuid;
+    print("UUID set to: $uuid");
+  }
+
+
+
+  void printUuidInfo() {
+    print("=== UUID Information In Slot ===");
+    print("UUID: ${uuid ?? 'NULL'}");
+    print("Is UUID null: ${uuid == null}");
+    print("Is UUID empty: ${uuid?.isEmpty ?? true}");
+    print("UUID length: ${uuid?.length ?? 0}");
+    print("========================");
+  }
+
+
+
   final List<Map<String, String>> slots = [
     {'code': '550', 'description': 'slot 1 on time'},
     {'code': '554', 'description': 'slot 1 off time'},
@@ -209,7 +232,7 @@ class SlotController extends GetxController {
           };
 
           final response = await http.post(
-            Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/862360073414729'),
+            Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/$uuid'),
             headers: headers,
             body: jsonEncode(requestBody),
           ).timeout(const Duration(seconds: 30));

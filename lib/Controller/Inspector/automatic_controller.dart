@@ -185,51 +185,7 @@ class ModbusParametersController extends GetxController {
     }
   }
 
-  // /// Save all modified parameters
-  // Future<void> saveParameters() async {
-  //   if (modifiedParameters.isEmpty) {
-  //     Get.snackbar(
-  //       'No Changes',
-  //       'No parameters have been modified',
-  //       snackPosition: SnackPosition.BOTTOM,
-  //     );
-  //     return;
-  //   }
-  //
-  //   try {
-  //     isLoading.value = true;
-  //     errorMessage.value = '';
-  //
-  //     // TODO: Send modified parameters to device via MQTT or API
-  //     // For now, just update the local data structure
-  //
-  //     // Update main data structure with only active parameters
-  //     parametersData.value = {
-  //       ...parametersData.value ?? {},
-  //       'parameters': _getActiveParametersMap(),
-  //       'lastModified': DateTime.now().toIso8601String(),
-  //       'modifiedCount': modifiedParameters.length,
-  //     };
-  //
-  //     // Clear modified parameters tracking
-  //     modifiedParameters.clear();
-  //
-  //     Get.snackbar(
-  //       'Success',
-  //       'Parameters updated successfully',
-  //       snackPosition: SnackPosition.BOTTOM,
-  //     );
-  //   } catch (e) {
-  //     errorMessage.value = e.toString();
-  //     Get.snackbar(
-  //       'Save Error',
-  //       'Failed to save parameters: ${e.toString()}',
-  //       snackPosition: SnackPosition.BOTTOM,
-  //     );
-  //   } finally {
-  //     isLoading.value = false;
-  //   }
-  // }
+
   /// Save all modified parameters
   Future<void> saveParameters() async {
     if (modifiedParameters.isEmpty) {

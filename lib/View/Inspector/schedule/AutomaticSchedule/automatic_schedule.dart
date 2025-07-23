@@ -10,7 +10,15 @@ class ModbusParametersView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(ModbusParametersController());
+    final Map<String, dynamic>? plantData = Get.arguments;
+    print('Received plant data: $plantData');
+    final String? uuid = plantData?['uuid']?.toString();
+    print('UUID: $uuid');
+    final controller = Get.put(ModbusParametersController(uuid: uuid));
+
+
+
+    // final controller = Get.put(ModbusParametersController());
 
     return Scaffold(
       backgroundColor: Colors.grey[50],

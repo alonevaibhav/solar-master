@@ -8,6 +8,7 @@ import '../Component/Cleaner/task_detail_view.dart';
 import '../Component/Cleaner/update_view.dart';
 import '../Component/Inspector/AlertsView/alerts_view.dart';
 import '../Component/Inspector/AreaInspectionView/area_history.dart';
+import '../Component/Inspector/MqttSetting/setting_interphase.dart';
 import '../Component/Inspector/PlantInfo/plant _info.dart';
 import '../Component/Inspector/PlantInfo/plant_details_view.dart';
 import '../Component/Inspector/StartInspection/start_inspection.dart';
@@ -73,6 +74,7 @@ class AppRoutes {
 
   static const manualSchedule = '/manualSchedule';
   static const automaticSchedule = '/automaticSchedule';
+  static const settingPageRoute  = '/settingPageRoute';
 
 
   // All of your pages
@@ -228,6 +230,13 @@ class AppRoutes {
     GetPage(
       name: manualSchedule,
       page: () => ManualSchedule(),
+      binding: AppBindings(),
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: settingPageRoute,
+      page: () => SchedulePage(),
       binding: AppBindings(),
       transition: Transition.rightToLeft,
       transitionDuration: const Duration(milliseconds: 300),

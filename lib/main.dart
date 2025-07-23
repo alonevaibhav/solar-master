@@ -164,34 +164,34 @@ void main() async {
   await AppInitializer.initialize();
 
   // Initialize MQTT Service with binary data parsing
-  late final SolarMQTTService mqttService;
-
-  mqttService = SolarMQTTService(
-    onConnectionChanged: (isConnected) async {
-      if (isConnected) {
-        print('✅ Successfully connected to the MQTT broker');
-
-        try {
-          final success = await mqttService.subscribe('vidani/vm/862360073414729/data');
-          if (success) {
-            print('✅ Successfully subscribed to vidani/vm/862360073414729/data');
-          } else {
-            print('❌ Failed to subscribe to vidani/vm/862360073414729/data');
-          }
-        } catch (e) {
-          print('❌ Subscription error: $e');
-        }
-      } else {
-        print('❌ Disconnected from the MQTT broker');
-      }
-    },
-    onError: (error) {
-      print('❌ MQTT Error: $error');
-    },
-  );
-
-  await mqttService.initialize();
-  await mqttService.connect();
+  // late final SolarMQTTService mqttService;
+  //
+  // mqttService = SolarMQTTService(
+  //   onConnectionChanged: (isConnected) async {
+  //     if (isConnected) {
+  //       print('✅ Successfully connected to the MQTT broker');
+  //
+  //       try {
+  //         final success = await mqttService.subscribe('vidani/vm/862360073414729/data');
+  //         if (success) {
+  //           print('✅ Successfully subscribed to vidani/vm/862360073414729/data');
+  //         } else {
+  //           print('❌ Failed to subscribe to vidani/vm/862360073414729/data');
+  //         }
+  //       } catch (e) {
+  //         print('❌ Subscription error: $e');
+  //       }
+  //     } else {
+  //       print('❌ Disconnected from the MQTT broker');
+  //     }
+  //   },
+  //   onError: (error) {
+  //     print('❌ MQTT Error: $error');
+  //   },
+  // );
+  //
+  // await mqttService.initialize();
+  // await mqttService.connect();
 
   // Determine initial route based on token status
   String initialRoute = AppRoutes.login;

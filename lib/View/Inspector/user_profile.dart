@@ -8,9 +8,6 @@ import '../../Controller/login_controller.dart';
 class UserProfile extends GetView<IUserProfile> {
   const UserProfile({Key? key}) : super(key: key);
 
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,25 +40,23 @@ class UserProfile extends GetView<IUserProfile> {
                 title: ' Plants Info ',
                 onTap: controller.goToPlantInfo,
               ),
-              _buildMenuOption(
-                icon: Icons.schedule,
-                title: ' Automatic Schedule ',
-                onTap: () {
-
-
-                  controller.automaticSchedule();
-                },
-              ),
-              _buildMenuOption(
-                icon: Icons.schedule,
-                title: ' Manual Schedule ',
-                onTap: controller.manualSchedule,
-              ),
-              _buildMenuOption(
-                icon: Icons.info_outline,
-                title: 'Info Page',
-                onTap: controller.goToHelpAndSupport,
-              ),
+              // _buildMenuOption(
+              //   icon: Icons.schedule,
+              //   title: ' Automatic Schedule ',
+              //   onTap: () {
+              //     controller.automaticSchedule();
+              //   },
+              // ),
+              // _buildMenuOption(
+              //   icon: Icons.schedule,
+              //   title: ' Manual Schedule ',
+              //   onTap: controller.manualSchedule,
+              // ),
+              // _buildMenuOption(
+              //   icon: Icons.info_outline,
+              //   title: 'Info Page',
+              //   onTap: controller.goToHelpAndSupport,
+              // ),
               SizedBox(height: 14.4.h),
               Padding(
                 padding: EdgeInsets.only(left: 14.4.w, bottom: 7.2.h),

@@ -10,6 +10,11 @@ import 'package:http/http.dart' as http;
 
 
 class ModbusParametersController extends GetxController {
+
+  final String? uuid;
+
+  ModbusParametersController({this.uuid});
+
   // Reactive state variables
   final isLoading = false.obs;
   final errorMessage = ''.obs;
@@ -234,7 +239,9 @@ class ModbusParametersController extends GetxController {
 
       // Make the POST request
       final response = await http.post(
-        Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/862360073414729'),
+        Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/$uuid'),
+
+        // Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/862360073414729'),
         headers: headers,
         body: jsonEncode(requestBody),
       ).timeout(const Duration(seconds: 30));

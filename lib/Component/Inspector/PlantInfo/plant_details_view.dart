@@ -51,6 +51,8 @@ class InfoPlantDetailsView extends StatelessWidget {
               padding: EdgeInsets.all(20.w),
               child: Column(
                 children: [
+                  // _buildScheduleRow(plantData),
+                  SizedBox(height: 24.h),
                   _buildQuickStatsRow(plantData),
                   SizedBox(height: 24.h),
                   _buildBasicInformation(plantData),
@@ -77,7 +79,6 @@ class InfoPlantDetailsView extends StatelessWidget {
   Widget _buildSliverAppBar(Map<String, dynamic> plantData) {
     final isActive = plantData['isActive'] == 1;
     final underMaintenance = plantData['under_maintenance'] == 1;
-
     Color statusColor = Colors.grey.shade400;
     String statusText = 'Inactive';
     IconData statusIcon = Icons.power_off;
@@ -118,9 +119,19 @@ class InfoPlantDetailsView extends StatelessWidget {
         ),
       ),
       actions: [
+
         Container(
           margin: EdgeInsets.only(right: 12.w, top: 8.h, bottom: 8.h),
           child: _buildCreateTicketButton(),
+        ),
+        Container(
+          margin: EdgeInsets.only(right: 12.w, top: 8.h, bottom: 8.h),
+          child: IconButton(
+            icon: Icon(Icons.settings, color: Colors.white, size: 25.sp),
+            onPressed: () {
+              Get.toNamed(AppRoutes.settingPageRoute, arguments: plantData);
+            },
+          ),
         ),
       ],
       flexibleSpace: FlexibleSpaceBar(
@@ -195,6 +206,179 @@ class InfoPlantDetailsView extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+
+  Widget _buildScheduleRow(Map<String, dynamic> plantData) {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildNavigatableStatCard(
+            'Automatic Schedule',
+            plantData['total_panels']?.toString() ?? '0',
+            Icons.schedule,
+            const Color(0xFF3B82F6),
+            onTap: () {
+              Get.toNamed(AppRoutes.automaticSchedule, arguments: plantData);
+            },
+          ),
+        ),
+        SizedBox(width: 9.6.w), // Adjusted from 12.w
+        Expanded(
+          child: _buildNavigatableStatCard(
+            'Manual Schedule',
+            '${plantData['capacity_w']?.toString() ?? '0'} W',
+            Icons.schedule_outlined,
+            const Color(0xFF10B981),
+            onTap: () {
+              Get.toNamed(AppRoutes.manualSchedule, arguments: plantData);
+            },
+          ),
+        ),
+        SizedBox(width: 9.6.w), // Adjusted from 12.w
+        Expanded(
+          child: _buildNavigatableStatCard(
+            'Info Area',
+            '${plantData['area_squrM']?.toString() ?? '0'} m²',
+            Icons.info_outline,
+            const Color(0xFFFF8C00),
+            onTap: () {
+              // Get.toNamed(AppRoutes.infoArea, arguments: plantData);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNavigatableStatCard(String label, String value, IconData icon, Color color, {required VoidCallback onTap}) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            color.withOpacity(0.1),
+            color.withOpacity(0.05),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16.r), // Adjusted from 20.r
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1.2, // Adjusted from 1.5
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.15),
+            blurRadius: 12, // Adjusted from 15
+            offset: const Offset(0, 4.8), // Adjusted from 6
+            spreadRadius: 0.8, // Adjusted from 1
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16.r), // Adjusted from 20.r
+          splashColor: color.withOpacity(0.2),
+          highlightColor: color.withOpacity(0.1),
+          child: Container(
+            padding: EdgeInsets.all(14.4.w), // Adjusted from 18.w
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(11.2.w), // Adjusted from 14.w
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        color,
+                        color.withOpacity(0.8),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(12.8.r), // Adjusted from 16.r
+                    boxShadow: [
+                      BoxShadow(
+                        color: color.withOpacity(0.3),
+                        blurRadius: 6.4, // Adjusted from 8
+                        offset: const Offset(0, 3.2), // Adjusted from 4
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    icon,
+                    color: Colors.white,
+                    size: 20.8.sp, // Adjusted from 26.sp
+                  ),
+                ),
+                SizedBox(height: 11.2.h), // Adjusted from 14.h
+
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 10.4.sp, // Adjusted from 13.sp
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                    letterSpacing: 0.4, // Adjusted from 0.5
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+
+                SizedBox(height: 6.4.h), // Adjusted from 8.h
+
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(vertical: 8.h), // Adjusted from 10.h
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        color,
+                        color.withOpacity(0.8),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(20.r), // Adjusted from 25.r
+                    boxShadow: [
+                      BoxShadow(
+                        color: color.withOpacity(0.3),
+                        blurRadius: 4.8, // Adjusted from 6
+                        offset: const Offset(0, 2.4), // Adjusted from 3
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Open',
+                        style: TextStyle(
+                          fontSize: 9.6.sp, // Adjusted from 12.sp
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.64, // Adjusted from 0.8
+                        ),
+                      ),
+                      SizedBox(width: 4.8.w), // Adjusted from 6.w
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        size: 11.2.sp, // Adjusted from 14.sp
+                        color: Colors.white,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ),

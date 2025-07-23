@@ -47,8 +47,7 @@ class UserProfile extends GetView<IUserProfile> {
                 icon: Icons.schedule,
                 title: ' Automatic Schedule ',
                 onTap: () {
-                  // final mcontroller = Get.put(ModbusParametersController());
-                  // controller.automaticSchedule();
+
 
                   controller.automaticSchedule();
                 },

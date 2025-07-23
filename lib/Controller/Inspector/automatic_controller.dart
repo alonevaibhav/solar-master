@@ -253,8 +253,8 @@ class ModbusParametersController extends GetxController {
       // Make the POST request
       final response = await http
           .post(
-            Uri.parse(
-                'https://smartsolarcleaner.com/api/api/mqtt/publish/$uuid'),
+            // Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/$uuid'),
+            Uri.parse('https://3nxc7762-3000.inc1.devtunnels.ms/api/mqtt/publish/$uuid'),
 
             // Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/862360073414729'),
             headers: headers,
@@ -314,6 +314,56 @@ class ModbusParametersController extends GetxController {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('token');
   }
+
+
+  // Add this method to ModbusParametersController class
+
+  /// Set all active parameters to the same value
+  void setAllParametersTo(int value) {
+    if (numberOfBoxes.value == 0) {
+      Get.snackbar(
+        'No Active Boxes',
+        'No boxes available to set',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    // Validate range
+    if (value < 0 || value > 65535) {
+      Get.snackbar(
+        'Invalid Value',
+        'Value must be between 0 and 65535',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    final maxParameterToShow = 49 + numberOfBoxes.value;
+    int updatedCount = 0;
+
+    for (int i = 50; i <= maxParameterToShow; i++) {
+      if (parameterValues.containsKey(i)) {
+        parameterValues[i]!.value = value;
+        modifiedParameters.add(i);
+        updatedCount++;
+      }
+    }
+
+    // Update parameters data
+    parametersData.value = {
+      ...parametersData.value ?? {},
+      'parameters': _getActiveParametersMap(),
+    };
+
+    Get.snackbar(
+      'Success',
+      'All $updatedCount boxes set to $value',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.green,
+    );
+  }
+
 
   /// Reset all active parameters to their original values
   Future<void> resetParameters() async {

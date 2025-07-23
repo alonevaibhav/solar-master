@@ -74,44 +74,22 @@ class ModbusParametersView extends StatelessWidget {
           PopupMenuButton<String>(
             onSelected: (value) {
               switch (value) {
-                case 'save':
-                  controller.saveParameters();
-                  break;
                 case 'reset':
                   controller.resetParameters();
                   break;
-                case 'refresh':
+                case 'setall':
+                  _showSetAllDialog(controller);
                   break;
               }
             },
             itemBuilder: (context) => [
               PopupMenuItem(
-                value: 'save',
+                value: 'setall',
                 child: Row(
                   children: [
-                    Icon(Icons.save, size: 18.w),
+                    Icon(Icons.settings_applications, size: 18.w),
                     SizedBox(width: 8.w),
-                    Text('Save Changes'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'reset',
-                child: Row(
-                  children: [
-                    Icon(Icons.refresh, size: 18.w),
-                    SizedBox(width: 8.w),
-                    Text('Reset All'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'refresh',
-                child: Row(
-                  children: [
-                    Icon(Icons.sync, size: 18.w),
-                    SizedBox(width: 8.w),
-                    Text('Refresh Data'),
+                    Text('Set All Boxes'),
                   ],
                 ),
               ),
@@ -507,6 +485,71 @@ class ModbusParametersView extends StatelessWidget {
               foregroundColor: Colors.white,
             ),
             child: Text('Update'),
+          ),
+        ],
+      ),
+    );
+  }
+  void _showSetAllDialog(ModbusParametersController controller) {
+    final textController = TextEditingController();
+
+    Get.dialog(
+      AlertDialog(
+        title: Text(
+          'Set All Boxes',
+          style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Set all ${controller.numberOfBoxes.value} active boxes to the same value',
+              style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+            ),
+            SizedBox(height: 16.h),
+            TextField(
+              controller: textController,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(5),
+              ],
+              decoration: InputDecoration(
+                labelText: 'Value',
+                hintText: 'Enter value for all boxes',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+              ),
+              autofocus: true,
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              'Valid range: 0 to 65535',
+              style: TextStyle(fontSize: 11.sp, color: Colors.grey[500]),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final value = int.tryParse(textController.text);
+              if (value != null) {
+                controller.setAllParametersTo(value);
+                Get.back();
+              } else {
+                Get.snackbar('Invalid Input', 'Please enter a valid number');
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange,
+              foregroundColor: Colors.white,
+            ),
+            child: Text('Set All'),
           ),
         ],
       ),

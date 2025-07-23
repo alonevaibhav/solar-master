@@ -1,7 +1,14 @@
 
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:typed_data';
 import '../../Services/data_parser.dart';
+import 'package:http/http.dart' as http;
+
 
 class ManualController extends GetxController {
   // Reactive state variables
@@ -217,36 +224,95 @@ class ManualController extends GetxController {
       isLoading.value = true;
       errorMessage.value = '';
 
-      // TODO: Send modified parameters to device via MQTT or API
-      // For now, just update the local data structure
 
-      // Update main data structure with only active parameters
-      parametersData.value = {
-        ...parametersData.value ?? {},
-        'parameters': _getActiveParametersMap(),
-        'lastModified': DateTime.now().toIso8601String(),
-        'modifiedCount': modifiedParameters.length,
+      // First get the authentication token
+      final token = await getToken();
+      if (token == null || token.isEmpty) {
+        throw Exception('Authentication token not found. Please login again.');
+      }
+
+      // Prepare the value string for the API call
+      String valueString = '';
+      for (int i = 450; i < 450 + numberOfBoxes.value; i++) {
+        // Format each value as 5 digits with leading zeros
+        valueString += parameterValues[i]!.value.toString().padLeft(5, '0');
+        if (i < 499 + numberOfBoxes.value) {
+          valueString += ',';
+        }
+      }
+
+      // Prepare the request body
+      final requestBody = {
+        "type": "config",
+        "id": 1,
+        "key": "upvlt5",
+        "value": valueString,
       };
 
-      // Clear modified parameters tracking
-      modifiedParameters.clear();
+      // Prepare headers with the token
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
 
-      Get.snackbar(
-        'Success',
-        'Parameters updated successfully',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      // Make the POST request
+      final response = await http.post(
+        Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/862360073414729'),
+        headers: headers,
+        body: jsonEncode(requestBody),
+      ).timeout(const Duration(seconds: 30));
 
+      if (response.statusCode == 200) {
+        // Update main data structure with only active parameters
+        parametersData.value = {
+          ...parametersData.value ?? {},
+          'parameters': _getActiveParametersMap(),
+          'lastModified': DateTime.now().toIso8601String(),
+          'modifiedCount': modifiedParameters.length,
+        };
+
+        // Clear modified parameters tracking
+        modifiedParameters.clear();
+
+        Get.snackbar(
+          'Success',
+          'Parameters updated successfully',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
+        );
+      } else {
+        // More detailed error handling
+        String errorMessage = 'Failed to save parameters';
+        if (response.statusCode == 401) {
+          errorMessage =  'Something went Wrong: ${response.body}';
+        } else if (response.statusCode == 400) {
+          errorMessage = 'Invalid request: ${response.body}';
+        } else {
+          errorMessage = 'Error ${response.statusCode}: ${response.body}';
+        }
+        throw Exception(errorMessage);
+      }
+    } on TimeoutException {
+      throw Exception('Request timed out. Please try again.');
     } catch (e) {
       errorMessage.value = e.toString();
       Get.snackbar(
         'Save Error',
-        'Failed to save parameters: ${e.toString()}',
+        e.toString(),
         snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 3),
       );
+      rethrow;
     } finally {
       isLoading.value = false;
     }
+  }
+
+// Add this method to your controller class
+  static Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token');
   }
 
   /// Reset all active parameters to their original values

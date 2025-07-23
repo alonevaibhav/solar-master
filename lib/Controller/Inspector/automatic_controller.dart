@@ -254,9 +254,9 @@ class ModbusParametersController extends GetxController {
       final response = await http
           .post(
             // Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/$uuid'),
-            Uri.parse('https://3nxc7762-3000.inc1.devtunnels.ms/api/mqtt/publish/$uuid'),
+            // Uri.parse('https://3nxc7762-3000.inc1.devtunnels.ms/api/mqtt/publish/$uuid'),
 
-            // Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/862360073414729'),
+            Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/862360073414729'),
             headers: headers,
             body: jsonEncode(requestBody),
           )

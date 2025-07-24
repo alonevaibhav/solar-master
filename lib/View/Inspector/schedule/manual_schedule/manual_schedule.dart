@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,9 +9,6 @@ class ManualSchedule extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-
-
     final Map<String, dynamic>? plantData = Get.arguments;
     print('Received plant data: $plantData');
     final String? uuid = plantData?['uuid']?.toString();
@@ -43,34 +38,36 @@ class ManualSchedule extends StatelessWidget {
               ),
             ),
             Obx(() => Text(
-              'IMEI: ${controller.currentImei.value} | Boxes: ${controller.numberOfBoxes.value}',
-              style: TextStyle(
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey[600],
-              ),
-            )),
+                  'IMEI: ${controller.currentImei.value} | Boxes: ${controller.numberOfBoxes.value}',
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.grey[600],
+                  ),
+                )),
           ],
         ),
         actions: [
-          Obx(() => controller.modifiedCount > 0
-              ? Container(
-            margin: EdgeInsets.only(right: 8.w),
-            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-            decoration: BoxDecoration(
-              color: Colors.orange[100],
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: Text(
-              '${controller.modifiedCount} modified',
-              style: TextStyle(
-                fontSize: 11.sp,
-                color: Colors.orange[800],
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          )
-              : SizedBox(),
+          Obx(
+            () => controller.modifiedCount > 0
+                ? Container(
+                    margin: EdgeInsets.only(right: 8.w),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                    decoration: BoxDecoration(
+                      color: Colors.orange[100],
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: Text(
+                      '${controller.modifiedCount} modified',
+                      style: TextStyle(
+                        fontSize: 11.sp,
+                        color: Colors.orange[800],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  )
+                : SizedBox(),
           ),
           PopupMenuButton<String>(
             onSelected: (value) {
@@ -157,7 +154,8 @@ class ManualSchedule extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
                   ),
                 ),
               ],
@@ -269,7 +267,7 @@ class ManualSchedule extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: controller.modifiedCount > 0
-                          ? controller.saveParameters
+                          ? () => _saveWithCustomLoader(context, controller)
                           : null,
                       icon: Icon(Icons.save, size: 18.w),
                       label: Text('Save Changes'),
@@ -336,7 +334,7 @@ class ManualSchedule extends StatelessWidget {
               children: [
                 // Build columns in each row
                 for (int col = 0; col < columnsPerRow; col++)
-                      () {
+                  () {
                     final paramIndex = 450 + (row * columnsPerRow) + col;
                     // Only show if this parameter index is within the active range
                     if (paramIndex < 450 + numberOfBoxes) {
@@ -518,8 +516,10 @@ class ManualSchedule extends StatelessWidget {
               decoration: InputDecoration(
                 labelText: 'Value',
                 hintText: 'Enter value for all boxes',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.r)),
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
               ),
               autofocus: true,
             ),
@@ -537,6 +537,7 @@ class ManualSchedule extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
+              Get.back();
               final value = int.tryParse(textController.text);
               if (value != null) {
                 controller.setAllParametersTo(value);
@@ -556,7 +557,122 @@ class ManualSchedule extends StatelessWidget {
     );
   }
 
-  void _updateParameter(ManualController controller, int paramIndex, String newValueStr) {
+  // 2. Add these methods to your ModbusParametersView class:
+  void _saveWithCustomLoader(
+      BuildContext context, ManualController controller) async {
+    try {
+      // Call the original save method
+      await controller.saveParameters();
+
+      // Show custom loader only after successful save
+      _showCustomSuccessLoader(context);
+    } catch (e) {
+      // Handle error if save fails
+      Get.snackbar(
+        'Error',
+        'Failed to save parameters: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red[100],
+        colorText: Colors.red[800],
+      );
+    }
+  }
+
+  void _showCustomSuccessLoader(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        // Auto dismiss after 12 seconds
+        Future.delayed(Duration(seconds: 12), () {
+          if (Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
+          }
+        });
+
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.all(24.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16.r),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Success Animation
+                Container(
+                  width: 80.w,
+                  height: 80.w,
+                  decoration: BoxDecoration(
+                    color: Colors.green[100],
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.check,
+                    size: 50.w,
+                    color: Colors.green[600],
+                  ),
+                ),
+
+                SizedBox(height: 24.h),
+
+                Text(
+                  'Success!',
+                  style: TextStyle(
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
+                  ),
+                ),
+
+                SizedBox(height: 12.h),
+
+                Text(
+                  'Parameters updated successfully',
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Colors.grey[600],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+
+                SizedBox(height: 24.h),
+
+                // Loading indicator
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 20.w,
+                      height: 20.w,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(Colors.green[600]!),
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Text(
+                      'Refreshing data...',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _updateParameter(
+      ManualController controller, int paramIndex, String newValueStr) {
     final newValue = int.tryParse(newValueStr);
 
     if (newValue == null) {

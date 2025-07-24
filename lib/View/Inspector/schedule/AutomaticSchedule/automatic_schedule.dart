@@ -269,7 +269,7 @@ class ModbusParametersView extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: controller.modifiedCount > 0
-                          ? controller.saveParameters
+                          ?  () => _saveWithCustomLoader(context, controller)
                           : null,
                       icon: Icon(Icons.save, size: 18.w),
                       label: Text('Save Changes'),
@@ -537,6 +537,7 @@ class ModbusParametersView extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
+              Get.back();
               final value = int.tryParse(textController.text);
               if (value != null) {
                 controller.setAllParametersTo(value);
@@ -553,6 +554,118 @@ class ModbusParametersView extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  // 2. Add these methods to your ModbusParametersView class:
+  void _saveWithCustomLoader(BuildContext context, ModbusParametersController controller) async {
+    try {
+      // Call the original save method
+      await controller.saveParameters();
+
+      // Show custom loader only after successful save
+      _showCustomSuccessLoader(context);
+    } catch (e) {
+      // Handle error if save fails
+      Get.snackbar(
+        'Error',
+        'Failed to save parameters: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red[100],
+        colorText: Colors.red[800],
+      );
+    }
+  }
+
+  void _showCustomSuccessLoader(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        // Auto dismiss after 12 seconds
+        Future.delayed(Duration(seconds: 12), () {
+          if (Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
+          }
+        });
+
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.all(24.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16.r),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Success Animation
+                Container(
+                  width: 80.w,
+                  height: 80.w,
+                  decoration: BoxDecoration(
+                    color: Colors.green[100],
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.check,
+                    size: 50.w,
+                    color: Colors.green[600],
+                  ),
+                ),
+
+                SizedBox(height: 24.h),
+
+                Text(
+                  'Success!',
+                  style: TextStyle(
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
+                  ),
+                ),
+
+                SizedBox(height: 12.h),
+
+                Text(
+                  'Parameters updated successfully',
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Colors.grey[600],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+
+                SizedBox(height: 24.h),
+
+                // Loading indicator
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 20.w,
+                      height: 20.w,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.green[600]!),
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Text(
+                      'Refreshing data...',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

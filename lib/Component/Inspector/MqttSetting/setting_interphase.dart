@@ -36,9 +36,9 @@ class SchedulePage extends StatelessWidget {
               },            ),
             SizedBox(height: 16),
             _buildScheduleTile(
-              title: 'Schedule Info',
-              description: 'View your current schedule details',
-              icon: Icons.info,
+              title: 'Slot Timing',
+              description: 'View your Slot Timing details',
+              icon: Icons.timelapse_outlined,
               color: Colors.orange,
               onTap: () {
                 Get.toNamed(AppRoutes.cleanerHelp, arguments: plantData);

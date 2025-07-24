@@ -274,13 +274,6 @@ class ModbusParametersController extends GetxController {
         // Clear modified parameters tracking
         modifiedParameters.clear();
 
-        Get.snackbar(
-          'Success',
-          'Parameters updated successfully',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green,
-          duration: const Duration(seconds: 2),
-        );
       } else {
         // More detailed error handling
         String errorMessage = 'Failed to save parameters';

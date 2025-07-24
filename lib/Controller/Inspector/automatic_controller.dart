@@ -159,9 +159,7 @@ class ModbusParametersController extends GetxController {
   /// Get only active parameters as a map (based on numberOfBoxes)
   Map<String, int> _getActiveParametersMap() {
     final maxParameterToShow = 49 + numberOfBoxes.value;
-    return Map.fromEntries(parameterValues.entries
-        .where((e) => e.key >= 50 && e.key <= maxParameterToShow)
-        .map((e) => MapEntry(e.key.toString(), e.value.value)));
+    return Map.fromEntries(parameterValues.entries.where((e) => e.key >= 50 && e.key <= maxParameterToShow).map((e) => MapEntry(e.key.toString(), e.value.value)));
   }
 
   /// Get the list of active box parameters (only those that should be shown)
@@ -256,7 +254,7 @@ class ModbusParametersController extends GetxController {
             // Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/$uuid'),
             // Uri.parse('https://3nxc7762-3000.inc1.devtunnels.ms/api/mqtt/publish/$uuid'),
 
-            Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/862360073414729'),
+            Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/$uuid'),
             headers: headers,
             body: jsonEncode(requestBody),
           )

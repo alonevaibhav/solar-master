@@ -729,50 +729,48 @@ class ManualSchedule extends StatelessWidget {
               ),
             ),
             Obx(() => Text(
-              'IMEI: ${controller.currentImei.value} | Boxes: ${controller.numberOfBoxes.value}',
-              style: TextStyle(
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey[600],
-              ),
-            )),
+                  'IMEI: ${controller.currentImei.value} | Boxes: ${controller.numberOfBoxes.value}',
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.grey[600],
+                  ),
+                )),
           ],
         ),
         actions: [
           Obx(
-                () => controller.modifiedCount > 0
+            () => controller.modifiedCount > 0
                 ? Container(
-              margin: EdgeInsets.only(right: 8.w),
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-              decoration: BoxDecoration(
-                color: Colors.orange[100],
-                borderRadius: BorderRadius.circular(16.r),
-                border: Border.all(color: Colors.orange[300]!, width: 1),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.edit, size: 14.w, color: Colors.orange[700]),
-                  SizedBox(width: 4.w),
-                  Text(
-                    '${controller.modifiedCount}',
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.orange[800],
-                      fontWeight: FontWeight.w600,
+                    margin: EdgeInsets.only(right: 8.w),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                    decoration: BoxDecoration(
+                      color: Colors.orange[100],
+                      borderRadius: BorderRadius.circular(16.r),
+                      border: Border.all(color: Colors.orange[300]!, width: 1),
                     ),
-                  ),
-                ],
-              ),
-            )
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.edit, size: 14.w, color: Colors.orange[700]),
+                        SizedBox(width: 4.w),
+                        Text(
+                          '${controller.modifiedCount}',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: Colors.orange[800],
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
                 : SizedBox(),
           ),
           PopupMenuButton<String>(
             onSelected: (value) {
               switch (value) {
-                case 'reset':
-                  controller.resetParameters();
-                  break;
                 case 'setall':
                   _showSetAllDialog(controller);
                   break;
@@ -786,16 +784,6 @@ class ManualSchedule extends StatelessWidget {
                     Icon(Icons.settings_applications, size: 18.w),
                     SizedBox(width: 8.w),
                     Text('Set All Boxes'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'reset',
-                child: Row(
-                  children: [
-                    Icon(Icons.refresh, size: 18.w),
-                    SizedBox(width: 8.w),
-                    Text('Reset All'),
                   ],
                 ),
               ),
@@ -1059,7 +1047,8 @@ class ManualSchedule extends StatelessWidget {
 
     // Responsive grid with better spacing
     final screenWidth = Get.width - 64.w; // Account for margins and padding
-    final cellWidth = (screenWidth / 6).clamp(60.0, 80.0); // 6 columns max, min 60, max 80
+    final cellWidth =
+        (screenWidth / 6).clamp(60.0, 80.0); // 6 columns max, min 60, max 80
     final columnsPerRow = (screenWidth / cellWidth).floor().clamp(3, 6);
     final totalRows = (numberOfBoxes / columnsPerRow).ceil();
 
@@ -1072,13 +1061,14 @@ class ManualSchedule extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 for (int col = 0; col < columnsPerRow; col++)
-                      () {
+                  () {
                     final paramIndex = 450 + (row * columnsPerRow) + col;
                     if (paramIndex < 450 + numberOfBoxes) {
                       return Expanded(
                         child: Container(
                           margin: EdgeInsets.symmetric(horizontal: 3.w),
-                          child: _buildImprovedParameterCell(controller, paramIndex),
+                          child: _buildImprovedParameterCell(
+                              controller, paramIndex),
                         ),
                       );
                     } else {
@@ -1110,31 +1100,35 @@ class ManualSchedule extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: isModified
                   ? LinearGradient(
-                colors: [Colors.orange[50]!, Colors.orange[100]!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
+                      colors: [Colors.orange[50]!, Colors.orange[100]!],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
                   : LinearGradient(
-                colors: [Colors.grey[50]!, Colors.grey[100]!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+                      colors: [Colors.grey[50]!, Colors.grey[100]!],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
               border: Border.all(
                 color: isModified ? Colors.orange[400]! : Colors.grey[300]!,
                 width: isModified ? 2 : 1,
               ),
               borderRadius: BorderRadius.circular(12.r),
               boxShadow: isModified
-                  ? [BoxShadow(
-                color: Colors.orange.withOpacity(0.2),
-                blurRadius: 4,
-                offset: Offset(0, 2),
-              )]
-                  : [BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 2,
-                offset: Offset(0, 1),
-              )],
+                  ? [
+                      BoxShadow(
+                        color: Colors.orange.withOpacity(0.2),
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      )
+                    ]
+                  : [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 2,
+                        offset: Offset(0, 1),
+                      )
+                    ],
             ),
             child: Stack(
               children: [
@@ -1147,7 +1141,9 @@ class ManualSchedule extends StatelessWidget {
                         '$paramIndex',
                         style: TextStyle(
                           fontSize: 10.sp,
-                          color: isModified ? Colors.orange[700] : Colors.grey[600],
+                          color: isModified
+                              ? Colors.orange[700]
+                              : Colors.grey[600],
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -1157,7 +1153,8 @@ class ManualSchedule extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w700,
-                          color: isModified ? Colors.orange[900] : Colors.black87,
+                          color:
+                              isModified ? Colors.orange[900] : Colors.black87,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -1201,7 +1198,8 @@ class ManualSchedule extends StatelessWidget {
 
     Get.dialog(
       AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
         title: Row(
           children: [
             Container(
@@ -1223,7 +1221,8 @@ class ManualSchedule extends StatelessWidget {
                 children: [
                   Text(
                     'Edit Valve $boxNumber',
-                    style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+                    style:
+                        TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
                   ),
                   Text(
                     'Parameter $paramIndex',
@@ -1331,7 +1330,8 @@ class ManualSchedule extends StatelessWidget {
 
     Get.dialog(
       AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
         title: Row(
           children: [
             Container(
@@ -1380,12 +1380,14 @@ class ManualSchedule extends StatelessWidget {
               decoration: InputDecoration(
                 labelText: 'Value for All Valves',
                 hintText: 'Enter value for all valves',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.r)),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.r),
                   borderSide: BorderSide(color: Colors.orange, width: 2),
                 ),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
                 prefixIcon: Icon(Icons.numbers),
               ),
               autofocus: true,
@@ -1404,17 +1406,11 @@ class ManualSchedule extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
+              Get.back();
               final value = int.tryParse(textController.text);
               if (value != null && value >= 0 && value <= 65535) {
                 controller.setAllParametersTo(value);
                 Get.back();
-                Get.snackbar(
-                  'Success',
-                  'All valves set to $value',
-                  snackPosition: SnackPosition.BOTTOM,
-                  backgroundColor: Colors.green[100],
-                  colorText: Colors.green[800],
-                );
               } else {
                 Get.snackbar(
                   'Invalid Input',
@@ -1439,7 +1435,8 @@ class ManualSchedule extends StatelessWidget {
     );
   }
 
-  void _saveWithCustomLoader(BuildContext context, ManualController controller) async {
+  void _saveWithCustomLoader(
+      BuildContext context, ManualController controller) async {
     try {
       await controller.saveParameters();
       _showCustomSuccessLoader(context);
@@ -1526,7 +1523,7 @@ class ManualSchedule extends StatelessWidget {
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         valueColor:
-                        AlwaysStoppedAnimation<Color>(Colors.green[600]!),
+                            AlwaysStoppedAnimation<Color>(Colors.green[600]!),
                       ),
                     ),
                     SizedBox(width: 12.w),
@@ -1547,7 +1544,8 @@ class ManualSchedule extends StatelessWidget {
     );
   }
 
-  void _updateParameter(ManualController controller, int paramIndex, String newValueStr) {
+  void _updateParameter(
+      ManualController controller, int paramIndex, String newValueStr) {
     final newValue = int.tryParse(newValueStr);
 
     if (newValue == null || newValue < 0 || newValue > 65535) {

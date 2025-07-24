@@ -768,9 +768,6 @@ class ModbusParametersView extends StatelessWidget {
           PopupMenuButton<String>(
             onSelected: (value) {
               switch (value) {
-                case 'reset':
-                  controller.resetParameters();
-                  break;
                 case 'setall':
                   _showSetAllDialog(controller);
                   break;
@@ -784,16 +781,6 @@ class ModbusParametersView extends StatelessWidget {
                     Icon(Icons.settings_applications, size: 18.w),
                     SizedBox(width: 8.w),
                     Text('Set All Boxes'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'reset',
-                child: Row(
-                  children: [
-                    Icon(Icons.refresh, size: 18.w),
-                    SizedBox(width: 8.w),
-                    Text('Reset All'),
                   ],
                 ),
               ),
@@ -1403,17 +1390,11 @@ class ModbusParametersView extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
+              Get.back();
               final value = int.tryParse(textController.text);
               if (value != null && value >= 0 && value <= 65535) {
                 controller.setAllParametersTo(value);
                 Get.back();
-                Get.snackbar(
-                  'Success',
-                  'All valves set to $value',
-                  snackPosition: SnackPosition.BOTTOM,
-                  backgroundColor: Colors.green[100],
-                  colorText: Colors.green[800],
-                );
               } else {
                 Get.snackbar(
                   'Invalid Input',

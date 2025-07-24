@@ -50,6 +50,8 @@ String postChatByIDInspector(int ticketId) => "/ticketChat/chat/inspector";
 
 String getMyTicket(int inspectorId) => "/api/tickets/created-by-inspector/$inspectorId";
 
+String mqttSchedulePost(String uuid) => "/api/mqtt/publish/$uuid";
+
 String raiseTicket = "/api/tickets/create/inspector";
 
 

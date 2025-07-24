@@ -1,15 +1,11 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'dart:async';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import '../../API Service/api_service.dart';
 import '../../Controller/Inspector/manual_controller.dart';
+import '../../utils/constants.dart';
 
 class SlotController extends GetxController {
-
-
   String? uuid;
 
   SlotController();
@@ -19,8 +15,6 @@ class SlotController extends GetxController {
     print("UUID set to: $uuid");
   }
 
-
-
   void printUuidInfo() {
     print("=== UUID Information In Slot ===");
     print("UUID: ${uuid ?? 'NULL'}");
@@ -29,8 +23,6 @@ class SlotController extends GetxController {
     print("UUID length: ${uuid?.length ?? 0}");
     print("========================");
   }
-
-
 
   final List<Map<String, String>> slots = [
     {'code': '550', 'description': 'slot 1 on time'},
@@ -93,8 +85,8 @@ class SlotController extends GetxController {
     final seconds = secondsValue is String
         ? int.tryParse(secondsValue) ?? 0
         : secondsValue is int
-        ? secondsValue
-        : 0;
+            ? secondsValue
+            : 0;
 
     if (seconds < 0) return '00:00:00';
 
@@ -144,7 +136,7 @@ class SlotController extends GetxController {
     // Otherwise, get from the manual controller
     final ManualController manualController = Get.find<ManualController>();
     final slot = manualController.slotTimingsForDisplay.firstWhere(
-          (s) => s['code'].toString() == slotCode,
+      (s) => s['code'].toString() == slotCode,
       orElse: () => {'value': 0},
     );
 
@@ -158,6 +150,148 @@ class SlotController extends GetxController {
     }
     return 0;
   }
+
+  // Future<void> saveChanges() async {
+  //   print('Entering saveChanges function');
+  //
+  //   if (modifiedSlots.isEmpty) {
+  //     print('No modified slots to save');
+  //     Get.snackbar(
+  //       'No Changes',
+  //       'No slot timings have been modified',
+  //       snackPosition: SnackPosition.BOTTOM,
+  //       backgroundColor: Colors.orange,
+  //       colorText: Colors.white,
+  //     );
+  //     return;
+  //   }
+  //
+  //   try {
+  //     isSaving.value = true;
+  //     print('Retrieving authentication token');
+  //     final token = await getToken();
+  //
+  //     if (token == null || token.isEmpty) {
+  //       print('Authentication token is null or empty');
+  //       throw Exception('Authentication token not found. Please login again.');
+  //     }
+  //
+  //     int successCount = 0;
+  //     List<String> failedSlots = [];
+  //
+  //     for (String slotCode in modifiedSlots) {
+  //       try {
+  //         print('Processing slot: $slotCode');
+  //
+  //         // Use the locally stored modified value
+  //         int secondsValue = modifiedValues[slotCode] ?? 0;
+  //
+  //         print('Using modified value for slot $slotCode: $secondsValue');
+  //
+  //         final commandPrefix = slotCommandMap[slotCode];
+  //
+  //         if (commandPrefix == null) {
+  //           throw Exception('Unknown slot code: $slotCode');
+  //         }
+  //
+  //         final paddedSeconds = secondsValue.toString().padLeft(5, '0');
+  //         final modbusValue = '$commandPrefix,001,001,$paddedSeconds,600';
+  //
+  //         print('Sending data for slot $slotCode: $modbusValue');
+  //
+  //         final requestBody = {
+  //           "type": "config",
+  //           "id": 1,
+  //           "key": "modbus",
+  //           "value": modbusValue,
+  //         };
+  //
+  //         final headers = {
+  //           'Content-Type': 'application/json',
+  //           'Authorization': 'Bearer $token',
+  //         };
+  //
+  //         final response = await http
+  //             .post(
+  //               Uri.parse(
+  //                   'https://smartsolarcleaner.com/api/api/mqtt/publish/$uuid'),
+  //               headers: headers,
+  //               body: jsonEncode(requestBody),
+  //             )
+  //             .timeout(const Duration(seconds: 30));
+  //
+  //         if (response.statusCode == 200) {
+  //           successCount++;
+  //           print('Successfully updated slot $slotCode');
+  //         } else {
+  //           failedSlots.add(slotCode);
+  //           print(
+  //               'Failed to update slot $slotCode: ${response.statusCode} - ${response.body}');
+  //         }
+  //
+  //         await Future.delayed(Duration(milliseconds: 500));
+  //       } catch (e) {
+  //         failedSlots.add(slotCode);
+  //         print('Error updating slot $slotCode: $e');
+  //       }
+  //     }
+  //
+  //     // Handle success/failure
+  //     if (failedSlots.isEmpty) {
+  //       print('All slots updated successfully');
+  //       modifiedSlots.clear();
+  //       modifiedValues.clear(); // Clear local values after successful save
+  //       isEditMode.value = false;
+  //       Get.snackbar(
+  //         'Success',
+  //         'All $successCount slot timing(s) updated successfully',
+  //         snackPosition: SnackPosition.BOTTOM,
+  //         backgroundColor: Colors.green,
+  //         colorText: Colors.white,
+  //         duration: Duration(seconds: 3),
+  //       );
+  //     } else if (successCount > 0) {
+  //       print('Some slots failed to update');
+  //       // Only remove successfully updated slots from modified tracking
+  //       for (String slotCode in List.from(modifiedSlots)) {
+  //         if (!failedSlots.contains(slotCode)) {
+  //           modifiedSlots.remove(slotCode);
+  //           modifiedValues.remove(slotCode);
+  //         }
+  //       }
+  //       Get.snackbar(
+  //         'Partial Success',
+  //         '$successCount updated, ${failedSlots.length} failed. Failed slots: ${failedSlots.join(", ")}',
+  //         snackPosition: SnackPosition.BOTTOM,
+  //         backgroundColor: Colors.orange,
+  //         colorText: Colors.white,
+  //         duration: Duration(seconds: 4),
+  //       );
+  //     } else {
+  //       print('All slots failed to update');
+  //       throw Exception(
+  //           'Failed to update any slot timings. Failed slots: ${failedSlots.join(", ")}');
+  //     }
+  //   } on TimeoutException {
+  //     print('Request timed out');
+  //     throw Exception('Request timed out. Please try again.');
+  //   } catch (e) {
+  //     print('Exception in saveChanges: $e');
+  //     Get.snackbar(
+  //       'Save Error',
+  //       e.toString(),
+  //       snackPosition: SnackPosition.BOTTOM,
+  //       backgroundColor: Colors.red,
+  //       colorText: Colors.white,
+  //       duration: const Duration(seconds: 4),
+  //     );
+  //   } finally {
+  //     isSaving.value = false;
+  //     print('Exiting saveChanges function');
+  //   }
+  // }
+
+  // Get authentication token from SharedPreferences
 
   Future<void> saveChanges() async {
     print('Entering saveChanges function');
@@ -176,25 +310,7 @@ class SlotController extends GetxController {
 
     try {
       isSaving.value = true;
-      print('Retrieving authentication token');
-      final token = await getToken();
-
-      if (token == null || token.isEmpty) {
-        print('Authentication token is null or empty');
-        throw Exception('Authentication token not found. Please login again.');
-      }
-
-      print('Updating ${modifiedSlots.length} slot timings...');
-      print('Modified values: $modifiedValues');
-
-      Get.snackbar(
-        'Saving',
-        'Updating ${modifiedSlots.length} slot timing(s)...',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.blue,
-        colorText: Colors.white,
-        duration: Duration(seconds: 2),
-      );
+      print('Starting save process using ApiService');
 
       int successCount = 0;
       List<String> failedSlots = [];
@@ -205,11 +321,9 @@ class SlotController extends GetxController {
 
           // Use the locally stored modified value
           int secondsValue = modifiedValues[slotCode] ?? 0;
-
           print('Using modified value for slot $slotCode: $secondsValue');
 
           final commandPrefix = slotCommandMap[slotCode];
-
           if (commandPrefix == null) {
             throw Exception('Unknown slot code: $slotCode');
           }
@@ -226,25 +340,24 @@ class SlotController extends GetxController {
             "value": modbusValue,
           };
 
-          final headers = {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token',
-          };
+          // Use ApiService instead of direct HTTP calls
+          final response = await ApiService.post<Map<String, dynamic>>(
+            endpoint: mqttSchedulePost(uuid!),
+            body: requestBody,
+            fromJson: (json) => json as Map<String, dynamic>,
+            includeToken: true,
+          );
 
-          final response = await http.post(
-            Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/$uuid'),
-            headers: headers,
-            body: jsonEncode(requestBody),
-          ).timeout(const Duration(seconds: 30));
-
-          if (response.statusCode == 200) {
+          if (response.success) {
             successCount++;
             print('Successfully updated slot $slotCode');
           } else {
             failedSlots.add(slotCode);
-            print('Failed to update slot $slotCode: ${response.statusCode} - ${response.body}');
+            print(
+                'Failed to update slot $slotCode: ${response.statusCode} - ${response.errorMessage}');
           }
 
+          // Add delay between requests
           await Future.delayed(Duration(milliseconds: 500));
         } catch (e) {
           failedSlots.add(slotCode);
@@ -285,11 +398,9 @@ class SlotController extends GetxController {
         );
       } else {
         print('All slots failed to update');
-        throw Exception('Failed to update any slot timings. Failed slots: ${failedSlots.join(", ")}');
+        throw Exception(
+            'Failed to update any slot timings. Failed slots: ${failedSlots.join(", ")}');
       }
-    } on TimeoutException {
-      print('Request timed out');
-      throw Exception('Request timed out. Please try again.');
     } catch (e) {
       print('Exception in saveChanges: $e');
       Get.snackbar(
@@ -304,12 +415,6 @@ class SlotController extends GetxController {
       isSaving.value = false;
       print('Exiting saveChanges function');
     }
-  }
-
-  // Get authentication token from SharedPreferences
-  static Future<String?> getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('token');
   }
 
   // Cancel editing - revert to original values
@@ -370,7 +475,7 @@ class SlotController extends GetxController {
   // Method to get slot description by code
   String getSlotDescription(String code) {
     final slot = slots.firstWhere(
-          (s) => s['code'] == code,
+      (s) => s['code'] == code,
       orElse: () => {'description': 'Unknown slot'},
     );
     return slot['description'] ?? 'Unknown slot';

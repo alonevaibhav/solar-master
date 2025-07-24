@@ -5,8 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:typed_data';
+import '../../API Service/api_service.dart';
 import '../../Services/data_parser.dart';
 import 'package:http/http.dart' as http;
+
+import '../../utils/constants.dart';
 
 class ModbusParametersController extends GetxController {
   String? uuid;
@@ -204,6 +207,100 @@ class ModbusParametersController extends GetxController {
   }
 
   /// Save all modified parameters
+  // Future<void> saveParameters() async {
+  //   if (modifiedParameters.isEmpty) {
+  //     Get.snackbar(
+  //       'No Changes',
+  //       'No parameters have been modified',
+  //       snackPosition: SnackPosition.BOTTOM,
+  //     );
+  //     return;
+  //   }
+  //
+  //   try {
+  //     isLoading.value = true;
+  //     errorMessage.value = '';
+  //
+  //     // First get the authentication token
+  //     final token = await getToken();
+  //     if (token == null || token.isEmpty) {
+  //       throw Exception('Authentication token not found. Please login again.');
+  //     }
+  //
+  //     // Prepare the value string for the API call
+  //     String valueString = '';
+  //     for (int i = 50; i < 50 + numberOfBoxes.value; i++) {
+  //       // Format each value as 5 digits with leading zeros
+  //       valueString += parameterValues[i]!.value.toString().padLeft(5, '0');
+  //       if (i < 49 + numberOfBoxes.value) {
+  //         valueString += ',';
+  //       }
+  //     }
+  //
+  //     // Prepare the request body
+  //     final requestBody = {
+  //       "type": "config",
+  //       "id": 1,
+  //       "key": "upvlt1",
+  //       "value": valueString,
+  //     };
+  //
+  //     // Prepare headers with the token
+  //     final headers = {
+  //       'Content-Type': 'application/json',
+  //       'Authorization': 'Bearer $token',
+  //     };
+  //
+  //     // Make the POST request
+  //     final response = await http.post(
+  //           Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/$uuid'),
+  //           headers: headers,
+  //           body: jsonEncode(requestBody),
+  //         )
+  //         .timeout(const Duration(seconds: 30));
+  //
+  //     if (response.statusCode == 200) {
+  //       // Update main data structure with only active parameters
+  //       parametersData.value = {
+  //         ...parametersData.value ?? {},
+  //         'parameters': _getActiveParametersMap(),
+  //         'lastModified': DateTime.now().toIso8601String(),
+  //         'modifiedCount': modifiedParameters.length,
+  //       };
+  //
+  //       // Clear modified parameters tracking
+  //       modifiedParameters.clear();
+  //
+  //     } else {
+  //       // More detailed error handling
+  //       String errorMessage = 'Failed to save parameters';
+  //       if (response.statusCode == 401) {
+  //         errorMessage = 'Something went Wrong: ${response.body}';
+  //       } else if (response.statusCode == 400) {
+  //         errorMessage = 'Invalid request: ${response.body}';
+  //       } else {
+  //         errorMessage = 'Error ${response.statusCode}: ${response.body}';
+  //       }
+  //       throw Exception(errorMessage);
+  //     }
+  //   } on TimeoutException {
+  //     throw Exception('Request timed out. Please try again.');
+  //   } catch (e) {
+  //     errorMessage.value = e.toString();
+  //     Get.snackbar(
+  //       'Save Error',
+  //       e.toString(),
+  //       snackPosition: SnackPosition.BOTTOM,
+  //       duration: const Duration(seconds: 3),
+  //     );
+  //     rethrow;
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
+
+// Add this method to your controller class
+
   Future<void> saveParameters() async {
     if (modifiedParameters.isEmpty) {
       Get.snackbar(
@@ -217,12 +314,6 @@ class ModbusParametersController extends GetxController {
     try {
       isLoading.value = true;
       errorMessage.value = '';
-
-      // First get the authentication token
-      final token = await getToken();
-      if (token == null || token.isEmpty) {
-        throw Exception('Authentication token not found. Please login again.');
-      }
 
       // Prepare the value string for the API call
       String valueString = '';
@@ -242,25 +333,16 @@ class ModbusParametersController extends GetxController {
         "value": valueString,
       };
 
-      // Prepare headers with the token
-      final headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      };
+      // Make the POST request using ApiService
+      final response = await ApiService.post<Map<String, dynamic>>(
+        // endpoint: '/api/mqtt/publish/$uuid',
+        endpoint: mqttSchedulePost(uuid!),
+        body: requestBody,
+        fromJson: (json) => json as Map<String, dynamic>,
+        includeToken: true,
+      );
 
-      // Make the POST request
-      final response = await http
-          .post(
-            // Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/$uuid'),
-            // Uri.parse('https://3nxc7762-3000.inc1.devtunnels.ms/api/mqtt/publish/$uuid'),
-
-            Uri.parse('https://smartsolarcleaner.com/api/api/mqtt/publish/$uuid'),
-            headers: headers,
-            body: jsonEncode(requestBody),
-          )
-          .timeout(const Duration(seconds: 30));
-
-      if (response.statusCode == 200) {
+      if (response.success) {
         // Update main data structure with only active parameters
         parametersData.value = {
           ...parametersData.value ?? {},
@@ -272,39 +354,57 @@ class ModbusParametersController extends GetxController {
         // Clear modified parameters tracking
         modifiedParameters.clear();
 
+        // Show success message
+        Get.snackbar(
+          'Success',
+          'Parameters saved successfully',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+
       } else {
-        // More detailed error handling
-        String errorMessage = 'Failed to save parameters';
+        // Handle error response from ApiService
+        String errorMsg = response.errorMessage ?? 'Failed to save parameters';
+
+        // Customize error message based on status code
         if (response.statusCode == 401) {
-          errorMessage = 'Something went Wrong: ${response.body}';
+          errorMsg = 'Authentication failed. Please login again.';
         } else if (response.statusCode == 400) {
-          errorMessage = 'Invalid request: ${response.body}';
-        } else {
-          errorMessage = 'Error ${response.statusCode}: ${response.body}';
+          errorMsg = 'Invalid request: ${response.errorMessage}';
+        } else if (response.statusCode == 404) {
+          errorMsg = 'Device not found. Please check the UUID.';
         }
-        throw Exception(errorMessage);
+
+        throw Exception(errorMsg);
       }
-    } on TimeoutException {
-      throw Exception('Request timed out. Please try again.');
     } catch (e) {
-      errorMessage.value = e.toString();
+      // Handle any errors (network, timeout, etc.)
+      String errorMsg = e.toString();
+
+      // Clean up error message if it contains 'Exception: '
+      if (errorMsg.startsWith('Exception: ')) {
+        errorMsg = errorMsg.substring(11);
+      }
+
+      errorMessage.value = errorMsg;
       Get.snackbar(
         'Save Error',
-        e.toString(),
+        errorMsg,
         snackPosition: SnackPosition.BOTTOM,
-        duration: const Duration(seconds: 3),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 4),
       );
       rethrow;
     } finally {
       isLoading.value = false;
     }
   }
-
-// Add this method to your controller class
-  static Future<String?> getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('token');
-  }
+  // static Future<String?> getToken() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   return prefs.getString('token');
+  // }
 
 
   // Add this method to ModbusParametersController class
@@ -374,7 +474,7 @@ class ModbusParametersController extends GetxController {
       Get.snackbar(
         'Reset Complete',
         'All active parameters reset to default values',
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
       );
     } catch (e) {
       errorMessage.value = e.toString();

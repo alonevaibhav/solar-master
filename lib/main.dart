@@ -7,8 +7,6 @@ import 'Route Manager/app_bindings.dart';
 import 'Route Manager/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import 'Services/mqtt-service.dart'; // Your updated MQTT service
 import 'utils/token_manager.dart';
 
 void main() async {

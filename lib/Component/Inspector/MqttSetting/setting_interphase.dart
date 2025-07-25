@@ -24,7 +24,8 @@ class SchedulePage extends StatelessWidget {
               color: Colors.blue,
               onTap: () {
                 Get.toNamed(AppRoutes.automaticSchedule, arguments: plantData);
-              },            ),
+              },
+            ),
             SizedBox(height: 16),
             _buildScheduleTile(
               title: 'Manual Schedule',
@@ -33,7 +34,8 @@ class SchedulePage extends StatelessWidget {
               color: Colors.green,
               onTap: () {
                 Get.toNamed(AppRoutes.manualSchedule, arguments: plantData);
-              },            ),
+              },
+            ),
             SizedBox(height: 16),
             _buildScheduleTile(
               title: 'Slot Timing',
@@ -42,7 +44,8 @@ class SchedulePage extends StatelessWidget {
               color: Colors.orange,
               onTap: () {
                 Get.toNamed(AppRoutes.cleanerHelp, arguments: plantData);
-              },            ),
+              },
+            ),
           ],
         ),
       ),

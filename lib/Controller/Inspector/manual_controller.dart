@@ -1,21 +1,12 @@
-
 import 'dart:async';
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:typed_data';
 import '../../API Service/api_service.dart';
 import '../../Services/data_parser.dart';
-import 'package:http/http.dart' as http;
-
 import '../../utils/constants.dart';
 
-
 class ManualController extends GetxController {
-
-
   String? uuid;
 
   ManualController();
@@ -25,8 +16,6 @@ class ManualController extends GetxController {
     print("UUID set to: $uuid");
   }
 
-
-
   void printUuidInfo() {
     print("=== UUID Information ===");
     print("UUID: ${uuid ?? 'NULL'}");
@@ -35,7 +24,6 @@ class ManualController extends GetxController {
     print("UUID length: ${uuid?.length ?? 0}");
     print("========================");
   }
-
 
   // Reactive state variables
   final isLoading = false.obs;
@@ -88,8 +76,12 @@ class ManualController extends GetxController {
       errorMessage.value = '';
 
       parametersData.value = {
-        'imei': currentImei.value.isEmpty ? 'Waiting for data...' : currentImei.value,
-        'topic': currentTopic.value.isEmpty ? 'Waiting for data...' : currentTopic.value,
+        'imei': currentImei.value.isEmpty
+            ? 'Waiting for data...'
+            : currentImei.value,
+        'topic': currentTopic.value.isEmpty
+            ? 'Waiting for data...'
+            : currentTopic.value,
         'timestamp': DateTime.now().toIso8601String(),
         'numberOfBoxes': numberOfBoxes.value,
         'parameters': _getActiveParametersMap(),
@@ -153,51 +145,81 @@ class ManualController extends GetxController {
         'parameters': _getActiveParametersMap(),
       };
 
-      print('📊 Updated parameters for ${numberOfBoxes.value} boxes for IMEI: ${currentImei.value}');
+      print(
+          '📊 Updated parameters for ${numberOfBoxes.value} boxes for IMEI: ${currentImei.value}');
       print('Number of boxes: ${numberOfBoxes.value}');
       print('Active box parameters values:');
       for (int i = 450; i < 450 + numberOfBoxes.value; i++) {
         if (parameterValues.containsKey(i)) {
-          print('    Box ${i-449} (Parameter $i) = ${parameterValues[i]!.value}');
+          print(
+              '    Box ${i - 449} (Parameter $i) = ${parameterValues[i]!.value}');
         }
       }
-
     } catch (e) {
       errorMessage.value = 'Error parsing MQTT message: $e';
       Get.snackbar('Parse Error', errorMessage.value);
     }
   }
+
   // Get slot timings as a list of maps for easy display
   List<Map<String, dynamic>> get slotTimingsForDisplay {
     return [
-      {'code': 550, 'value': getParameterValue(550), 'description': 'Slot 1 ON Time'},
-      {'code': 554, 'value': getParameterValue(554), 'description': 'Slot 1 OFF Time'},
-      {'code': 551, 'value': getParameterValue(551), 'description': 'Slot 2 ON Time'},
-      {'code': 555, 'value': getParameterValue(555), 'description': 'Slot 2 OFF Time'},
-      {'code': 552, 'value': getParameterValue(552), 'description': 'Slot 3 ON Time'},
-      {'code': 556, 'value': getParameterValue(556), 'description': 'Slot 3 OFF Time'},
-      {'code': 553, 'value': getParameterValue(553), 'description': 'Slot 4 ON Time'},
-      {'code': 557, 'value': getParameterValue(557), 'description': 'Slot 4 OFF Time'},
+      {
+        'code': 550,
+        'value': getParameterValue(550),
+        'description': 'Slot 1 ON Time'
+      },
+      {
+        'code': 554,
+        'value': getParameterValue(554),
+        'description': 'Slot 1 OFF Time'
+      },
+      {
+        'code': 551,
+        'value': getParameterValue(551),
+        'description': 'Slot 2 ON Time'
+      },
+      {
+        'code': 555,
+        'value': getParameterValue(555),
+        'description': 'Slot 2 OFF Time'
+      },
+      {
+        'code': 552,
+        'value': getParameterValue(552),
+        'description': 'Slot 3 ON Time'
+      },
+      {
+        'code': 556,
+        'value': getParameterValue(556),
+        'description': 'Slot 3 OFF Time'
+      },
+      {
+        'code': 553,
+        'value': getParameterValue(553),
+        'description': 'Slot 4 ON Time'
+      },
+      {
+        'code': 557,
+        'value': getParameterValue(557),
+        'description': 'Slot 4 OFF Time'
+      },
     ];
   }
 
   /// Get only active parameters as a map (based on numberOfBoxes)
   Map<String, int> _getActiveParametersMap() {
     final maxParameterToShow = 449 + numberOfBoxes.value;
-    return Map.fromEntries(
-        parameterValues.entries
-            .where((e) => e.key >= 450 && e.key <= maxParameterToShow)
-            .map((e) => MapEntry(e.key.toString(), e.value.value))
-    );
+    return Map.fromEntries(parameterValues.entries
+        .where((e) => e.key >= 450 && e.key <= maxParameterToShow)
+        .map((e) => MapEntry(e.key.toString(), e.value.value)));
   }
 
   /// Get the list of active box parameters (only those that should be shown)
   Map<int, RxInt> get activeBoxParameters {
     final maxParameterToShow = 449 + numberOfBoxes.value;
-    return Map.fromEntries(
-        parameterValues.entries
-            .where((e) => e.key >= 450 && e.key <= maxParameterToShow)
-    );
+    return Map.fromEntries(parameterValues.entries
+        .where((e) => e.key >= 450 && e.key <= maxParameterToShow));
   }
 
   /// Update a specific parameter value (only allow active parameters)
@@ -225,7 +247,6 @@ class ManualController extends GetxController {
         ...parametersData.value ?? {},
         'parameters': _getActiveParametersMap(),
       };
-
     } else {
       Get.snackbar(
         'Invalid Parameter',
@@ -395,7 +416,6 @@ class ManualController extends GetxController {
           backgroundColor: Colors.green,
           colorText: Colors.white,
         );
-
       } else {
         // Handle error response from ApiService
         String errorMsg = response.errorMessage ?? 'Failed to save parameters';
@@ -457,7 +477,6 @@ class ManualController extends GetxController {
         'All active parameters reset to default values',
         snackPosition: SnackPosition.BOTTOM,
       );
-
     } catch (e) {
       errorMessage.value = e.toString();
       Get.snackbar('Reset Error', errorMessage.value);
@@ -465,7 +484,6 @@ class ManualController extends GetxController {
       isLoading.value = false;
     }
   }
-
 
   // Add this method to ModbusParametersController class
 
@@ -514,7 +532,6 @@ class ManualController extends GetxController {
       backgroundColor: Colors.green,
     );
   }
-
 
   /// Get parameter value by index
   int getParameterValue(int index) {

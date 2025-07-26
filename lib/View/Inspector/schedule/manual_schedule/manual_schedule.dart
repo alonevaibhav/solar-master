@@ -1,694 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter/services.dart';
-// import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:get/get.dart';
-// import '../../../../Controller/Inspector/manual_controller.dart';
-//
-// class ManualSchedule extends StatelessWidget {
-//   const ManualSchedule({Key? key}) : super(key: key);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     final Map<String, dynamic>? plantData = Get.arguments;
-//     print('Received plant data: $plantData');
-//     final String? uuid = plantData?['uuid']?.toString();
-//     print('UUID: $uuid');
-//
-//     final controller = Get.put(ManualController());
-//
-//     // Set UUID after creation
-//     controller.setUuid(uuid);
-//     controller.printUuidInfo();
-//
-//     return Scaffold(
-//       backgroundColor: Colors.grey[50],
-//       appBar: AppBar(
-//         elevation: 2,
-//         backgroundColor: Colors.white,
-//         foregroundColor: Colors.black87,
-//         title: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             Text(
-//               'Manual Schedule',
-//               style: TextStyle(
-//                 fontSize: 18.sp,
-//                 fontWeight: FontWeight.w600,
-//                 color: Colors.black87,
-//               ),
-//             ),
-//             Obx(() => Text(
-//                   'IMEI: ${controller.currentImei.value} | Boxes: ${controller.numberOfBoxes.value}',
-//                   style: TextStyle(
-//                     fontSize: 12.sp,
-//                     fontWeight: FontWeight.w400,
-//                     color: Colors.grey[600],
-//                   ),
-//                 )),
-//           ],
-//         ),
-//         actions: [
-//           Obx(
-//             () => controller.modifiedCount > 0
-//                 ? Container(
-//                     margin: EdgeInsets.only(right: 8.w),
-//                     padding:
-//                         EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-//                     decoration: BoxDecoration(
-//                       color: Colors.orange[100],
-//                       borderRadius: BorderRadius.circular(12.r),
-//                     ),
-//                     child: Text(
-//                       '${controller.modifiedCount} modified',
-//                       style: TextStyle(
-//                         fontSize: 11.sp,
-//                         color: Colors.orange[800],
-//                         fontWeight: FontWeight.w500,
-//                       ),
-//                     ),
-//                   )
-//                 : SizedBox(),
-//           ),
-//           PopupMenuButton<String>(
-//             onSelected: (value) {
-//               switch (value) {
-//                 case 'reset':
-//                   controller.resetParameters();
-//                   break;
-//                 case 'setall':
-//                   _showSetAllDialog(controller);
-//                   break;
-//               }
-//             },
-//             itemBuilder: (context) => [
-//               PopupMenuItem(
-//                 value: 'setall',
-//                 child: Row(
-//                   children: [
-//                     Icon(Icons.settings_applications, size: 18.w),
-//                     SizedBox(width: 8.w),
-//                     Text('Set All Boxes'),
-//                   ],
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ],
-//       ),
-//       body: Obx(() {
-//         if (controller.isLoading.value) {
-//           return Center(
-//             child: Column(
-//               mainAxisAlignment: MainAxisAlignment.center,
-//               children: [
-//                 CircularProgressIndicator(),
-//                 SizedBox(height: 16.h),
-//                 Text(
-//                   'Loading parameters...',
-//                   style: TextStyle(
-//                     fontSize: 14.sp,
-//                     color: Colors.grey[600],
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           );
-//         }
-//
-//         if (controller.errorMessage.value.isNotEmpty) {
-//           return Center(
-//             child: Column(
-//               mainAxisAlignment: MainAxisAlignment.center,
-//               children: [
-//                 Icon(
-//                   Icons.error_outline,
-//                   size: 48.w,
-//                   color: Colors.red[400],
-//                 ),
-//                 SizedBox(height: 16.h),
-//                 Text(
-//                   'Error loading data',
-//                   style: TextStyle(
-//                     fontSize: 16.sp,
-//                     fontWeight: FontWeight.w600,
-//                     color: Colors.red[400],
-//                   ),
-//                 ),
-//                 SizedBox(height: 8.h),
-//                 Padding(
-//                   padding: EdgeInsets.symmetric(horizontal: 32.w),
-//                   child: Text(
-//                     controller.errorMessage.value,
-//                     textAlign: TextAlign.center,
-//                     style: TextStyle(
-//                       fontSize: 14.sp,
-//                       color: Colors.grey[600],
-//                     ),
-//                   ),
-//                 ),
-//                 SizedBox(height: 24.h),
-//                 ElevatedButton.icon(
-//                   onPressed: null,
-//                   icon: Icon(Icons.refresh, size: 18.w),
-//                   label: Text('Retry'),
-//                   style: ElevatedButton.styleFrom(
-//                     backgroundColor: Colors.blue,
-//                     foregroundColor: Colors.white,
-//                     padding:
-//                         EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           );
-//         }
-//
-//         // Check if no boxes to show
-//         if (controller.numberOfBoxes.value == 0) {
-//           return Center(
-//             child: Column(
-//               mainAxisAlignment: MainAxisAlignment.center,
-//               children: [
-//                 Icon(
-//                   Icons.inbox_outlined,
-//                   size: 48.w,
-//                   color: Colors.grey[400],
-//                 ),
-//                 SizedBox(height: 16.h),
-//                 Text(
-//                   'No boxes to display',
-//                   style: TextStyle(
-//                     fontSize: 16.sp,
-//                     fontWeight: FontWeight.w600,
-//                     color: Colors.grey[600],
-//                   ),
-//                 ),
-//                 SizedBox(height: 8.h),
-//                 Text(
-//                   'Parameter 561 value: ${controller.numberOfBoxes.value}',
-//                   style: TextStyle(
-//                     fontSize: 14.sp,
-//                     color: Colors.grey[500],
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           );
-//         }
-//
-//         return Column(
-//           children: [
-//             // Info header
-//             Container(
-//               width: double.infinity,
-//               margin: EdgeInsets.all(16.w),
-//               padding: EdgeInsets.all(16.w),
-//               decoration: BoxDecoration(
-//                 color: Colors.white,
-//                 borderRadius: BorderRadius.circular(12.r),
-//                 boxShadow: [
-//                   BoxShadow(
-//                     color: Colors.black.withOpacity(0.05),
-//                     blurRadius: 4,
-//                     offset: Offset(0, 2),
-//                   ),
-//                 ],
-//               ),
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   Text(
-//                     'Active Valve: ${controller.numberOfBoxes.value}',
-//                     style: TextStyle(
-//                       fontSize: 16.sp,
-//                       fontWeight: FontWeight.w600,
-//                       color: Colors.black87,
-//                     ),
-//                   ),
-//                   SizedBox(height: 4.h),
-//                   Text(
-//                     'Parameters ${450} to ${449 + controller.numberOfBoxes.value} • Tap any cell to edit',
-//                     style: TextStyle(
-//                       fontSize: 12.sp,
-//                       color: Colors.grey[600],
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//
-//             // Parameters grid
-//             Expanded(
-//               child: Container(
-//                 margin: EdgeInsets.symmetric(horizontal: 16.w),
-//                 decoration: BoxDecoration(
-//                   color: Colors.white,
-//                   borderRadius: BorderRadius.circular(12.r),
-//                   boxShadow: [
-//                     BoxShadow(
-//                       color: Colors.black.withOpacity(0.05),
-//                       blurRadius: 4,
-//                       offset: Offset(0, 2),
-//                     ),
-//                   ],
-//                 ),
-//                 child: Padding(
-//                   padding: EdgeInsets.all(16.w),
-//                   child: _buildDynamicParametersGrid(controller),
-//                 ),
-//               ),
-//             ),
-//
-//             // Action buttons
-//             Container(
-//               padding: EdgeInsets.all(16.w),
-//               child: Row(
-//                 children: [
-//                   Expanded(
-//                     child: ElevatedButton.icon(
-//                       onPressed: controller.modifiedCount > 0
-//                           ? () => _saveWithCustomLoader(context, controller)
-//                           : null,
-//                       icon: Icon(Icons.save, size: 18.w),
-//                       label: Text('Save Changes'),
-//                       style: ElevatedButton.styleFrom(
-//                         backgroundColor: Colors.green,
-//                         foregroundColor: Colors.white,
-//                         padding: EdgeInsets.symmetric(vertical: 14.h),
-//                         shape: RoundedRectangleBorder(
-//                           borderRadius: BorderRadius.circular(8.r),
-//                         ),
-//                       ),
-//                     ),
-//                   ),
-//                   SizedBox(width: 12.w),
-//                   Expanded(
-//                     child: OutlinedButton.icon(
-//                       onPressed: controller.resetParameters,
-//                       icon: Icon(Icons.refresh, size: 18.w),
-//                       label: Text('Reset All'),
-//                       style: OutlinedButton.styleFrom(
-//                         foregroundColor: Colors.grey[700],
-//                         padding: EdgeInsets.symmetric(vertical: 14.h),
-//                         shape: RoundedRectangleBorder(
-//                           borderRadius: BorderRadius.circular(8.r),
-//                         ),
-//                       ),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ],
-//         );
-//       }),
-//     );
-//   }
-//
-//   Widget _buildDynamicParametersGrid(ManualController controller) {
-//     final numberOfBoxes = controller.numberOfBoxes.value;
-//
-//     // If no boxes, show empty state
-//     if (numberOfBoxes == 0) {
-//       return Center(
-//         child: Text(
-//           'No active boxes',
-//           style: TextStyle(
-//             fontSize: 14.sp,
-//             color: Colors.grey[500],
-//           ),
-//         ),
-//       );
-//     }
-//
-//     // Calculate grid dimensions based on number of boxes
-//     const int columnsPerRow = 5;
-//     final int totalRows = (numberOfBoxes / columnsPerRow).ceil();
-//
-//     return Column(
-//       children: [
-//         // Build only the required number of rows
-//         for (int row = 0; row < totalRows; row++)
-//           Expanded(
-//             child: Row(
-//               children: [
-//                 // Build columns in each row
-//                 for (int col = 0; col < columnsPerRow; col++)
-//                   () {
-//                     final paramIndex = 450 + (row * columnsPerRow) + col;
-//                     // Only show if this parameter index is within the active range
-//                     if (paramIndex < 450 + numberOfBoxes) {
-//                       return Expanded(
-//                         child: Container(
-//                           margin: EdgeInsets.all(1.w),
-//                           child: _buildParameterCell(controller, paramIndex),
-//                         ),
-//                       );
-//                     } else {
-//                       // Empty space for unused cells in the last row
-//                       return Expanded(child: SizedBox());
-//                     }
-//                   }(),
-//               ],
-//             ),
-//           ),
-//       ],
-//     );
-//   }
-//
-//   Widget _buildParameterCell(ManualController controller, int paramIndex) {
-//     return Obx(() {
-//       final value = controller.getParameterValue(paramIndex);
-//       final isModified = controller.isParameterModified(paramIndex);
-//
-//       return InkWell(
-//         onTap: () => _showEditDialog(controller, paramIndex),
-//         borderRadius: BorderRadius.circular(8.r),
-//         child: Container(
-//           height: double.infinity,
-//           decoration: BoxDecoration(
-//             color: isModified ? Colors.orange[50] : Colors.grey[100],
-//             border: Border.all(
-//               color: isModified ? Colors.orange[300]! : Colors.grey[300]!,
-//               width: isModified ? 2 : 1,
-//             ),
-//             borderRadius: BorderRadius.circular(8.r),
-//           ),
-//           padding: EdgeInsets.all(4.w),
-//           child: Column(
-//             mainAxisAlignment: MainAxisAlignment.center,
-//             children: [
-//               Text(
-//                 '$paramIndex',
-//                 style: TextStyle(
-//                   fontSize: 8.sp,
-//                   color: isModified ? Colors.orange[700] : Colors.grey[500],
-//                 ),
-//               ),
-//               SizedBox(height: 2.h),
-//               Text(
-//                 value.toString(),
-//                 style: TextStyle(
-//                   fontSize: 12.sp,
-//                   fontWeight: FontWeight.w600,
-//                   color: isModified ? Colors.orange[900] : Colors.black87,
-//                 ),
-//                 maxLines: 1,
-//                 overflow: TextOverflow.ellipsis,
-//               ),
-//               if (isModified)
-//                 Container(
-//                   width: 4.w,
-//                   height: 4.w,
-//                   margin: EdgeInsets.only(top: 2.h),
-//                   decoration: BoxDecoration(
-//                     color: Colors.orange,
-//                     shape: BoxShape.circle,
-//                   ),
-//                 ),
-//             ],
-//           ),
-//         ),
-//       );
-//     });
-//   }
-//
-//   void _showEditDialog(ManualController controller, int paramIndex) {
-//     final currentValue = controller.getParameterValue(paramIndex);
-//     final textController = TextEditingController(text: currentValue.toString());
-//
-//     Get.dialog(
-//       AlertDialog(
-//         title: Text(
-//           'Edit Box ${paramIndex - 449} (Parameter $paramIndex)',
-//           style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
-//         ),
-//         content: Column(
-//           mainAxisSize: MainAxisSize.min,
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             Text(
-//               'Current value: $currentValue',
-//               style: TextStyle(
-//                 fontSize: 12.sp,
-//                 color: Colors.grey[600],
-//               ),
-//             ),
-//             SizedBox(height: 12.h),
-//             TextField(
-//               controller: textController,
-//               keyboardType: TextInputType.number,
-//               inputFormatters: [
-//                 FilteringTextInputFormatter.digitsOnly,
-//                 LengthLimitingTextInputFormatter(5),
-//               ],
-//               decoration: InputDecoration(
-//                 labelText: 'New Value',
-//                 hintText: 'Enter value (0-65535)',
-//                 border: OutlineInputBorder(
-//                   borderRadius: BorderRadius.circular(8.r),
-//                 ),
-//                 contentPadding: EdgeInsets.symmetric(
-//                   horizontal: 12.w,
-//                   vertical: 12.h,
-//                 ),
-//               ),
-//               autofocus: true,
-//               onSubmitted: (value) {
-//                 _updateParameter(controller, paramIndex, textController.text);
-//               },
-//             ),
-//             SizedBox(height: 8.h),
-//             Text(
-//               'Valid range: 0 to 65535',
-//               style: TextStyle(
-//                 fontSize: 11.sp,
-//                 color: Colors.grey[500],
-//               ),
-//             ),
-//           ],
-//         ),
-//         actions: [
-//           TextButton(
-//             onPressed: () => Get.back(),
-//             child: Text('Cancel'),
-//           ),
-//           ElevatedButton(
-//             onPressed: () {
-//               _updateParameter(controller, paramIndex, textController.text);
-//             },
-//             style: ElevatedButton.styleFrom(
-//               backgroundColor: Colors.blue,
-//               foregroundColor: Colors.white,
-//             ),
-//             child: Text('Update'),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   void _showSetAllDialog(ManualController controller) {
-//     final textController = TextEditingController();
-//
-//     Get.dialog(
-//       AlertDialog(
-//         title: Text(
-//           'Set All Boxes',
-//           style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
-//         ),
-//         content: Column(
-//           mainAxisSize: MainAxisSize.min,
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             Text(
-//               'Set all ${controller.numberOfBoxes.value} active boxes to the same value',
-//               style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
-//             ),
-//             SizedBox(height: 16.h),
-//             TextField(
-//               controller: textController,
-//               keyboardType: TextInputType.number,
-//               inputFormatters: [
-//                 FilteringTextInputFormatter.digitsOnly,
-//                 LengthLimitingTextInputFormatter(5),
-//               ],
-//               decoration: InputDecoration(
-//                 labelText: 'Value',
-//                 hintText: 'Enter value for all boxes',
-//                 border: OutlineInputBorder(
-//                     borderRadius: BorderRadius.circular(8.r)),
-//                 contentPadding:
-//                     EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-//               ),
-//               autofocus: true,
-//             ),
-//             SizedBox(height: 8.h),
-//             Text(
-//               'Valid range: 0 to 65535',
-//               style: TextStyle(fontSize: 11.sp, color: Colors.grey[500]),
-//             ),
-//           ],
-//         ),
-//         actions: [
-//           TextButton(
-//             onPressed: () => Get.back(),
-//             child: Text('Cancel'),
-//           ),
-//           ElevatedButton(
-//             onPressed: () {
-//               Get.back();
-//               final value = int.tryParse(textController.text);
-//               if (value != null) {
-//                 controller.setAllParametersTo(value);
-//                 Get.back();
-//               } else {
-//                 Get.snackbar('Invalid Input', 'Please enter a valid number');
-//               }
-//             },
-//             style: ElevatedButton.styleFrom(
-//               backgroundColor: Colors.orange,
-//               foregroundColor: Colors.white,
-//             ),
-//             child: Text('Set All'),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   // 2. Add these methods to your ModbusParametersView class:
-//   void _saveWithCustomLoader(
-//       BuildContext context, ManualController controller) async {
-//     try {
-//       // Call the original save method
-//       await controller.saveParameters();
-//
-//       // Show custom loader only after successful save
-//       _showCustomSuccessLoader(context);
-//     } catch (e) {
-//       // Handle error if save fails
-//       Get.snackbar(
-//         'Error',
-//         'Failed to save parameters: $e',
-//         snackPosition: SnackPosition.BOTTOM,
-//         backgroundColor: Colors.red[100],
-//         colorText: Colors.red[800],
-//       );
-//     }
-//   }
-//
-//   void _showCustomSuccessLoader(BuildContext context) {
-//     showDialog(
-//       context: context,
-//       barrierDismissible: false,
-//       builder: (BuildContext context) {
-//         // Auto dismiss after 12 seconds
-//         Future.delayed(Duration(seconds: 12), () {
-//           if (Navigator.of(context).canPop()) {
-//             Navigator.of(context).pop();
-//           }
-//         });
-//
-//         return Dialog(
-//           backgroundColor: Colors.transparent,
-//           child: Container(
-//             padding: EdgeInsets.all(24.w),
-//             decoration: BoxDecoration(
-//               color: Colors.white,
-//               borderRadius: BorderRadius.circular(16.r),
-//             ),
-//             child: Column(
-//               mainAxisSize: MainAxisSize.min,
-//               children: [
-//                 // Success Animation
-//                 Container(
-//                   width: 80.w,
-//                   height: 80.w,
-//                   decoration: BoxDecoration(
-//                     color: Colors.green[100],
-//                     shape: BoxShape.circle,
-//                   ),
-//                   child: Icon(
-//                     Icons.check,
-//                     size: 50.w,
-//                     color: Colors.green[600],
-//                   ),
-//                 ),
-//
-//                 SizedBox(height: 24.h),
-//
-//                 Text(
-//                   'Success!',
-//                   style: TextStyle(
-//                     fontSize: 24.sp,
-//                     fontWeight: FontWeight.bold,
-//                     color: Colors.grey[800],
-//                   ),
-//                 ),
-//
-//                 SizedBox(height: 12.h),
-//
-//                 Text(
-//                   'Parameters updated successfully',
-//                   style: TextStyle(
-//                     fontSize: 16.sp,
-//                     color: Colors.grey[600],
-//                   ),
-//                   textAlign: TextAlign.center,
-//                 ),
-//
-//                 SizedBox(height: 24.h),
-//
-//                 // Loading indicator
-//                 Row(
-//                   mainAxisAlignment: MainAxisAlignment.center,
-//                   children: [
-//                     SizedBox(
-//                       width: 20.w,
-//                       height: 20.w,
-//                       child: CircularProgressIndicator(
-//                         strokeWidth: 2,
-//                         valueColor:
-//                             AlwaysStoppedAnimation<Color>(Colors.green[600]!),
-//                       ),
-//                     ),
-//                     SizedBox(width: 12.w),
-//                     Text(
-//                       'Refreshing data...',
-//                       style: TextStyle(
-//                         fontSize: 14.sp,
-//                         color: Colors.grey[600],
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ],
-//             ),
-//           ),
-//         );
-//       },
-//     );
-//   }
-//
-//   void _updateParameter(
-//       ManualController controller, int paramIndex, String newValueStr) {
-//     final newValue = int.tryParse(newValueStr);
-//
-//     if (newValue == null) {
-//       Get.snackbar(
-//         'Invalid Input',
-//         'Please enter a valid number',
-//         snackPosition: SnackPosition.BOTTOM,
-//       );
-//       return;
-//     }
-//
-//     controller.updateParameter(paramIndex, newValue);
-//     Get.back();
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -884,59 +193,63 @@ class ManualSchedule extends StatelessWidget {
 
         return Column(
           children: [
-            // Info header with better design
-            Container(
-              width: double.infinity,
-              margin: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
-              padding: EdgeInsets.all(16.w),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.blue[50]!, Colors.blue[100]!],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+            // Info header with better design - now clickable to add valves
+            GestureDetector(
+              onTap: () => null,
+              child: Container(
+                width: double.infinity,
+                margin: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
+                padding: EdgeInsets.all(16.w),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.blue[50]!, Colors.blue[100]!],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(color: Colors.blue[200]!, width: 1),
                 ),
-                borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(color: Colors.blue[200]!, width: 1),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(8.w),
-                    decoration: BoxDecoration(
-                      color: Colors.blue[600],
-                      borderRadius: BorderRadius.circular(8.r),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(8.w),
+                      decoration: BoxDecoration(
+                        color: Colors.blue[600],
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: Icon(
+                        Icons.developer_board,
+                        color: Colors.white,
+                        size: 20.w,
+                      ),
                     ),
-                    child: Icon(
-                      Icons.developer_board,
-                      color: Colors.white,
-                      size: 20.w,
-                    ),
-                  ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Active Valves: ${controller.numberOfBoxes.value}',
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.blue[800],
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Active Valves: ${controller.numberOfBoxes.value}',
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.blue[800],
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 2.h),
-                        Text(
-                          'Parameters ${450} to ${449 + controller.numberOfBoxes.value} • Tap any valve to edit',
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            color: Colors.blue[600],
+                          SizedBox(height: 2.h),
+                          Text(
+                            'Parameters ${450} to ${449 + controller.numberOfBoxes.value} ',
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: Colors.blue[600],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                    // Add an icon to indicate it's clickable
+                  ],
+                ),
               ),
             ),
 
@@ -1027,30 +340,15 @@ class ManualSchedule extends StatelessWidget {
     );
   }
 
+  // Updated to show all 50 boxes instead of using numberOfBoxes
   Widget _buildImprovedParametersGrid(ManualController controller) {
-    final numberOfBoxes = controller.numberOfBoxes.value;
+    // CHANGE: Always show 50 boxes instead of using numberOfBoxes
+    final totalBoxesToShow = 50; // Always show 50 boxes
 
-    if (numberOfBoxes == 0) {
-      return Center(
-        child: Padding(
-          padding: EdgeInsets.all(32.w),
-          child: Text(
-            'No active boxes',
-            style: TextStyle(
-              fontSize: 14.sp,
-              color: Colors.grey[500],
-            ),
-          ),
-        ),
-      );
-    }
-
-    // Responsive grid with better spacing
-    final screenWidth = Get.width - 64.w; // Account for margins and padding
-    final cellWidth =
-        (screenWidth / 6).clamp(60.0, 80.0); // 6 columns max, min 60, max 80
+    final screenWidth = Get.width - 64.w;
+    final cellWidth = (screenWidth / 6).clamp(60.0, 80.0);
     final columnsPerRow = (screenWidth / cellWidth).floor().clamp(3, 6);
-    final totalRows = (numberOfBoxes / columnsPerRow).ceil();
+    final totalRows = (totalBoxesToShow / columnsPerRow).ceil();
 
     return Column(
       children: [
@@ -1063,7 +361,7 @@ class ManualSchedule extends StatelessWidget {
                 for (int col = 0; col < columnsPerRow; col++)
                   () {
                     final paramIndex = 450 + (row * columnsPerRow) + col;
-                    if (paramIndex < 450 + numberOfBoxes) {
+                    if (paramIndex < 450 + totalBoxesToShow) {
                       return Expanded(
                         child: Container(
                           margin: EdgeInsets.symmetric(horizontal: 3.w),
@@ -1082,6 +380,7 @@ class ManualSchedule extends StatelessWidget {
     );
   }
 
+  // Updated parameter cell to show live vs dummy status
   Widget _buildImprovedParameterCell(
       ManualController controller, int paramIndex) {
     return Obx(() {
@@ -1089,32 +388,37 @@ class ManualSchedule extends StatelessWidget {
       final isModified = controller.isParameterModified(paramIndex);
       final boxNumber = paramIndex - 449;
 
+      // NEW: Check if this box has live data or dummy data
+      final isLiveData = paramIndex < 450 + controller.numberOfBoxes.value;
+
       return Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () => _showEditDialog(controller, paramIndex),
+          onTap:
+              isLiveData ? () => _showEditDialog(controller, paramIndex) : null,
           borderRadius: BorderRadius.circular(12.r),
           child: AnimatedContainer(
             duration: Duration(milliseconds: 200),
             height: 70.h,
             decoration: BoxDecoration(
-              gradient: isModified
-                  ? LinearGradient(
-                      colors: [Colors.orange[50]!, Colors.orange[100]!],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    )
-                  : LinearGradient(
-                      colors: [Colors.grey[50]!, Colors.grey[100]!],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+              gradient: isLiveData
+                  ? (isModified
+                      ? LinearGradient(
+                          colors: [Colors.orange[50]!, Colors.orange[100]!])
+                      : LinearGradient(
+                          colors: [Colors.blue[50]!, Colors.blue[100]!]))
+                  : LinearGradient(colors: [
+                      Colors.grey[200]!,
+                      Colors.grey[300]!
+                    ]), // Dummy data style
               border: Border.all(
-                color: isModified ? Colors.orange[400]! : Colors.grey[300]!,
-                width: isModified ? 2 : 1,
+                color: isLiveData
+                    ? (isModified ? Colors.orange[400]! : Colors.blue[300]!)
+                    : Colors.grey[400]!, // Dummy border
+                width: isLiveData ? (isModified ? 2 : 1) : 1,
               ),
               borderRadius: BorderRadius.circular(12.r),
-              boxShadow: isModified
+              boxShadow: isModified && isLiveData
                   ? [
                       BoxShadow(
                         color: Colors.orange.withOpacity(0.2),
@@ -1141,9 +445,8 @@ class ManualSchedule extends StatelessWidget {
                         '$paramIndex',
                         style: TextStyle(
                           fontSize: 10.sp,
-                          color: isModified
-                              ? Colors.orange[700]
-                              : Colors.grey[600],
+                          color:
+                              isLiveData ? Colors.blue[700] : Colors.grey[600],
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -1153,17 +456,26 @@ class ManualSchedule extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w700,
-                          color:
-                              isModified ? Colors.orange[900] : Colors.black87,
+                          color: isLiveData ? Colors.black87 : Colors.grey[500],
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
+                      // NEW: Show data type indicator
+                      Text(
+                        isLiveData ? 'ACTIVE' : 'INACTIVE',
+                        style: TextStyle(
+                          fontSize: 6.sp,
+                          color:
+                              isLiveData ? Colors.green[600] : Colors.grey[400],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                // Modified indicator
-                if (isModified)
+                // Modified indicator (only for live data)
+                if (isModified && isLiveData)
                   Positioned(
                     top: 4.h,
                     right: 4.w,
@@ -1434,6 +746,199 @@ class ManualSchedule extends StatelessWidget {
       ),
     );
   }
+
+  // NEW: Add valves dialog with 12-second custom loader
+  // void _showAddValvesDialog(ManualController controller) {
+  //   final textController = TextEditingController(
+  //       text: controller.numberOfBoxes.value.toString()
+  //   );
+  //
+  //   Get.dialog(
+  //     AlertDialog(
+  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+  //       title: Row(
+  //         children: [
+  //           Container(
+  //             padding: EdgeInsets.all(8.w),
+  //             decoration: BoxDecoration(
+  //               color: Colors.blue[100],
+  //               borderRadius: BorderRadius.circular(8.r),
+  //             ),
+  //             child: Icon(
+  //               Icons.settings,
+  //               size: 20.w,
+  //               color: Colors.blue[700],
+  //             ),
+  //           ),
+  //           SizedBox(width: 12.w),
+  //           Expanded(
+  //             child: Text(
+  //               'Configure Valves',
+  //               style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //       content: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           // Current configuration display
+  //           Container(
+  //             width: double.infinity,
+  //             padding: EdgeInsets.all(12.w),
+  //             decoration: BoxDecoration(
+  //               color: Colors.blue[50],
+  //               borderRadius: BorderRadius.circular(8.r),
+  //               border: Border.all(color: Colors.blue[200]!),
+  //             ),
+  //             child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Text(
+  //                   'Current Configuration:',
+  //                   style: TextStyle(
+  //                       fontSize: 12.sp,
+  //                       fontWeight: FontWeight.w600,
+  //                       color: Colors.blue[700]
+  //                   ),
+  //                 ),
+  //                 SizedBox(height: 4.h),
+  //                 Text(
+  //                   'Active Valves: ${controller.numberOfBoxes.value}',
+  //                   style: TextStyle(fontSize: 14.sp, color: Colors.blue[700]),
+  //                 ),
+  //                 Text(
+  //                   'Modbus: 139,561,001,${controller.numberOfBoxes.value.toString().padLeft(5, '0')},006',
+  //                   style: TextStyle(
+  //                     fontSize: 12.sp,
+  //                     color: Colors.blue[600],
+  //                     fontFamily: 'monospace',
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //           SizedBox(height: 16.h),
+  //
+  //           // Input field
+  //           TextField(
+  //             controller: textController,
+  //             keyboardType: TextInputType.number,
+  //             inputFormatters: [
+  //               FilteringTextInputFormatter.digitsOnly,
+  //               LengthLimitingTextInputFormatter(2),
+  //             ],
+  //             decoration: InputDecoration(
+  //               labelText: 'Number of Valves',
+  //               hintText: 'Enter number (1-50)',
+  //               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
+  //               focusedBorder: OutlineInputBorder(
+  //                 borderRadius: BorderRadius.circular(8.r),
+  //                 borderSide: BorderSide(color: Colors.blue, width: 2),
+  //               ),
+  //               contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+  //               prefixIcon: Icon(Icons.developer_board),
+  //             ),
+  //             autofocus: true,
+  //           ),
+  //           SizedBox(height: 8.h),
+  //
+  //           // Help text
+  //           Row(
+  //             children: [
+  //               Icon(Icons.info_outline, size: 14.w, color: Colors.grey[500]),
+  //               SizedBox(width: 4.w),
+  //               Expanded(
+  //                 child: Text(
+  //                   'Valid range: 1 to 50 valves. This will update the modbus configuration.',
+  //                   style: TextStyle(fontSize: 11.sp, color: Colors.grey[500]),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ],
+  //       ),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () => Get.back(),
+  //           child: Text(
+  //             'Cancel',
+  //             style: TextStyle(color: Colors.grey[600]),
+  //           ),
+  //         ),
+  //         Obx(() => ElevatedButton(
+  //           onPressed: controller.isLoading.value ? null : () async {
+  //             final newValue = int.tryParse(textController.text);
+  //             if (newValue != null && newValue >= 1 && newValue <= 50) {
+  //               try {
+  //                 // Close dialog first
+  //                 Get.back();
+  //
+  //                 // Show loading indicator with 12-second auto-dismiss
+  //                 Get.dialog(
+  //                   AlertDialog(
+  //                     content: Column(
+  //                       mainAxisSize: MainAxisSize.min,
+  //                       children: [
+  //                         CircularProgressIndicator(),
+  //                         SizedBox(height: 16.h),
+  //                         Text('Updating valve configuration...'),
+  //                       ],
+  //                     ),
+  //                   ),
+  //                   barrierDismissible: false,
+  //                 );
+  //
+  //                 // Auto dismiss after 12 seconds
+  //                 Future.delayed(Duration(seconds: 12), () {
+  //                   if (Get.isDialogOpen ?? false) {
+  //                     Get.back();
+  //                   }
+  //                 });
+  //
+  //                 // Update the number of boxes and save via API (in background)
+  //                 // await controller.saveValveParameters(newValue);
+  //
+  //                 // Success feedback is handled in the controller
+  //               } catch (e) {
+  //                 // Close loading dialog if it's still open after error
+  //                 if (Get.isDialogOpen ?? false) {
+  //                   Get.back();
+  //                 }
+  //                 // Error feedback is handled in the controller
+  //               }
+  //             } else {
+  //               Get.snackbar(
+  //                 'Invalid Input',
+  //                 'Please enter a valid number between 1 and 50',
+  //                 snackPosition: SnackPosition.BOTTOM,
+  //                 backgroundColor: Colors.red[100],
+  //                 colorText: Colors.red[800],
+  //                 duration: Duration(seconds: 3),
+  //               );
+  //             }
+  //           },
+  //           style: ElevatedButton.styleFrom(
+  //             backgroundColor: Colors.blue,
+  //             foregroundColor: Colors.white,
+  //             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+  //           ),
+  //           child: controller.isLoading.value
+  //               ? SizedBox(
+  //             width: 16.w,
+  //             height: 16.w,
+  //             child: CircularProgressIndicator(
+  //               strokeWidth: 2,
+  //               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+  //             ),
+  //           )
+  //               : Text('Update & Save'),
+  //         )),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   void _saveWithCustomLoader(
       BuildContext context, ManualController controller) async {

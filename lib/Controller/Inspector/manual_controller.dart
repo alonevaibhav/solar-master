@@ -145,14 +145,9 @@ class ManualController extends GetxController {
         'parameters': _getActiveParametersMap(),
       };
 
-      print(
-          '📊 Updated parameters for ${numberOfBoxes.value} boxes for IMEI: ${currentImei.value}');
-      print('Number of boxes: ${numberOfBoxes.value}');
-      print('Active box parameters values:');
       for (int i = 450; i < 450 + numberOfBoxes.value; i++) {
         if (parameterValues.containsKey(i)) {
-          print(
-              '    Box ${i - 449} (Parameter $i) = ${parameterValues[i]!.value}');
+          print('    Box ${i - 449} (Parameter $i) = ${parameterValues[i]!.value}');
         }
       }
     } catch (e) {

@@ -725,12 +725,17 @@
 //   }
 // }
 
+// -----------------------------
+
+import 'dart:typed_data';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import '../../../API Service/api_service.dart';
 import '../../../Route Manager/app_routes.dart';
+import '../../../Services/data_parser.dart';
+import '../../../Services/init.dart';
 import '../../../utils/constants.dart';
 
 class CleaningManagementController extends GetxController {
@@ -819,6 +824,8 @@ class CleaningManagementController extends GetxController {
     super.onInit();
     _initSharedPreferences();
     fetchTodaysSchedules();
+
+
   }
 
   @override
@@ -860,6 +867,45 @@ class CleaningManagementController extends GetxController {
           await _clearETAData();
         }
       }
+    }
+  }
+
+  final currentImei = ''.obs;
+  final currentTopic = ''.obs;
+  final numberOfBoxes = 0.obs;
+
+  void parseCleanerMessage(String topic, Uint8List payloadBytes) {
+    try {
+      print('🔵 parseCleanerMessage called - START');
+
+      // Extract IMEI from topic
+      currentImei.value = ModbusDataParser.extractImei(topic);
+      currentTopic.value = topic;
+      print('🔵 IMEI and topic set');
+
+      // Parse all parameters using the real parser
+      final allParameters = ModbusDataParser.parseParameters(payloadBytes);
+      print('🔵 Parameters parsed, length: ${allParameters.length}');
+
+      // Check the condition explicitly
+      print('🔵 Condition check: 561 < ${allParameters.length} = ${561 < allParameters.length}');
+
+      if (561 < allParameters.length) {
+        print('🔵 About to set numberOfBoxes.value');
+        numberOfBoxes.value = allParameters[561];
+        print('🔵 numberOfBoxes.value set to: ${numberOfBoxes.value}');
+        print('Parsed number of boxes xoxo: ${numberOfBoxes.value}');
+      } else {
+        print('🔴 Condition failed - array length: ${allParameters.length}');
+      }
+
+      print('🔵 parseCleanerMessage completed - END');
+
+    } catch (e) {
+      print('🔴 Exception caught: $e');
+      print('🔴 Stack trace: ${StackTrace.current}');
+      errorMessage.value = 'Error parsing MQTT message: $e';
+      Get.snackbar('Parse Error', errorMessage.value);
     }
   }
 
@@ -1341,21 +1387,42 @@ class CleaningManagementController extends GetxController {
     }
   }
 
-  void navigateToTaskDetails(Map<String, dynamic> taskData) {
-    // Clear ETA if switching to a different task
-    if (selectedTaskId.value != taskData['id'] && isETAActive.value) {
-      _etaTimer?.cancel();
-      isETAActive.value = false;
-      remainingETA.value = 0;
-    }
+  // Future<void> navigateToTaskDetails(Map<String, dynamic> taskData)  async {
+  //   // Clear ETA if switching to a different task
+  //   if (selectedTaskId.value != taskData['id'] && isETAActive.value) {
+  //     _etaTimer?.cancel();
+  //     isETAActive.value = false;
+  //     remainingETA.value = 0;
+  //   }
+  //   // // // Get UUID from the selected plant
+  //   // final uuid = taskData['plant_uuid']?.toString();
+  //   //
+  //   // if (uuid != null) {
+  //   //   print('Initializing MQTT for plant UUID: $uuid');
+  //   //   // Initialize/reinitialize MQTT with the selected plant's UUID
+  //   //   await AppInitializer.reinitializeWithUUID(uuid);
+  //   //   print('✅ MQTT successfully initialized for UUID: $uuid');
+  //   // } else {
+  //   //   print('⚠️ No UUID found for selected plant');
+  //   // }
+  //
+  //
+  //   taskDetails.value = taskData;
+  //   selectedTaskId.value = taskData['id'];
+  //   taskStatus.value = taskData['status'] ?? 'pending';
+  //
+  //   // Restore ETA state for this specific task
+  //   _restoreETAState();
+  //
+  //   fetchReportData(taskData['id']);
+  //   Get.toNamed(AppRoutes.clenupDetailsPage, arguments: taskData);
+  // }
 
+    void navigateToTaskDetails(Map<String, dynamic> taskData) {
     taskDetails.value = taskData;
     selectedTaskId.value = taskData['id'];
-    taskStatus.value = taskData['status'] ?? 'pending';
-
-    // Restore ETA state for this specific task
-    _restoreETAState();
-
+    taskStatus.value =
+        taskData['status'] ?? 'pending'; // Set status from schedule data
     fetchReportData(taskData['id']);
     Get.toNamed(AppRoutes.clenupDetailsPage);
   }

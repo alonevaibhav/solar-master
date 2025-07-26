@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -33,7 +31,7 @@ class DetailsViewTask extends StatelessWidget {
               onPressed: () => Get.back(),
             ),
             title: Text(
-              'Task Details',
+              'Task Detailsli',
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 16.2.sp,
@@ -221,7 +219,8 @@ class DetailsViewTask extends StatelessWidget {
                   child: LinearProgressIndicator(
                     backgroundColor: Colors.white.withOpacity(0.3),
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    value: controller.remainingETA.value / (controller.maintenanceETA.value * 60),
+                    value: controller.remainingETA.value /
+                        (controller.maintenanceETA.value * 60),
                   ),
                 ),
               ],
@@ -397,8 +396,8 @@ class DetailsViewTask extends StatelessWidget {
               Obx(() {
                 final status = controller.taskStatus.value;
                 return Container(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 7.2.w, vertical: 1.8.h),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 7.2.w, vertical: 1.8.h),
                   decoration: BoxDecoration(
                     color: controller.getStatusColor(status).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(7.2.r),
@@ -493,82 +492,55 @@ class DetailsViewTask extends StatelessWidget {
         ),
         SizedBox(height: 10.8.h),
 
-        // Generate panel valve items based on total panels
+        // Show total panel valves count
         Obx(() {
-          final totalPanels = controller.totalPanels;
-          final maxDisplay = totalPanels > 4 ? 4 : totalPanels;
+          final totalPanels = controller.numberOfBoxes.value;
+          final isCompleted = controller.taskStatus.value == 'done';
 
-          return Column(
-            children: List.generate(maxDisplay, (index) {
-              final panelNumber = index + 1;
-              final isCompleted = controller.taskStatus.value == 'done';
-
-              return Container(
-                margin: EdgeInsets.only(bottom: 10.8.h),
-                padding: EdgeInsets.all(14.4.w),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10.8.r),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 9,
-                      offset: Offset(0, 1.8),
-                    ),
-                  ],
+          return Container(
+            padding: EdgeInsets.all(14.4.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10.8.r),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 9,
+                  offset: Offset(0, 1.8),
                 ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Panel Valve - $panelNumber',
-                        style: TextStyle(
-                          fontSize: 12.6.sp,
-                          color: Colors.black87,
-                        ),
-                      ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Total Panel Valves: $totalPanels',
+                    style: TextStyle(
+                      fontSize: 12.6.sp,
+                      color: Colors.black87,
                     ),
-                    Container(
-                      width: 21.6.w,
-                      height: 21.6.h,
-                      decoration: BoxDecoration(
-                        color: isCompleted
-                            ? Colors.green.shade400
-                            : Colors.grey.shade300,
-                        shape: BoxShape.circle,
-                      ),
-                      child: isCompleted
-                          ? Icon(
-                        Icons.check,
-                        color: Colors.white,
-                        size: 14.4.w,
-                      )
-                          : null,
-                    ),
-                  ],
+                  ),
                 ),
-              );
-            }),
+                Container(
+                  width: 21.6.w,
+                  height: 21.6.h,
+                  decoration: BoxDecoration(
+                    color: isCompleted
+                        ? Colors.green.shade400
+                        : Colors.grey.shade300,
+                    shape: BoxShape.circle,
+                  ),
+                  child: isCompleted
+                      ? Icon(
+                          Icons.check,
+                          color: Colors.white,
+                          size: 14.4.w,
+                        )
+                      : null,
+                ),
+              ],
+            ),
           );
-        }),
-
-        // Show more panels indicator if needed
-        Obx(() {
-          final totalPanels = controller.totalPanels;
-          if (totalPanels > 4) {
-            return Container(
-              margin: EdgeInsets.only(top: 7.2.h),
-              child: Text(
-                '... and ${totalPanels - 4} more panels',
-                style: TextStyle(
-                  fontSize: 10.8.sp,
-                  color: Colors.grey.shade600,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            );
-          }
-          return SizedBox.shrink();
         }),
       ],
     );
@@ -598,21 +570,21 @@ class DetailsViewTask extends StatelessWidget {
           ),
           child: controller.isMaintenanceModeLoading.value
               ? SizedBox(
-            width: 18.w,
-            height: 18.h,
-            child: CircularProgressIndicator(
-              color: Colors.white,
-              strokeWidth: 2,
-            ),
-          )
+                  width: 18.w,
+                  height: 18.h,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                )
               : Text(
-            controller.maintenanceButtonText,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 14.4.sp,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+                  controller.maintenanceButtonText,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14.4.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
         ),
       );
     });

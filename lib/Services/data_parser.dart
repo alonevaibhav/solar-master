@@ -30,7 +30,7 @@ class ModbusDataParser {
 
         final paramIndex = (++index ~/ 2);
 
-        print('    $varIndex: Parameter $varIndex = $value');
+        // print('    $varIndex: Parameter $varIndex = $value');
         varIndex++;
 
         // Show first 10 parameters, then summarize

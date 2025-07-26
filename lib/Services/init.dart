@@ -48,12 +48,14 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import '../Controller/Inspector/automatic_controller.dart';
 import '../Controller/Inspector/manual_controller.dart';
+import '../View/Cleaner/CleanupManegment/cleanup_controller.dart';
 import 'mqtt-service.dart';
 
 class AppInitializer {
   static SolarMQTTService? mqttService; // Changed from late to nullable
   static late ModbusParametersController modbusController;
   static late ManualController manualController;
+  static late CleaningManagementController cleaningManagementController;
   static bool _isInitialized = false;
 
   static Future<void> initialize({String? uuid}) async {
@@ -62,6 +64,7 @@ class AppInitializer {
     // Initialize both controllers
     modbusController = Get.put(ModbusParametersController());
     manualController = Get.put(ManualController());
+    cleaningManagementController = Get.put(CleaningManagementController());
 
     _isInitialized = true;
   }
@@ -80,6 +83,7 @@ class AppInitializer {
         onDataReceived: (String topic, Uint8List payload) {
           modbusController.parseModbusMessage(topic, payload);
           manualController.parseManualMessage(topic, payload);
+          // cleaningManagementController.parseCleanerMessage(topic, payload);
         },
         onConnectionChanged: (bool isConnected) {
           print('MQTT Connection status: $isConnected for UUID: $uuid');

@@ -20,7 +20,6 @@ import '../Component/Inspector/plant_details_view.dart';
 import '../View/Auth/login_page.dart';
 import '../View/Cleaner/CleanupManegment/detail_cleanu_view.dart';
 import '../View/Cleaner/c_dashboard.dart';
-import '../Component/Cleaner/TodayCleaning/task_details_view.dart';
 import '../View/Inspector/assigned_plant_view.dart';
 import '../View/Inspector/in_dashboard.dart';
 import '../View/Inspector/schedule/AutomaticSchedule/automatic_schedule.dart';
@@ -135,11 +134,11 @@ class AppRoutes {
       page: () => CleanerDetailsPage(),
       binding: AppBindings(),
     ),
-    GetPage(
-      name: cleanerNew,
-      page: () => TaskDetailsView(),
-      binding: AppBindings(),
-    ),
+    // GetPage(
+    //   name: cleanerNew,
+    //   page: () => TaskDetailsView(),
+    //   binding: AppBindings(),
+    // ),
     GetPage(
       name: clenupDetailsPage,
       page: () => DetailsViewTask(),

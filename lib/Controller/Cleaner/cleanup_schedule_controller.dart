@@ -294,8 +294,7 @@ class CleanupScheduleController extends GetxController {
 
   // Select task for details view
   void selectTask(Map<String, dynamic> schedule) {
-    Get.toNamed(AppRoutes.cleanerNew,
-        arguments: schedule); // Pass task data to the new route
+    Get.toNamed(AppRoutes.cleanerNew, arguments: schedule); // Pass task data to the new route
   }
 
   // Start task (change status to ongoing)

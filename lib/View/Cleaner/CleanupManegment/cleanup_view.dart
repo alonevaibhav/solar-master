@@ -4,31 +4,36 @@ import 'package:get/get.dart';
 import 'cleanup_controller.dart';
 
 class CleaningManagementView extends StatelessWidget {
-  const CleaningManagementView({Key? key}) : super(key: key);
+  const CleaningManagementView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(CleaningManagementController());
+    controller.fetchTodaysSchedules();
+
     return GetBuilder<CleaningManagementController>(
-      init: CleaningManagementController(),
       builder: (controller) {
         return Scaffold(
           backgroundColor: Colors.grey.shade100,
-          body: SafeArea(
-            child: Padding(
-              padding: EdgeInsets.all(12.8.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSearchBar(),
-                  SizedBox(height: 19.2.h),
-                  _buildStatusCards(controller),
-                  SizedBox(height: 19.2.h),
-                  _buildAreaSection(controller),
-                  SizedBox(height: 12.8.h),
-                  Expanded(
-                    child: _buildTaskList(controller),
-                  ),
-                ],
+          body: RefreshIndicator(
+            onRefresh: controller.refreshData,
+            child: SafeArea(
+              child: Padding(
+                padding: EdgeInsets.all(12.8.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildSearchBar(),
+                    SizedBox(height: 19.2.h),
+                    _buildStatusCards(controller),
+                    SizedBox(height: 19.2.h),
+                    _buildAreaSection(controller),
+                    SizedBox(height: 12.8.h),
+                    Expanded(
+                      child: _buildTaskList(controller),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -36,6 +41,8 @@ class CleaningManagementView extends StatelessWidget {
       },
     );
   }
+}
+
 
   Widget _buildSearchBar() {
     return Container(
@@ -53,7 +60,7 @@ class CleaningManagementView extends StatelessWidget {
       ),
       child: TextField(
         decoration: InputDecoration(
-          hintText: 'Search Area...',
+          hintText: 'no search...',
           hintStyle: TextStyle(
             color: Colors.grey.shade500,
             fontSize: 12.8.sp,
@@ -64,8 +71,7 @@ class CleaningManagementView extends StatelessWidget {
             size: 16.w,
           ),
           border: InputBorder.none,
-          contentPadding:
-          EdgeInsets.symmetric(horizontal: 12.8.w, vertical: 9.6.h),
+          contentPadding: EdgeInsets.symmetric(horizontal: 12.8.w, vertical: 9.6.h),
         ),
       ),
     );
@@ -174,7 +180,7 @@ class CleaningManagementView extends StatelessWidget {
     return Obx(() {
       final areaName = controller.todaysSchedules.value?.isNotEmpty == true
           ? controller.todaysSchedules.value!.first['area_name'] ??
-          'Unknown Area'
+              'Unknown Area'
           : 'No Area';
 
       Color statusColor;
@@ -252,20 +258,18 @@ class CleaningManagementView extends StatelessWidget {
         );
       }
 
-      return RefreshIndicator(
-        onRefresh: controller.refreshData,
-        child: ListView.builder(
-          itemCount: controller.todaysSchedules.value!.length,
-          itemBuilder: (context, index) {
-            final task = controller.todaysSchedules.value![index];
-            return _buildTaskCard(controller, task);
-          },
-        ),
+      return ListView.builder(
+        itemCount: controller.todaysSchedules.value!.length,
+        itemBuilder: (context, index) {
+          final task = controller.todaysSchedules.value![index];
+          return _buildTaskCard(controller, task);
+        },
       );
     });
   }
 
-  Widget _buildTaskCard(CleaningManagementController controller, Map<String, dynamic> task) {
+  Widget _buildTaskCard(
+      CleaningManagementController controller, Map<String, dynamic> task) {
     return Obx(() {
       // Get the current status from reportData
       // Get the task ID
@@ -321,7 +325,7 @@ class CleaningManagementView extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: ()  {
+            onTap: () {
               controller.fetchReportData(task['id']);
               controller.navigateToTaskDetails(task);
             },
@@ -369,10 +373,10 @@ class CleaningManagementView extends StatelessWidget {
                               status == 'pending'
                                   ? 'Cleaning Pending'
                                   : status == 'ongoing'
-                                  ? 'In Progress'
-                                  : status == 'done'
-                                  ? 'Completed'
-                                  : status.toUpperCase(),
+                                      ? 'In Progress'
+                                      : status == 'done'
+                                          ? 'Completed'
+                                          : status.toUpperCase(),
                               style: TextStyle(
                                 color: controller.getStatusColor(status),
                                 fontSize: 9.6.sp,
@@ -439,8 +443,6 @@ class CleaningManagementView extends StatelessWidget {
       );
     });
   }
-
-
 
   void _showPendingCleanups(CleaningManagementController controller) {
     Get.bottomSheet(
@@ -555,6 +557,4 @@ class CleaningManagementView extends StatelessWidget {
       ),
     );
   }
-}
-
 

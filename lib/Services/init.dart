@@ -83,7 +83,7 @@ class AppInitializer {
         onDataReceived: (String topic, Uint8List payload) {
           modbusController.parseModbusMessage(topic, payload);
           manualController.parseManualMessage(topic, payload);
-          // cleaningManagementController.parseCleanerMessage(topic, payload);
+          cleaningManagementController.parseCleanerMessage(topic, payload);
         },
         onConnectionChanged: (bool isConnected) {
           print('MQTT Connection status: $isConnected for UUID: $uuid');

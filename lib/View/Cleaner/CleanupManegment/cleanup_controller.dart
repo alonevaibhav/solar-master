@@ -1387,45 +1387,45 @@ class CleaningManagementController extends GetxController {
     }
   }
 
-  // Future<void> navigateToTaskDetails(Map<String, dynamic> taskData)  async {
-  //   // Clear ETA if switching to a different task
-  //   if (selectedTaskId.value != taskData['id'] && isETAActive.value) {
-  //     _etaTimer?.cancel();
-  //     isETAActive.value = false;
-  //     remainingETA.value = 0;
-  //   }
-  //   // // // Get UUID from the selected plant
-  //   // final uuid = taskData['plant_uuid']?.toString();
-  //   //
-  //   // if (uuid != null) {
-  //   //   print('Initializing MQTT for plant UUID: $uuid');
-  //   //   // Initialize/reinitialize MQTT with the selected plant's UUID
-  //   //   await AppInitializer.reinitializeWithUUID(uuid);
-  //   //   print('✅ MQTT successfully initialized for UUID: $uuid');
-  //   // } else {
-  //   //   print('⚠️ No UUID found for selected plant');
-  //   // }
-  //
-  //
-  //   taskDetails.value = taskData;
-  //   selectedTaskId.value = taskData['id'];
-  //   taskStatus.value = taskData['status'] ?? 'pending';
-  //
-  //   // Restore ETA state for this specific task
-  //   _restoreETAState();
-  //
-  //   fetchReportData(taskData['id']);
-  //   Get.toNamed(AppRoutes.clenupDetailsPage, arguments: taskData);
-  // }
+  Future<void> navigateToTaskDetails(Map<String, dynamic> taskData)  async {
+    // Clear ETA if switching to a different task
+    if (selectedTaskId.value != taskData['id'] && isETAActive.value) {
+      _etaTimer?.cancel();
+      isETAActive.value = false;
+      remainingETA.value = 0;
+    }
+    // // Get UUID from the selected plant
+    final uuid = taskData['plant_uuid']?.toString();
 
-    void navigateToTaskDetails(Map<String, dynamic> taskData) {
+    if (uuid != null) {
+      print('Initializing MQTT for plant UUID: $uuid');
+      // Initialize/reinitialize MQTT with the selected plant's UUID
+      await AppInitializer.reinitializeWithUUID(uuid);
+      print('✅ MQTT successfully initialized for UUID: $uuid');
+    } else {
+      print('⚠️ No UUID found for selected plant');
+    }
+
+
     taskDetails.value = taskData;
     selectedTaskId.value = taskData['id'];
-    taskStatus.value =
-        taskData['status'] ?? 'pending'; // Set status from schedule data
+    taskStatus.value = taskData['status'] ?? 'pending';
+
+    // Restore ETA state for this specific task
+    _restoreETAState();
+
     fetchReportData(taskData['id']);
-    Get.toNamed(AppRoutes.clenupDetailsPage);
+    Get.toNamed(AppRoutes.clenupDetailsPage, arguments: taskData);
   }
+
+  //   void navigateToTaskDetails(Map<String, dynamic> taskData) {
+  //   taskDetails.value = taskData;
+  //   selectedTaskId.value = taskData['id'];
+  //   taskStatus.value =
+  //       taskData['status'] ?? 'pending'; // Set status from schedule data
+  //   fetchReportData(taskData['id']);
+  //   Get.toNamed(AppRoutes.clenupDetailsPage);
+  // }
 
   Future<void> refreshData() async {
     await fetchTodaysSchedules();

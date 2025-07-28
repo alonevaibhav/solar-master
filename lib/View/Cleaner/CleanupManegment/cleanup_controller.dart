@@ -1296,7 +1296,7 @@ class CleaningManagementController extends GetxController {
         ),
         actions: [
           TextButton(
-            onPressed: () => Get.back(),
+            onPressed: () => Navigator.of(Get.context!).pop(), // Try this instead
             child: Text(
               'Cancel',
               style: TextStyle(
@@ -1307,7 +1307,7 @@ class CleaningManagementController extends GetxController {
           ),
           TextButton(
             onPressed: () {
-              Get.back();
+              Navigator.of(Get.context!).pop(); // And here
               _updateTaskStatusToFinal('failed');
             },
             style: TextButton.styleFrom(
@@ -1327,7 +1327,7 @@ class CleaningManagementController extends GetxController {
           ),
           ElevatedButton(
             onPressed: () {
-              Get.back();
+              Navigator.of(Get.context!).pop(); // And here
               _updateTaskStatusToFinal('done');
             },
             style: ElevatedButton.styleFrom(
@@ -1502,6 +1502,7 @@ class CleaningManagementController extends GetxController {
 
   Future<void> updateCleaningStatus() async {
     try {
+
       if (currentReportId == null) {
         throw Exception('Report ID not found');
       }
@@ -1511,9 +1512,7 @@ class CleaningManagementController extends GetxController {
 
         final response = await ApiService.put<Map<String, dynamic>>(
           endpoint: putTodayReport(currentReportId!),
-          body: {
-            'status': 'cleaning',
-          },
+          body: {'status': 'cleaning',},
           fromJson: (json) {
             if (json['success'] == true) {
               return json['data'] as Map<String, dynamic>;

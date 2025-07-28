@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -40,43 +38,43 @@ class ModbusParametersView extends StatelessWidget {
               ),
             ),
             Obx(() => Text(
-              'IMEI: ${controller.currentImei.value} | Boxes: ${controller.numberOfBoxes.value}',
-              style: TextStyle(
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey[600],
-              ),
-            )),
+                  'IMEI: ${controller.currentImei.value} | Boxes: ${controller.numberOfBoxes.value}',
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.grey[600],
+                  ),
+                )),
           ],
         ),
         actions: [
           Obx(
-                () => controller.modifiedCount > 0
+            () => controller.modifiedCount > 0
                 ? Container(
-              margin: EdgeInsets.only(right: 8.w),
-              padding:
-              EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-              decoration: BoxDecoration(
-                color: Colors.orange[100],
-                borderRadius: BorderRadius.circular(16.r),
-                border: Border.all(color: Colors.orange[300]!, width: 1),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.edit, size: 14.w, color: Colors.orange[700]),
-                  SizedBox(width: 4.w),
-                  Text(
-                    '${controller.modifiedCount}',
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.orange[800],
-                      fontWeight: FontWeight.w600,
+                    margin: EdgeInsets.only(right: 8.w),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                    decoration: BoxDecoration(
+                      color: Colors.orange[100],
+                      borderRadius: BorderRadius.circular(16.r),
+                      border: Border.all(color: Colors.orange[300]!, width: 1),
                     ),
-                  ),
-                ],
-              ),
-            )
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.edit, size: 14.w, color: Colors.orange[700]),
+                        SizedBox(width: 4.w),
+                        Text(
+                          '${controller.modifiedCount}',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: Colors.orange[800],
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
                 : SizedBox(),
           ),
           PopupMenuButton<String>(
@@ -348,7 +346,6 @@ class ModbusParametersView extends StatelessWidget {
     );
   }
 
-
 // 4. Update UI to show all 50 boxes - Modify _buildImprovedParametersGrid
   Widget _buildImprovedParametersGrid(ModbusParametersController controller) {
     // CHANGE: Always show 50 boxes instead of using numberOfBoxes
@@ -368,13 +365,14 @@ class ModbusParametersView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 for (int col = 0; col < columnsPerRow; col++)
-                      () {
+                  () {
                     final paramIndex = 50 + (row * columnsPerRow) + col;
                     if (paramIndex < 50 + totalBoxesToShow) {
                       return Expanded(
                         child: Container(
                           margin: EdgeInsets.symmetric(horizontal: 3.w),
-                          child: _buildImprovedParameterCell(controller, paramIndex),
+                          child: _buildImprovedParameterCell(
+                              controller, paramIndex),
                         ),
                       );
                     } else {
@@ -389,7 +387,8 @@ class ModbusParametersView extends StatelessWidget {
   }
 
 // 5. Update parameter cell to show live vs dummy status
-  Widget _buildImprovedParameterCell(ModbusParametersController controller, int paramIndex) {
+  Widget _buildImprovedParameterCell(
+      ModbusParametersController controller, int paramIndex) {
     return Obx(() {
       final value = controller.getParameterValue(paramIndex);
       final isModified = controller.isParameterModified(paramIndex);
@@ -401,7 +400,8 @@ class ModbusParametersView extends StatelessWidget {
       return Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: isLiveData ? () => _showEditDialog(controller, paramIndex) : null,
+          onTap:
+              isLiveData ? () => _showEditDialog(controller, paramIndex) : null,
           borderRadius: BorderRadius.circular(12.r),
           child: AnimatedContainer(
             duration: Duration(milliseconds: 200),
@@ -409,9 +409,14 @@ class ModbusParametersView extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: isLiveData
                   ? (isModified
-                  ? LinearGradient(colors: [Colors.orange[50]!, Colors.orange[100]!])
-                  : LinearGradient(colors: [Colors.blue[50]!, Colors.blue[100]!]))
-                  : LinearGradient(colors: [Colors.grey[200]!, Colors.grey[300]!]), // Dummy data style
+                      ? LinearGradient(
+                          colors: [Colors.orange[50]!, Colors.orange[100]!])
+                      : LinearGradient(
+                          colors: [Colors.blue[50]!, Colors.blue[100]!]))
+                  : LinearGradient(colors: [
+                      Colors.grey[200]!,
+                      Colors.grey[300]!
+                    ]), // Dummy data style
               border: Border.all(
                 color: isLiveData
                     ? (isModified ? Colors.orange[400]! : Colors.blue[300]!)
@@ -430,7 +435,8 @@ class ModbusParametersView extends StatelessWidget {
                         '$paramIndex',
                         style: TextStyle(
                           fontSize: 10.sp,
-                          color: isLiveData ? Colors.blue[700] : Colors.grey[600],
+                          color:
+                              isLiveData ? Colors.blue[700] : Colors.grey[600],
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -448,7 +454,8 @@ class ModbusParametersView extends StatelessWidget {
                         isLiveData ? 'ACTIVE' : 'INACTIVE',
                         style: TextStyle(
                           fontSize: 6.sp,
-                          color: isLiveData ? Colors.green[600] : Colors.grey[400],
+                          color:
+                              isLiveData ? Colors.green[600] : Colors.grey[400],
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -477,7 +484,6 @@ class ModbusParametersView extends StatelessWidget {
     });
   }
 
-
   void _showEditDialog(ModbusParametersController controller, int paramIndex) {
     final currentValue = controller.getParameterValue(paramIndex);
     final textController = TextEditingController(text: currentValue.toString());
@@ -486,7 +492,7 @@ class ModbusParametersView extends StatelessWidget {
     Get.dialog(
       AlertDialog(
         shape:
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
         title: Row(
           children: [
             Container(
@@ -509,7 +515,7 @@ class ModbusParametersView extends StatelessWidget {
                   Text(
                     'Edit Valve $boxNumber',
                     style:
-                    TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+                        TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
                   ),
                   Text(
                     'Parameter $paramIndex',
@@ -618,7 +624,7 @@ class ModbusParametersView extends StatelessWidget {
     Get.dialog(
       AlertDialog(
         shape:
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
         title: Row(
           children: [
             Container(
@@ -674,7 +680,7 @@ class ModbusParametersView extends StatelessWidget {
                   borderSide: BorderSide(color: Colors.orange, width: 2),
                 ),
                 contentPadding:
-                EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+                    EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
                 prefixIcon: Icon(Icons.numbers),
               ),
               autofocus: true,
@@ -810,7 +816,7 @@ class ModbusParametersView extends StatelessWidget {
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         valueColor:
-                        AlwaysStoppedAnimation<Color>(Colors.green[600]!),
+                            AlwaysStoppedAnimation<Color>(Colors.green[600]!),
                       ),
                     ),
                     SizedBox(width: 12.w),
@@ -830,15 +836,16 @@ class ModbusParametersView extends StatelessWidget {
       },
     );
   }
+
   // Replace your _showAddValvesDialog method with this version that has an 8-second custom loader
   void _showAddValvesDialog(ModbusParametersController controller) {
-    final textController = TextEditingController(
-        text: controller.numberOfBoxes.value.toString()
-    );
+    final textController =
+        TextEditingController(text: controller.numberOfBoxes.value.toString());
 
     Get.dialog(
       AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
         title: Row(
           children: [
             Container(
@@ -883,8 +890,7 @@ class ModbusParametersView extends StatelessWidget {
                     style: TextStyle(
                         fontSize: 12.sp,
                         fontWeight: FontWeight.w600,
-                        color: Colors.blue[700]
-                    ),
+                        color: Colors.blue[700]),
                   ),
                   SizedBox(height: 4.h),
                   Text(
@@ -915,12 +921,14 @@ class ModbusParametersView extends StatelessWidget {
               decoration: InputDecoration(
                 labelText: 'Number of Valves',
                 hintText: 'Enter number (1-50)',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.r)),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.r),
                   borderSide: BorderSide(color: Colors.blue, width: 2),
                 ),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
                 prefixIcon: Icon(Icons.developer_board),
               ),
               autofocus: true,
@@ -928,7 +936,9 @@ class ModbusParametersView extends StatelessWidget {
                 // Real-time preview of modbus string
                 if (value.isNotEmpty) {
                   int? previewValue = int.tryParse(value);
-                  if (previewValue != null && previewValue >= 1 && previewValue <= 50) {
+                  if (previewValue != null &&
+                      previewValue >= 1 &&
+                      previewValue <= 50) {
                     // You could add a preview here if needed
                   }
                 }
@@ -960,73 +970,79 @@ class ModbusParametersView extends StatelessWidget {
             ),
           ),
           Obx(() => ElevatedButton(
-            onPressed: controller.isLoading.value ? null : () async {
-              final newValue = int.tryParse(textController.text);
-              if (newValue != null && newValue >= 1 && newValue <= 50) {
-                try {
-                  // Close dialog first
-                  Get.back();
+                onPressed: controller.isLoading.value
+                    ? null
+                    : () async {
+                        final newValue = int.tryParse(textController.text);
+                        if (newValue != null &&
+                            newValue >= 1 &&
+                            newValue <= 50) {
+                          try {
+                            // Close dialog first
+                            Get.back();
 
-                  // Show loading indicator with 8-second auto-dismiss
-                  Get.dialog(
-                    AlertDialog(
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          CircularProgressIndicator(),
-                          SizedBox(height: 16.h),
-                          Text('Updating valve configuration...'),
-                        ],
-                      ),
-                    ),
-                    barrierDismissible: false,
-                  );
+                            // Show loading indicator with 8-second auto-dismiss
+                            Get.dialog(
+                              AlertDialog(
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    CircularProgressIndicator(),
+                                    SizedBox(height: 16.h),
+                                    Text('Updating valve configuration...'),
+                                  ],
+                                ),
+                              ),
+                              barrierDismissible: false,
+                            );
 
-                  // Auto dismiss after 8 seconds
-                  Future.delayed(Duration(seconds: 12), () {
-                    if (Get.isDialogOpen ?? false) {
-                      Get.back();
-                    }
-                  });
+                            // Auto dismiss after 8 seconds
+                            Future.delayed(Duration(seconds: 12), () {
+                              if (Get.isDialogOpen ?? false) {
+                                Get.back();
+                              }
+                            });
 
-                  // Update the number of boxes and save via API (in background)
-                  await controller.saveValveParameters(newValue);
+                            // Update the number of boxes and save via API (in background)
+                            await controller.saveValveParameters(newValue);
 
-                  // Success feedback is handled in the controller
-                } catch (e) {
-                  // Close loading dialog if it's still open after error
-                  if (Get.isDialogOpen ?? false) {
-                    Get.back();
-                  }
-                  // Error feedback is handled in the controller
-                }
-              } else {
-                Get.snackbar(
-                  'Invalid Input',
-                  'Please enter a valid number between 1 and 50',
-                  snackPosition: SnackPosition.BOTTOM,
-                  backgroundColor: Colors.red[100],
-                  colorText: Colors.red[800],
-                  duration: Duration(seconds: 3),
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-            ),
-            child: controller.isLoading.value
-                ? SizedBox(
-              width: 16.w,
-              height: 16.w,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            )
-                : Text('Update & Save'),
-          )),
+                            // Success feedback is handled in the controller
+                          } catch (e) {
+                            // Close loading dialog if it's still open after error
+                            if (Get.isDialogOpen ?? false) {
+                              Get.back();
+                            }
+                            // Error feedback is handled in the controller
+                          }
+                        } else {
+                          Get.snackbar(
+                            'Invalid Input',
+                            'Please enter a valid number between 1 and 50',
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: Colors.red[100],
+                            colorText: Colors.red[800],
+                            duration: Duration(seconds: 3),
+                          );
+                        }
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.r)),
+                ),
+                child: controller.isLoading.value
+                    ? SizedBox(
+                        width: 16.w,
+                        height: 16.w,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : Text('Update & Save'),
+              )),
         ],
       ),
     );

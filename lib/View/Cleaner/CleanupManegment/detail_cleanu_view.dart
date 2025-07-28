@@ -1162,7 +1162,7 @@ class DetailsViewTask extends StatelessWidget {
           onPressed: controller.isMaintenanceModeLoading.value
               ? null
               // : controller.enableMaintenanceMode,
-          : controller.toggleMaintenanceMode,
+          : controller.updateCleaningStatus,
           style: ElevatedButton.styleFrom(
             backgroundColor: controller.isMaintenanceModeEnabled.value
                 ? Colors.green.shade500

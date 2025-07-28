@@ -1528,6 +1528,8 @@ class CleaningManagementController extends GetxController {
           isETAActive.value = true;
           remainingETA.value = maintenanceETA.value * 60; // Convert to seconds
 
+          await  saveMaintenanceModeParameters();
+
           // Save ETA state
           await _saveETAState();
 

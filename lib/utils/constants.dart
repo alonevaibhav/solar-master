@@ -52,6 +52,8 @@ String getMyTicket(int inspectorId) => "/api/tickets/created-by-inspector/$inspe
 
 String mqttSchedulePost(String uuid) => "/api/mqtt/publish/$uuid";
 
+String mqttCleanerPost(String uuid) => "/api/mqtt/cleaner/publish/$uuid";
+
 String raiseTicket = "/api/tickets/create/inspector";
 
 

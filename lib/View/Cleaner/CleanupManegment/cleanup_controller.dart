@@ -1,9 +1,13 @@
+//
+// import 'dart:typed_data';
 // import 'package:get/get.dart';
 // import 'package:flutter/material.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 // import 'dart:async';
 // import '../../../API Service/api_service.dart';
 // import '../../../Route Manager/app_routes.dart';
+// import '../../../Services/data_parser.dart';
+// import '../../../Services/init.dart';
 // import '../../../utils/constants.dart';
 //
 // class CleaningManagementController extends GetxController {
@@ -37,9 +41,9 @@
 //   List<Map<String, dynamic>> get pendingCleanups {
 //     if (todaysSchedules.value == null) return [];
 //     print('All schedules: ${todaysSchedules.value?.map((s) => {
-//           'id': s['id'],
-//           'status': s['status']
-//         }).toList()}');
+//       'id': s['id'],
+//       'status': s['status']
+//     }).toList()}');
 //
 //     final pending = todaysSchedules.value!
 //         .where((schedule) => schedule['status'] == 'pending')
@@ -47,6 +51,24 @@
 //
 //     print('Pending cleanups: ${pending.length} items');
 //     return pending;
+//   }
+//
+//
+//   String? uuid;
+//
+//
+//   void setUuid(String? newUuid) {
+//     uuid = newUuid;
+//     print("UUID set to: $uuid");
+//   }
+//
+//   void printUuidInfo() {
+//     print("=== UUID Information ===");
+//     print("UUID: ${uuid ?? 'NULL'}");
+//     print("Is UUID null: ${uuid == null}");
+//     print("Is UUID empty: ${uuid?.isEmpty ?? true}");
+//     print("UUID length: ${uuid?.length ?? 0}");
+//     print("========================");
 //   }
 //
 //   List<Map<String, dynamic>> get ongoingCleanups {
@@ -92,6 +114,8 @@
 //     super.onInit();
 //     _initSharedPreferences();
 //     fetchTodaysSchedules();
+//
+//
 //   }
 //
 //   @override
@@ -107,6 +131,7 @@
 //   }
 //
 //   // Restore ETA state when app reopens
+// // Restore ETA state when app reopens
 //   Future<void> _restoreETAState() async {
 //     if (_prefs == null) return;
 //
@@ -116,23 +141,70 @@
 //     final duration = _prefs!.getInt(_etaDurationKey) ?? 0;
 //
 //     if (isActive && savedTaskId > 0 && startTime > 0) {
-//       final currentTime = DateTime.now().millisecondsSinceEpoch;
-//       final elapsedSeconds = ((currentTime - startTime) / 1000).floor();
-//       final remainingSeconds = (duration * 60) - elapsedSeconds;
+//       // Only restore if the saved task matches the current selected task
+//       if (savedTaskId == selectedTaskId.value) {
+//         final currentTime = DateTime.now().millisecondsSinceEpoch;
+//         final elapsedSeconds = ((currentTime - startTime) / 1000).floor();
+//         final remainingSeconds = (duration * 60) - elapsedSeconds;
 //
-//       if (remainingSeconds > 0) {
-//         selectedTaskId.value = savedTaskId;
-//         remainingETA.value = remainingSeconds;
-//         isETAActive.value = true;
-//         isMaintenanceModeEnabled.value = true;
-//         taskStatus.value = 'cleaning';
-//         _startETATimer();
-//       } else {
-//         // ETA expired, clean up
-//         await _clearETAData();
+//         if (remainingSeconds > 0) {
+//           remainingETA.value = remainingSeconds;
+//           isETAActive.value = true;
+//           isMaintenanceModeEnabled.value = true;
+//           taskStatus.value = 'cleaning';
+//           _startETATimer();
+//         } else {
+//           await _clearETAData();
+//         }
 //       }
 //     }
 //   }
+//
+//   final currentImei = ''.obs;
+//   final currentTopic = ''.obs;
+//   final numberOfBoxes = 0.obs;
+//
+//   void parseCleanerMessage(String topic, Uint8List payloadBytes) {
+//     try {
+//       print('🔵 parseCleanerMessage called - START');
+//
+//       // Extract IMEI from topic
+//       currentImei.value = ModbusDataParser.extractImei(topic);
+//       currentTopic.value = topic;
+//       print('🔵 IMEI and topic set');
+//
+//       // Parse all parameters using the real parser
+//       final allParameters = ModbusDataParser.parseParameters(payloadBytes);
+//       print('🔵 Parameters parsed, length: ${allParameters.length}');
+//
+//       // Check the condition explicitly
+//       print('🔵 Condition check: 561 < ${allParameters.length} = ${561 < allParameters.length}');
+//
+//       if (561 < allParameters.length) {
+//         print('🔵 About to set numberOfBoxes.value');
+//         numberOfBoxes.value = allParameters[561];
+//         print('🔵 numberOfBoxes.value set to: ${numberOfBoxes.value}');
+//         print('Parsed number of boxes xoxo: ${numberOfBoxes.value}');
+//       } else {
+//         print('🔴 Condition failed - array length: ${allParameters.length}');
+//       }
+//
+//       print('🔵 parseCleanerMessage completed - END');
+//
+//     } catch (e) {
+//       print('🔴 Exception caught: $e');
+//       print('🔴 Stack trace: ${StackTrace.current}');
+//       errorMessage.value = 'Error parsing MQTT message: $e';
+//       Get.snackbar('Parse Error', errorMessage.value);
+//     }
+//   }
+//
+//   bool get isCurrentTaskETAActive {
+//     return isETAActive.value &&
+//         _prefs?.getInt(_taskIdKey) == selectedTaskId.value;
+//   }
+//
+//
 //
 //   // Start ETA timer
 //   void _startETATimer() {
@@ -231,7 +303,7 @@
 //         if (todaysSchedules.value!.isNotEmpty) {
 //           // Update taskStatus based on selected task if any
 //           final selectedTask = todaysSchedules.value!.firstWhere(
-//             (schedule) => schedule['id'] == selectedTaskId.value,
+//                 (schedule) => schedule['id'] == selectedTaskId.value,
 //             orElse: () => <String, dynamic>{},
 //           );
 //           if (selectedTask.isNotEmpty) {
@@ -264,7 +336,7 @@
 //       selectedTaskId.value = scheduleId;
 //
 //       final taskData = todaysSchedules.value?.firstWhere(
-//         (schedule) => schedule['id'] == scheduleId,
+//             (schedule) => schedule['id'] == scheduleId,
 //         orElse: () => <String, dynamic>{},
 //       );
 //
@@ -309,7 +381,7 @@
 //         reportData.value = response.data!;
 //         // Keep the status from todaysSchedules as primary source
 //         final scheduleStatus = todaysSchedules.value?.firstWhere(
-//           (schedule) => schedule['id'] == scheduleId,
+//               (schedule) => schedule['id'] == scheduleId,
 //           orElse: () => <String, dynamic>{},
 //         )['status'];
 //
@@ -336,7 +408,7 @@
 //       // Update the status in todaysSchedules
 //       if (todaysSchedules.value != null && selectedTaskId.value > 0) {
 //         final scheduleIndex = todaysSchedules.value!.indexWhere(
-//           (schedule) => schedule['id'] == selectedTaskId.value,
+//               (schedule) => schedule['id'] == selectedTaskId.value,
 //         );
 //
 //         if (scheduleIndex != -1) {
@@ -482,7 +554,7 @@
 //         // Update the status in todaysSchedules
 //         if (todaysSchedules.value != null && selectedTaskId.value > 0) {
 //           final scheduleIndex = todaysSchedules.value!.indexWhere(
-//             (schedule) => schedule['id'] == selectedTaskId.value,
+//                 (schedule) => schedule['id'] == selectedTaskId.value,
 //           );
 //
 //           if (scheduleIndex != -1) {
@@ -494,12 +566,12 @@
 //         await fetchReportData(selectedTaskId.value);
 //
 //         String title =
-//             finalStatus == 'done' ? 'Cleaning Completed' : 'Cleaning Failed';
+//         finalStatus == 'done' ? 'Cleaning Completed' : 'Cleaning Failed';
 //         String message = finalStatus == 'done'
 //             ? 'Task has been completed successfully'
 //             : 'Task has been marked as failed';
 //         Color backgroundColor =
-//             finalStatus == 'done' ? Colors.green : Colors.red;
+//         finalStatus == 'done' ? Colors.green : Colors.red;
 //
 //         Get.snackbar(
 //           title,
@@ -537,8 +609,7 @@
 //
 //         final response = await ApiService.put<Map<String, dynamic>>(
 //           endpoint: putTodayReport(currentReportId!),
-//           body: {
-//             'status': 'cleaning',
+//           body: {'status': 'cleaning',
 //           },
 //           fromJson: (json) {
 //             if (json['success'] == true) {
@@ -563,7 +634,7 @@
 //           // Update the status in todaysSchedules
 //           if (todaysSchedules.value != null && selectedTaskId.value > 0) {
 //             final scheduleIndex = todaysSchedules.value!.indexWhere(
-//               (schedule) => schedule['id'] == selectedTaskId.value,
+//                   (schedule) => schedule['id'] == selectedTaskId.value,
 //             );
 //
 //             if (scheduleIndex != -1) {
@@ -605,14 +676,47 @@
 //     }
 //   }
 //
-//   void navigateToTaskDetails(Map<String, dynamic> taskData) {
+//
+//
+//
+//   Future<void> navigateToTaskDetails(Map<String, dynamic> taskData)  async {
+//     // Clear ETA if switching to a different task
+//     if (selectedTaskId.value != taskData['id'] && isETAActive.value) {
+//       _etaTimer?.cancel();
+//       isETAActive.value = false;
+//       remainingETA.value = 0;
+//     }
+//     // // Get UUID from the selected plant
+//     final uuid = taskData['plant_uuid']?.toString();
+//
+//     if (uuid != null) {
+//       print('Initializing MQTT for plant UUID: $uuid');
+//       // Initialize/reinitialize MQTT with the selected plant's UUID
+//       await AppInitializer.reinitializeWithUUID(uuid);
+//       print('✅ MQTT successfully initialized for UUID: $uuid');
+//     } else {
+//       print('⚠️ No UUID found for selected plant');
+//     }
+//
+//
 //     taskDetails.value = taskData;
 //     selectedTaskId.value = taskData['id'];
-//     taskStatus.value =
-//         taskData['status'] ?? 'pending'; // Set status from schedule data
+//     taskStatus.value = taskData['status'] ?? 'pending';
+//
+//     // Restore ETA state for this specific task
+//     _restoreETAState();
+//
 //     fetchReportData(taskData['id']);
-//     Get.toNamed(AppRoutes.clenupDetailsPage);
+//     Get.toNamed(AppRoutes.clenupDetailsPage, arguments: taskData);
 //   }
+//
+//   //   void navigateToTaskDetails(Map<String, dynamic> taskData) {
+//   //   taskDetails.value = taskData;
+//   //   selectedTaskId.value = taskData['id'];
+//   //   taskStatus.value = taskData['status'] ?? 'pending'; // Set status from schedule data
+//   //   fetchReportData(taskData['id']);
+//   //   Get.toNamed(AppRoutes.clenupDetailsPage,arguments: taskData);
+//   // }
 //
 //   Future<void> refreshData() async {
 //     await fetchTodaysSchedules();
@@ -724,8 +828,9 @@
 //     }
 //   }
 // }
+//
 
-// -----------------------------
+
 
 import 'dart:typed_data';
 import 'package:get/get.dart';
@@ -769,9 +874,9 @@ class CleaningManagementController extends GetxController {
   List<Map<String, dynamic>> get pendingCleanups {
     if (todaysSchedules.value == null) return [];
     print('All schedules: ${todaysSchedules.value?.map((s) => {
-      'id': s['id'],
-      'status': s['status']
-    }).toList()}');
+          'id': s['id'],
+          'status': s['status']
+        }).toList()}');
 
     final pending = todaysSchedules.value!
         .where((schedule) => schedule['status'] == 'pending')
@@ -779,6 +884,22 @@ class CleaningManagementController extends GetxController {
 
     print('Pending cleanups: ${pending.length} items');
     return pending;
+  }
+
+  String? uuid;
+
+  void setUuid(String? newUuid) {
+    uuid = newUuid;
+    print("UUID set to: $uuid");
+  }
+
+  void printUuidInfo() {
+    print("=== UUID Information ===");
+    print("UUID: ${uuid ?? 'NULL'}");
+    print("Is UUID null: ${uuid == null}");
+    print("Is UUID empty: ${uuid?.isEmpty ?? true}");
+    print("UUID length: ${uuid?.length ?? 0}");
+    print("========================");
   }
 
   List<Map<String, dynamic>> get ongoingCleanups {
@@ -824,8 +945,6 @@ class CleaningManagementController extends GetxController {
     super.onInit();
     _initSharedPreferences();
     fetchTodaysSchedules();
-
-
   }
 
   @override
@@ -888,7 +1007,8 @@ class CleaningManagementController extends GetxController {
       print('🔵 Parameters parsed, length: ${allParameters.length}');
 
       // Check the condition explicitly
-      print('🔵 Condition check: 561 < ${allParameters.length} = ${561 < allParameters.length}');
+      print(
+          '🔵 Condition check: 561 < ${allParameters.length} = ${561 < allParameters.length}');
 
       if (561 < allParameters.length) {
         print('🔵 About to set numberOfBoxes.value');
@@ -900,7 +1020,6 @@ class CleaningManagementController extends GetxController {
       }
 
       print('🔵 parseCleanerMessage completed - END');
-
     } catch (e) {
       print('🔴 Exception caught: $e');
       print('🔴 Stack trace: ${StackTrace.current}');
@@ -913,8 +1032,6 @@ class CleaningManagementController extends GetxController {
     return isETAActive.value &&
         _prefs?.getInt(_taskIdKey) == selectedTaskId.value;
   }
-
-
 
   // Start ETA timer
   void _startETATimer() {
@@ -1013,7 +1130,7 @@ class CleaningManagementController extends GetxController {
         if (todaysSchedules.value!.isNotEmpty) {
           // Update taskStatus based on selected task if any
           final selectedTask = todaysSchedules.value!.firstWhere(
-                (schedule) => schedule['id'] == selectedTaskId.value,
+            (schedule) => schedule['id'] == selectedTaskId.value,
             orElse: () => <String, dynamic>{},
           );
           if (selectedTask.isNotEmpty) {
@@ -1046,7 +1163,7 @@ class CleaningManagementController extends GetxController {
       selectedTaskId.value = scheduleId;
 
       final taskData = todaysSchedules.value?.firstWhere(
-            (schedule) => schedule['id'] == scheduleId,
+        (schedule) => schedule['id'] == scheduleId,
         orElse: () => <String, dynamic>{},
       );
 
@@ -1091,7 +1208,7 @@ class CleaningManagementController extends GetxController {
         reportData.value = response.data!;
         // Keep the status from todaysSchedules as primary source
         final scheduleStatus = todaysSchedules.value?.firstWhere(
-              (schedule) => schedule['id'] == scheduleId,
+          (schedule) => schedule['id'] == scheduleId,
           orElse: () => <String, dynamic>{},
         )['status'];
 
@@ -1118,7 +1235,7 @@ class CleaningManagementController extends GetxController {
       // Update the status in todaysSchedules
       if (todaysSchedules.value != null && selectedTaskId.value > 0) {
         final scheduleIndex = todaysSchedules.value!.indexWhere(
-              (schedule) => schedule['id'] == selectedTaskId.value,
+          (schedule) => schedule['id'] == selectedTaskId.value,
         );
 
         if (scheduleIndex != -1) {
@@ -1234,6 +1351,54 @@ class CleaningManagementController extends GetxController {
     );
   }
 
+  // Add this new method to handle maintenance mode when task is completed/failed
+  Future<void> _updateMaintenanceModeOnCompletion(String finalStatus) async {
+    print("🔧 _updateMaintenanceModeOnCompletion called with status: $finalStatus");
+
+    try {
+      // For completed/failed tasks, we want to send 0 (inactive) to turn off maintenance mode
+      int maintenanceValue = 0; // Always 0 for completed/failed tasks
+
+      print("🔧 Maintenance value to send for completion: $maintenanceValue");
+
+      // Prepare the request body for maintenance mode
+      final requestBody = {
+        "type": "control",
+        "id": 1,
+        "key": 1,
+        "value": maintenanceValue,
+      };
+
+      // Check if UUID is valid
+      if (uuid == null || uuid!.isEmpty) {
+        print("🔧 ⚠️ UUID is null or empty. Skipping maintenance mode update.");
+        return; // Don't throw error, just skip this step
+      }
+
+      final endpoint = mqttCleanerPost(uuid!);
+      print("🔧 API endpoint for completion: $endpoint");
+
+      // Make the POST request using ApiService
+      final response = await ApiService.post<Map<String, dynamic>>(
+        endpoint: endpoint,
+        body: requestBody,
+        fromJson: (json) => json as Map<String, dynamic>,
+        includeToken: true,
+      );
+
+      if (response.success) {
+        print("🔧 ✅ Success - Maintenance mode disabled after task completion");
+      } else {
+        print("🔧 ❌ Failed to disable maintenance mode: ${response.errorMessage}");
+        // Don't throw error, just log it since task completion is more important
+      }
+    } catch (e) {
+      print("🔧 ❌ Exception in _updateMaintenanceModeOnCompletion: $e");
+      // Don't rethrow - we don't want to fail task completion if maintenance mode update fails
+    }
+  }
+
+// Update the existing _updateTaskStatusToFinal method
   Future<void> _updateTaskStatusToFinal(String finalStatus) async {
     try {
       isMaintenanceModeLoading.value = true;
@@ -1257,9 +1422,15 @@ class CleaningManagementController extends GetxController {
       );
 
       if (response.success) {
-        // Clear ETA when task is completed/failed
+        // FIRST: Update maintenance mode to inactive (0) before clearing local state
+        await _updateMaintenanceModeOnCompletion(finalStatus);
+
+        // THEN: Clear ETA and local state
         _etaTimer?.cancel();
         await _clearETAData();
+
+        // Set maintenance mode to false after API call
+        isMaintenanceModeEnabled.value = false;
 
         // Update the status in todaysSchedules
         if (todaysSchedules.value != null && selectedTaskId.value > 0) {
@@ -1308,7 +1479,28 @@ class CleaningManagementController extends GetxController {
     }
   }
 
-  Future<void> enableMaintenanceMode() async {
+
+// Method to handle maintenance mode toggle (UI logic) - renamed to avoid conflict
+  void toggleMaintenanceMode() async {
+    print("🔧 toggleMaintenanceMode triggered");
+
+    try {
+      // Toggle the maintenance mode status
+      isMaintenanceModeEnabled.value = !isMaintenanceModeEnabled.value;
+
+      // Call both API methods separately
+      await Future.wait([
+        updateCleaningStatus(), // PUT request for cleaning status
+        saveMaintenanceModeParameters(), // POST request for maintenance mode
+      ]);
+    } catch (e) {
+      // Revert UI state if any API call fails
+      isMaintenanceModeEnabled.value = !isMaintenanceModeEnabled.value;
+      print("🔧 ❌ toggleMaintenanceMode failed: $e");
+    }
+  }
+
+  Future<void> updateCleaningStatus() async {
     try {
       if (currentReportId == null) {
         throw Exception('Report ID not found');
@@ -1345,7 +1537,7 @@ class CleaningManagementController extends GetxController {
           // Update the status in todaysSchedules
           if (todaysSchedules.value != null && selectedTaskId.value > 0) {
             final scheduleIndex = todaysSchedules.value!.indexWhere(
-                  (schedule) => schedule['id'] == selectedTaskId.value,
+              (schedule) => schedule['id'] == selectedTaskId.value,
             );
 
             if (scheduleIndex != -1) {
@@ -1386,8 +1578,127 @@ class CleaningManagementController extends GetxController {
       isMaintenanceModeLoading.value = false;
     }
   }
+// Update the existing saveMaintenanceModeParameters method to handle different scenarios
+  Future<void> saveMaintenanceModeParameters({bool? forceValue}) async {
+    print("🔧 saveMaintenanceModeParameters called");
+    print("🔧 Current UUID: $uuid");
+    print("🔧 Current maintenance mode status: ${isMaintenanceModeEnabled.value}");
+    print("🔧 Force value parameter: $forceValue");
 
-  Future<void> navigateToTaskDetails(Map<String, dynamic> taskData)  async {
+    try {
+      isMaintenanceModeLoading.value = true;
+      errorMessage.value = '';
+
+      // Use forceValue if provided, otherwise use current maintenance mode status
+      int maintenanceValue;
+      if (forceValue != null) {
+        maintenanceValue = forceValue ? 1 : 0;
+        print("🔧 Using forced maintenance value: $maintenanceValue");
+      } else {
+        maintenanceValue = isMaintenanceModeEnabled.value ? 1 : 0;
+        print("🔧 Using current maintenance value: $maintenanceValue");
+      }
+
+      // Prepare the request body for maintenance mode
+      final requestBody = {
+        "type": "control",
+        "id": 1,
+        "key": 1,
+        "value": maintenanceValue,
+      };
+      print("🔧 Request body: $requestBody");
+
+      // Check if UUID is valid
+      if (uuid == null || uuid!.isEmpty) {
+        throw Exception("UUID is null or empty. Cannot make API call.");
+      }
+
+      final endpoint = mqttCleanerPost(uuid!);
+      print("🔧 API endpoint: $endpoint");
+
+      // Make the POST request using ApiService
+      print("🔧 Making API call...");
+      final response = await ApiService.post<Map<String, dynamic>>(
+        endpoint: endpoint,
+        body: requestBody,
+        fromJson: (json) => json as Map<String, dynamic>,
+        includeToken: true,
+      );
+
+      print("🔧 API response received:");
+      print("🔧 Success: ${response.success}");
+      print("🔧 Status Code: ${response.statusCode}");
+      print("🔧 Data: ${response.data}");
+      print("🔧 Error Message: ${response.errorMessage}");
+
+      if (response.success) {
+        print(
+            "🔧 ✅ Success - Maintenance mode ${maintenanceValue == 1 ? 'enabled' : 'disabled'} successfully");
+
+        // Only show success message if not forced (i.e., user-initiated)
+        if (forceValue == null) {
+          Get.snackbar(
+            'Success',
+            'Maintenance mode ${maintenanceValue == 1 ? 'enabled' : 'disabled'} successfully',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+            duration: Duration(seconds: 3),
+          );
+        }
+      } else {
+        // Handle error response from ApiService
+        String errorMsg =
+            response.errorMessage ?? 'Failed to update maintenance mode';
+
+        // Customize error message based on status code
+        if (response.statusCode == 401) {
+          errorMsg = 'Authentication failed. Please login again.';
+        } else if (response.statusCode == 400) {
+          errorMsg =
+          'Invalid maintenance mode request: ${response.errorMessage}';
+        } else if (response.statusCode == 404) {
+          errorMsg = 'Device not found. Please check the UUID.';
+        }
+
+        print("🔧 ❌ API Error: $errorMsg");
+        throw Exception(errorMsg);
+      }
+    } catch (e) {
+      // Handle any errors (network, timeout, etc.)
+      String errorMsg = e.toString();
+      print("🔧 ❌ Exception caught: $errorMsg");
+
+      // Clean up error message if it contains 'Exception: '
+      if (errorMsg.startsWith('Exception: ')) {
+        errorMsg = errorMsg.substring(11);
+      }
+
+      errorMessage.value = errorMsg;
+
+      // Only revert the maintenance mode status on error if it's user-initiated (no forceValue)
+      if (forceValue == null) {
+        isMaintenanceModeEnabled.value = !isMaintenanceModeEnabled.value;
+
+        Get.snackbar(
+          'Maintenance Mode Error',
+          errorMsg,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 5),
+        );
+      }
+
+      rethrow;
+    } finally {
+      isMaintenanceModeLoading.value = false;
+      print(
+          "🔧 saveMaintenanceModeParameters completed, isMaintenanceModeLoading set to false");
+    }
+  }
+
+  Future<void> navigateToTaskDetails(Map<String, dynamic> taskData) async {
     // Clear ETA if switching to a different task
     if (selectedTaskId.value != taskData['id'] && isETAActive.value) {
       _etaTimer?.cancel();
@@ -1406,7 +1717,6 @@ class CleaningManagementController extends GetxController {
       print('⚠️ No UUID found for selected plant');
     }
 
-
     taskDetails.value = taskData;
     selectedTaskId.value = taskData['id'];
     taskStatus.value = taskData['status'] ?? 'pending';
@@ -1417,15 +1727,6 @@ class CleaningManagementController extends GetxController {
     fetchReportData(taskData['id']);
     Get.toNamed(AppRoutes.clenupDetailsPage, arguments: taskData);
   }
-
-  //   void navigateToTaskDetails(Map<String, dynamic> taskData) {
-  //   taskDetails.value = taskData;
-  //   selectedTaskId.value = taskData['id'];
-  //   taskStatus.value =
-  //       taskData['status'] ?? 'pending'; // Set status from schedule data
-  //   fetchReportData(taskData['id']);
-  //   Get.toNamed(AppRoutes.clenupDetailsPage);
-  // }
 
   Future<void> refreshData() async {
     await fetchTodaysSchedules();
@@ -1537,4 +1838,3 @@ class CleaningManagementController extends GetxController {
     }
   }
 }
-

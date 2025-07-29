@@ -26,6 +26,7 @@ import '../View/Inspector/schedule/AutomaticSchedule/automatic_schedule.dart';
 import '../View/Inspector/schedule/manual_schedule/manual_schedule.dart';
 import '../View/Inspector/user_profile.dart';
 import '../View/User/u_dashboard.dart';
+import '../login.dart';
 import 'app_bindings.dart';
 
 class AppRoutes {
@@ -74,6 +75,10 @@ class AppRoutes {
   static const manualSchedule = '/manualSchedule';
   static const automaticSchedule = '/automaticSchedule';
   static const settingPageRoute  = '/settingPageRoute';
+
+
+
+  static const loginssss  = '/loginssss';
 
 
   // All of your pages
@@ -142,6 +147,12 @@ class AppRoutes {
     GetPage(
       name: clenupDetailsPage,
       page: () => DetailsViewTask(),
+      binding: AppBindings(),
+    ),
+
+    GetPage(
+      name: loginssss,
+      page: () => LoginScreen(),
       binding: AppBindings(),
     ),
 

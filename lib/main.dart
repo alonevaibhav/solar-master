@@ -98,7 +98,7 @@ class MyApp extends StatelessWidget {
         },
         debugShowCheckedModeBanner: false,
         title: 'Restaurant App',
-        initialRoute: AppRoutes.loginssss,
+        initialRoute: initialRoute,
         getPages: AppRoutes.routes,
         initialBinding: AppBindings(),
       ),

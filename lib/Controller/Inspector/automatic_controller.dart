@@ -1,5 +1,3 @@
-
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -106,7 +104,8 @@ class ModbusParametersController extends GetxController {
         }
       }
 
-      print('📊 Live data for ${numberOfBoxes.value} boxes, dummy (0) for remaining ${50 - numberOfBoxes.value} boxes');
+      print(
+          '📊 Live data for ${numberOfBoxes.value} boxes, dummy (0) for remaining ${50 - numberOfBoxes.value} boxes');
     } catch (e) {
       errorMessage.value = 'Error parsing MQTT message: $e';
     }
@@ -141,7 +140,6 @@ class ModbusParametersController extends GetxController {
     }
   }
 
-
   /// Get only active parameters as a map (based on numberOfBoxes)
   Map<String, int> _getActiveParametersMap() {
     final maxParameterToShow = 49 + numberOfBoxes.value;
@@ -162,7 +160,8 @@ class ModbusParametersController extends GetxController {
     // Only allow updates to live data boxes
     if (index >= 50 && index < 50 + numberOfBoxes.value) {
       if (newValue < 0 || newValue > 65535) {
-        Get.snackbar('Invalid Value', 'Parameter value must be between 0 and 65535');
+        Get.snackbar(
+            'Invalid Value', 'Parameter value must be between 0 and 65535');
         return;
       }
 
@@ -171,7 +170,8 @@ class ModbusParametersController extends GetxController {
     } else {
       // For dummy data boxes, set to 0 when changed
       parameterValues[index]!.value = 0;
-      Get.snackbar('Dummy Data', 'Box ${index - 49} contains dummy data (set to 0). Only first ${numberOfBoxes.value} boxes are editable.');
+      Get.snackbar('Dummy Data',
+          'Box ${index - 49} contains dummy data (set to 0). Only first ${numberOfBoxes.value} boxes are editable.');
     }
   }
 
@@ -257,7 +257,8 @@ class ModbusParametersController extends GetxController {
         );
       } else {
         // Handle error response from ApiService
-        String errorMsg = response.errorMessage ?? 'Failed to save modbus parameters';
+        String errorMsg =
+            response.errorMessage ?? 'Failed to save modbus parameters';
 
         // Customize error message based on status code
         if (response.statusCode == 401) {
@@ -296,7 +297,6 @@ class ModbusParametersController extends GetxController {
       print("🔧 saveValveParameters completed, isLoading set to false");
     }
   }
-
 
   Future<void> saveParameters() async {
     if (modifiedParameters.isEmpty) {
@@ -397,7 +397,6 @@ class ModbusParametersController extends GetxController {
       isLoading.value = false;
     }
   }
-
 
   /// Set all active parameters to the same value
   void setAllParametersTo(int value) {

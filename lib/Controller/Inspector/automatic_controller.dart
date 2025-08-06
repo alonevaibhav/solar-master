@@ -104,8 +104,7 @@ class ModbusParametersController extends GetxController {
         }
       }
 
-      print(
-          '📊 Live data for ${numberOfBoxes.value} boxes, dummy (0) for remaining ${50 - numberOfBoxes.value} boxes');
+      print('📊 Live data for ${numberOfBoxes.value} boxes, dummy (0) for remaining ${50 - numberOfBoxes.value} boxes');
     } catch (e) {
       errorMessage.value = 'Error parsing MQTT message: $e';
     }

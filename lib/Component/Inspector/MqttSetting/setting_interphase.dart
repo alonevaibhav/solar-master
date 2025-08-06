@@ -46,6 +46,16 @@ class SchedulePage extends StatelessWidget {
                 Get.toNamed(AppRoutes.cleanerHelp, arguments: plantData);
               },
             ),
+            SizedBox(height: 16),
+            _buildScheduleTile(
+              title: 'History',
+              description: 'Check your past slot cleaning records',
+              icon: Icons.history, // more suitable for history
+              color: Colors.blueGrey, // more neutral color for history
+              onTap: () {
+                Get.toNamed(AppRoutes.historyInspector, arguments: plantData);
+              },
+            ),
           ],
         ),
       ),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../Controller/Inspector/info_plant_detail_controller.dart';
 import '../../../Route Manager/app_routes.dart';
+import '../../../View/Cleaner/CleanupManegment/cleanup_controller.dart';
 
 class InfoPlantDetailsView extends StatelessWidget {
   const InfoPlantDetailsView({Key? key}) : super(key: key);
@@ -9,6 +11,19 @@ class InfoPlantDetailsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Map<String, dynamic>? plantData = Get.arguments;
+
+    final InfoPlantDetailController controller = Get.put(
+        InfoPlantDetailController());
+
+
+    print('Received plant data: $plantData');
+    final String? uuid = plantData?['uuid']?.toString();
+    print('UUID: $uuid');
+
+
+    // Set UUID after creation
+    controller.setUuid(uuid);
+    controller.printUuidInfo();
 
     if (plantData == null) {
       return Scaffold(
@@ -55,6 +70,10 @@ class InfoPlantDetailsView extends StatelessWidget {
                   SizedBox(height: 24.h),
                   _buildQuickStatsRow(plantData),
                   SizedBox(height: 24.h),
+                  _buildSolarHealthSection(controller),
+                  // New solar health section
+                  SizedBox(height: 24.h),
+
                   _buildBasicInformation(plantData),
                   SizedBox(height: 20.h),
                   _buildPersonnelSection(plantData),
@@ -62,11 +81,39 @@ class InfoPlantDetailsView extends StatelessWidget {
                   _buildLocationSection(plantData),
                   SizedBox(height: 20.h),
                   _buildSystemInformation(plantData),
-                  if (plantData['info'] != null && plantData['info'].toString().isNotEmpty) ...[
+                  if (plantData['info'] != null &&
+                      plantData['info']
+                          .toString()
+                          .isNotEmpty) ...[
                     SizedBox(height: 20.h),
                     _buildAdditionalInfo(plantData),
                   ],
                   SizedBox(height: 32.h),
+                  Obx(() =>
+                      ElevatedButton(
+                        onPressed: controller.isLoading.value
+                            ? null
+                            : controller.toggleMaintenanceMode,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                          controller.isMaintenanceModeEnabled.value
+                              ? Colors.red
+                              : Colors.green,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 32, vertical: 16),
+                        ),
+                        child: controller.isLoading.value
+                            ? CircularProgressIndicator(color: Colors.white)
+                            : Text(
+                          controller.isMaintenanceModeEnabled.value
+                              ? 'STOP MAINTENANCE'
+                              : 'START MAINTENANCE',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      )),
                 ],
               ),
             ),
@@ -119,7 +166,6 @@ class InfoPlantDetailsView extends StatelessWidget {
         ),
       ),
       actions: [
-
         Container(
           margin: EdgeInsets.only(right: 12.w, top: 8.h, bottom: 8.h),
           child: _buildCreateTicketButton(),
@@ -155,7 +201,8 @@ class InfoPlantDetailsView extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                    padding:
+                    EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                     decoration: BoxDecoration(
                       color: statusColor.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(20.r),
@@ -190,7 +237,8 @@ class InfoPlantDetailsView extends StatelessWidget {
                   SizedBox(height: 8.h),
                   Row(
                     children: [
-                      Icon(Icons.location_on, color: Colors.white70, size: 16.sp),
+                      Icon(Icons.location_on,
+                          color: Colors.white70, size: 16.sp),
                       SizedBox(width: 6.w),
                       Expanded(
                         child: Text(
@@ -214,49 +262,9 @@ class InfoPlantDetailsView extends StatelessWidget {
   }
 
 
-  Widget _buildScheduleRow(Map<String, dynamic> plantData) {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildNavigatableStatCard(
-            'Automatic Schedule',
-            plantData['total_panels']?.toString() ?? '0',
-            Icons.schedule,
-            const Color(0xFF3B82F6),
-            onTap: () {
-              Get.toNamed(AppRoutes.automaticSchedule, arguments: plantData);
-            },
-          ),
-        ),
-        SizedBox(width: 9.6.w), // Adjusted from 12.w
-        Expanded(
-          child: _buildNavigatableStatCard(
-            'Manual Schedule',
-            '${plantData['capacity_w']?.toString() ?? '0'} W',
-            Icons.schedule_outlined,
-            const Color(0xFF10B981),
-            onTap: () {
-              Get.toNamed(AppRoutes.manualSchedule, arguments: plantData);
-            },
-          ),
-        ),
-        SizedBox(width: 9.6.w), // Adjusted from 12.w
-        Expanded(
-          child: _buildNavigatableStatCard(
-            'Info Area',
-            '${plantData['area_squrM']?.toString() ?? '0'} m²',
-            Icons.info_outline,
-            const Color(0xFFFF8C00),
-            onTap: () {
-              // Get.toNamed(AppRoutes.infoArea, arguments: plantData);
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildNavigatableStatCard(String label, String value, IconData icon, Color color, {required VoidCallback onTap}) {
+  Widget _buildNavigatableStatCard(String label, String value, IconData icon,
+      Color color,
+      {required VoidCallback onTap}) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -285,7 +293,8 @@ class InfoPlantDetailsView extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(16.r), // Adjusted from 20.r
+          borderRadius: BorderRadius.circular(16.r),
+          // Adjusted from 20.r
           splashColor: color.withOpacity(0.2),
           highlightColor: color.withOpacity(0.1),
           child: Container(
@@ -304,7 +313,8 @@ class InfoPlantDetailsView extends StatelessWidget {
                         color.withOpacity(0.8),
                       ],
                     ),
-                    borderRadius: BorderRadius.circular(12.8.r), // Adjusted from 16.r
+                    borderRadius:
+                    BorderRadius.circular(12.8.r), // Adjusted from 16.r
                     boxShadow: [
                       BoxShadow(
                         color: color.withOpacity(0.3),
@@ -338,7 +348,8 @@ class InfoPlantDetailsView extends StatelessWidget {
 
                 Container(
                   width: double.infinity,
-                  padding: EdgeInsets.symmetric(vertical: 8.h), // Adjusted from 10.h
+                  padding:
+                  EdgeInsets.symmetric(vertical: 8.h), // Adjusted from 10.h
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.centerLeft,
@@ -348,7 +359,8 @@ class InfoPlantDetailsView extends StatelessWidget {
                         color.withOpacity(0.8),
                       ],
                     ),
-                    borderRadius: BorderRadius.circular(20.r), // Adjusted from 25.r
+                    borderRadius:
+                    BorderRadius.circular(20.r), // Adjusted from 25.r
                     boxShadow: [
                       BoxShadow(
                         color: color.withOpacity(0.3),
@@ -419,7 +431,8 @@ class InfoPlantDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCard(String label, String value, IconData icon, Color color) {
+  Widget _buildStatCard(String label, String value, IconData icon,
+      Color color) {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
@@ -472,9 +485,12 @@ class InfoPlantDetailsView extends StatelessWidget {
       Icons.info_outline,
       const Color(0xFF3B82F6),
       [
-        _buildModernInfoRow('Plant ID', plantData['id']?.toString() ?? 'N/A', Icons.tag),
-        _buildModernInfoRow('UUID', plantData['uuid'] ?? 'N/A', Icons.fingerprint),
-        _buildModernInfoRow('Location', plantData['location'] ?? 'N/A', Icons.place),
+        _buildModernInfoRow(
+            'Plant ID', plantData['id']?.toString() ?? 'N/A', Icons.tag),
+        _buildModernInfoRow(
+            'UUID', plantData['uuid'] ?? 'N/A', Icons.fingerprint),
+        _buildModernInfoRow(
+            'Location', plantData['location'] ?? 'N/A', Icons.place),
       ],
     );
   }
@@ -485,9 +501,12 @@ class InfoPlantDetailsView extends StatelessWidget {
       Icons.people_outline,
       const Color(0xFF10B981),
       [
-        _buildModernInfoRow('Inspector', plantData['inspector_name'] ?? 'N/A', Icons.person_search),
-        _buildModernInfoRow('Cleaner', plantData['cleaner_name'] ?? 'N/A', Icons.cleaning_services),
-        _buildModernInfoRow('Installer', plantData['installed_by_name'] ?? 'N/A', Icons.build),
+        _buildModernInfoRow('Inspector', plantData['inspector_name'] ?? 'N/A',
+            Icons.person_search),
+        _buildModernInfoRow('Cleaner', plantData['cleaner_name'] ?? 'N/A',
+            Icons.cleaning_services),
+        _buildModernInfoRow(
+            'Installer', plantData['installed_by_name'] ?? 'N/A', Icons.build),
       ],
     );
   }
@@ -498,9 +517,12 @@ class InfoPlantDetailsView extends StatelessWidget {
       Icons.map_outlined,
       const Color(0xFFFF8C00),
       [
-        _buildModernInfoRow('State', plantData['state_name'] ?? 'N/A', Icons.location_city),
-        _buildModernInfoRow('District', plantData['district_name'] ?? 'N/A', Icons.domain),
-        _buildModernInfoRow('Taluka', plantData['taluka_name'] ?? 'N/A', Icons.location_on),
+        _buildModernInfoRow(
+            'State', plantData['state_name'] ?? 'N/A', Icons.location_city),
+        _buildModernInfoRow(
+            'District', plantData['district_name'] ?? 'N/A', Icons.domain),
+        _buildModernInfoRow(
+            'Taluka', plantData['taluka_name'] ?? 'N/A', Icons.location_on),
         _buildModernInfoRow('Area', plantData['area_name'] ?? 'N/A', Icons.map),
       ],
     );
@@ -512,12 +534,17 @@ class InfoPlantDetailsView extends StatelessWidget {
       Icons.settings_outlined,
       const Color(0xFF8B5CF6),
       [
-        _buildModernInfoRow('User ID', plantData['user_id']?.toString() ?? 'N/A', Icons.person),
-        _buildModernInfoRow('Distributor ID', plantData['distributor_id']?.toString() ?? 'N/A', Icons.business),
+        _buildModernInfoRow(
+            'User ID', plantData['user_id']?.toString() ?? 'N/A', Icons.person),
+        _buildModernInfoRow('Distributor ID',
+            plantData['distributor_id']?.toString() ?? 'N/A', Icons.business),
         _buildStatusRow('Status', plantData['isActive'] == 1),
-        _buildMaintenanceRow('Maintenance', plantData['under_maintenance'] == 1),
-        _buildModernInfoRow('Created', _formatDateTime(plantData['createAt']), Icons.schedule),
-        _buildModernInfoRow('Updated', _formatDateTime(plantData['UpdatedAt']), Icons.update),
+        _buildMaintenanceRow(
+            'Maintenance', plantData['under_maintenance'] == 1),
+        _buildModernInfoRow(
+            'Created', _formatDateTime(plantData['createAt']), Icons.schedule),
+        _buildModernInfoRow(
+            'Updated', _formatDateTime(plantData['UpdatedAt']), Icons.update),
       ],
     );
   }
@@ -549,7 +576,8 @@ class InfoPlantDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _buildModernSection(String title, IconData icon, Color color, List<Widget> children) {
+  Widget _buildModernSection(String title, IconData icon, Color color,
+      List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -678,10 +706,13 @@ class InfoPlantDetailsView extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
               decoration: BoxDecoration(
-                color: isActive ? const Color(0xFF10B981).withOpacity(0.1) : Colors.grey.shade100,
+                color: isActive
+                    ? const Color(0xFF10B981).withOpacity(0.1)
+                    : Colors.grey.shade100,
                 borderRadius: BorderRadius.circular(20.r),
                 border: Border.all(
-                  color: isActive ? const Color(0xFF10B981) : Colors.grey.shade300,
+                  color:
+                  isActive ? const Color(0xFF10B981) : Colors.grey.shade300,
                   width: 1,
                 ),
               ),
@@ -692,7 +723,9 @@ class InfoPlantDetailsView extends StatelessWidget {
                     width: 6.w,
                     height: 6.h,
                     decoration: BoxDecoration(
-                      color: isActive ? const Color(0xFF10B981) : Colors.grey.shade400,
+                      color: isActive
+                          ? const Color(0xFF10B981)
+                          : Colors.grey.shade400,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -701,7 +734,9 @@ class InfoPlantDetailsView extends StatelessWidget {
                     isActive ? 'Active' : 'Inactive',
                     style: TextStyle(
                       fontSize: 12.sp,
-                      color: isActive ? const Color(0xFF10B981) : Colors.grey.shade600,
+                      color: isActive
+                          ? const Color(0xFF10B981)
+                          : Colors.grey.shade600,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -744,10 +779,14 @@ class InfoPlantDetailsView extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
               decoration: BoxDecoration(
-                color: underMaintenance ? const Color(0xFFFF8C00).withOpacity(0.1) : const Color(0xFF10B981).withOpacity(0.1),
+                color: underMaintenance
+                    ? const Color(0xFFFF8C00).withOpacity(0.1)
+                    : const Color(0xFF10B981).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20.r),
                 border: Border.all(
-                  color: underMaintenance ? const Color(0xFFFF8C00) : const Color(0xFF10B981),
+                  color: underMaintenance
+                      ? const Color(0xFFFF8C00)
+                      : const Color(0xFF10B981),
                   width: 1,
                 ),
               ),
@@ -757,14 +796,18 @@ class InfoPlantDetailsView extends StatelessWidget {
                   Icon(
                     underMaintenance ? Icons.warning : Icons.check_circle,
                     size: 12.sp,
-                    color: underMaintenance ? const Color(0xFFFF8C00) : const Color(0xFF10B981),
+                    color: underMaintenance
+                        ? const Color(0xFFFF8C00)
+                        : const Color(0xFF10B981),
                   ),
                   SizedBox(width: 6.w),
                   Text(
                     underMaintenance ? 'Yes' : 'No',
                     style: TextStyle(
                       fontSize: 12.sp,
-                      color: underMaintenance ? const Color(0xFFFF8C00) : const Color(0xFF10B981),
+                      color: underMaintenance
+                          ? const Color(0xFFFF8C00)
+                          : const Color(0xFF10B981),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -802,7 +845,8 @@ class InfoPlantDetailsView extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: () {
-            Get.toNamed(AppRoutes.inspectorCreateTicket, arguments: Get.arguments);
+            Get.toNamed(AppRoutes.inspectorCreateTicket,
+                arguments: Get.arguments);
           },
           borderRadius: BorderRadius.circular(25.r),
           child: Container(
@@ -845,11 +889,195 @@ class InfoPlantDetailsView extends StatelessWidget {
 
     try {
       final DateTime parsedDate = DateTime.parse(dateTime.toString());
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      return '${parsedDate.day} ${months[parsedDate.month - 1]} ${parsedDate.year}';
+      const months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec'
+      ];
+      return '${parsedDate.day} ${months[parsedDate.month - 1]} ${parsedDate
+          .year}';
     } catch (e) {
       return dateTime.toString();
     }
+  }
+
+
+  Widget _buildSolarHealthSection(InfoPlantDetailController controller) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 2.w, vertical: 8.h),
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            children: [
+              Icon(
+                Icons.health_and_safety,
+                color: const Color(0xFF059669),
+                size: 24.sp,
+              ),
+              SizedBox(width: 8.w),
+              Text(
+                'Solar Health',
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF1F2937),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16.h),
+
+          // Health Stats Row (Water and Pressure only)
+          Obx(() => _buildSolarHealthStatsRow(controller)),
+
+          SizedBox(height: 12.h),
+
+          // RTC Time Row (Full width)
+          Obx(() => _buildRtcTimeRow(controller)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSolarHealthStatsRow(InfoPlantDetailController controller) {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildHealthStatCard(
+            'Water',
+            '${controller.floot.value}',
+            Icons.water_drop,
+            const Color(0xFF2563EB),
+            controller.flootStatus,
+          ),
+        ),
+        SizedBox(width: 12.w),
+        Expanded(
+          child: _buildHealthStatCard(
+            'Pressure',
+            '${controller.pressure.value} PSI',
+            Icons.compress,
+            const Color(0xFF2563EB),
+            controller.pressureStatus,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRtcTimeRow(InfoPlantDetailController controller) {
+    return _buildHealthStatCard(
+      'RTC Time',
+      controller.formattedRtcTime,
+      Icons.access_time,
+      const Color(0xFF3B82F6),
+      HealthStatus.good, // Time is always shown as good
+    );
+  }
+
+  Widget _buildHealthStatCard(String title,
+      String value,
+      IconData icon,
+      Color color,
+      HealthStatus status,) {
+    // Determine container color based on status
+    Color containerColor;
+    Color borderColor;
+    Color iconColor;
+    Color textColor;
+
+    switch (status) {
+      case HealthStatus.good:
+        containerColor =
+            const Color(0xFF2563EB).withOpacity(0.1); // Green background
+        borderColor = const Color(0xFF10B981).withOpacity(0.2);
+        iconColor = const Color(0xFF2563EB);
+        textColor = const Color(0xFF151A21);
+        break;
+      case HealthStatus.warning:
+        containerColor =
+            const Color(0xFFF59E0B).withOpacity(0.1); // Yellow background
+        borderColor = const Color(0xFFF59E0B).withOpacity(0.2);
+        iconColor = const Color(0xFFF59E0B);
+        textColor = const Color(0xFF1F2937);
+        break;
+      case HealthStatus.critical:
+        containerColor =
+            const Color(0xFFEF4444).withOpacity(0.1); // Red background
+        borderColor = const Color(0xFFEF4444).withOpacity(0.2);
+        iconColor = const Color(0xFFEF4444);
+        textColor = const Color(0xFF1F2937);
+        break;
+    }
+
+    return Container(
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: containerColor,
+        // Use status-based color instead of original color
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(
+          color: borderColor, // Use status-based border color
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Icon(
+                icon,
+                color: iconColor, // Use status-based icon color
+                size: 20.sp,
+              ),
+            ],
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 12.sp,
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          SizedBox(height: 4.h),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 12.sp,
+              fontWeight: FontWeight.bold,
+              color: textColor,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

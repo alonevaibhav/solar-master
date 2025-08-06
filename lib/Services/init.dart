@@ -47,6 +47,7 @@ import 'dart:typed_data';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import '../Controller/Inspector/automatic_controller.dart';
+import '../Controller/Inspector/info_plant_detail_controller.dart';
 import '../Controller/Inspector/manual_controller.dart';
 import '../View/Cleaner/CleanupManegment/cleanup_controller.dart';
 import 'mqtt-service.dart';
@@ -56,6 +57,7 @@ class AppInitializer {
   static late ModbusParametersController modbusController;
   static late ManualController manualController;
   static late CleaningManagementController cleaningManagementController;
+  static late InfoPlantDetailController infoPlantDetailController;
   static bool _isInitialized = false;
 
   static Future<void> initialize({String? uuid}) async {
@@ -65,6 +67,7 @@ class AppInitializer {
     modbusController = Get.put(ModbusParametersController());
     manualController = Get.put(ManualController());
     cleaningManagementController = Get.put(CleaningManagementController());
+    infoPlantDetailController = Get.put(InfoPlantDetailController());
 
     _isInitialized = true;
   }
@@ -84,6 +87,7 @@ class AppInitializer {
           modbusController.parseModbusMessage(topic, payload);
           manualController.parseManualMessage(topic, payload);
           cleaningManagementController.parseCleanerMessage(topic, payload);
+          infoPlantDetailController.parseModbusMessage(topic, payload);
         },
         onConnectionChanged: (bool isConnected) {
           print('MQTT Connection status: $isConnected for UUID: $uuid');

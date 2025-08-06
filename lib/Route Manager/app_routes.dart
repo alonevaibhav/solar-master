@@ -8,6 +8,7 @@ import '../Component/Cleaner/task_detail_view.dart';
 import '../Component/Cleaner/update_view.dart';
 import '../Component/Inspector/AlertsView/alerts_view.dart';
 import '../Component/Inspector/AreaInspectionView/area_history.dart';
+import '../Component/Inspector/History/history.dart';
 import '../Component/Inspector/MqttSetting/setting_interphase.dart';
 import '../Component/Inspector/PlantInfo/plant _info.dart';
 import '../Component/Inspector/PlantInfo/plant_details_view.dart';
@@ -68,6 +69,9 @@ class AppRoutes {
   static const inspectorCreateTicket = '/inspector/inspectorCreateTicket';
 
   static const  inspectorTicketChat = '/inspectorTicketChat/ticket-chat';
+
+
+  static const  historyInspector  = '/historyInspector';
 
 
   //mqtt route
@@ -247,6 +251,13 @@ class AppRoutes {
     GetPage(
       name: settingPageRoute,
       page: () => SchedulePage(),
+      binding: AppBindings(),
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: historyInspector,
+      page: () => HistoryInspector(),
       binding: AppBindings(),
       transition: Transition.rightToLeft,
       transitionDuration: const Duration(milliseconds: 300),

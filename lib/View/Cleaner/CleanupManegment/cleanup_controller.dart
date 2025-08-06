@@ -1694,8 +1694,7 @@ class CleaningManagementController extends GetxController {
       rethrow;
     } finally {
       isMaintenanceModeLoading.value = false;
-      print(
-          "🔧 saveMaintenanceModeParameters completed, isMaintenanceModeLoading set to false");
+      print("🔧 saveMaintenanceModeParameters completed, isMaintenanceModeLoading set to false");
     }
   }
 

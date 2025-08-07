@@ -1,5 +1,3 @@
-
-//
 // import 'package:get/get.dart';
 // import 'package:flutter/material.dart';
 // import '../../Controller/Inspector/manual_controller.dart';
@@ -47,55 +45,55 @@
 //         actions: [
 //           Obx(() => slotController.isEditMode.value
 //               ? Row(
-//             mainAxisSize: MainAxisSize.min,
-//             children: [
-//               TextButton(
-//                 onPressed: slotController.isSaving.value
-//                     ? null
-//                     : slotController.cancelEdit,
-//                 child: Text(
-//                   'Cancel',
-//                   style: TextStyle(
-//                       color: slotController.isSaving.value
-//                           ? Colors.grey[400]
-//                           : Colors.grey[600]),
-//                 ),
-//               ),
-//               SizedBox(width: 8),
-//               ElevatedButton(
-//                 onPressed: slotController.isSaving.value
-//                     ? null
-//                     : () => _saveWithCustomLoader(context),
-//                 style: ElevatedButton.styleFrom(
-//                   backgroundColor: slotController.isSaving.value
-//                       ? Colors.grey[400]
-//                       : Colors.blue,
-//                   foregroundColor: Colors.white,
-//                   elevation: 0,
-//                   shape: RoundedRectangleBorder(
-//                     borderRadius: BorderRadius.circular(8),
-//                   ),
-//                 ),
-//                 child: slotController.isSaving.value
-//                     ? SizedBox(
-//                   width: 16,
-//                   height: 16,
-//                   child: CircularProgressIndicator(
-//                     strokeWidth: 2,
-//                     valueColor:
-//                     AlwaysStoppedAnimation<Color>(Colors.white),
-//                   ),
+//                   mainAxisSize: MainAxisSize.min,
+//                   children: [
+//                     TextButton(
+//                       onPressed: slotController.isSaving.value
+//                           ? null
+//                           : slotController.cancelEdit,
+//                       child: Text(
+//                         'Cancel',
+//                         style: TextStyle(
+//                             color: slotController.isSaving.value
+//                                 ? Colors.grey[400]
+//                                 : Colors.grey[600]),
+//                       ),
+//                     ),
+//                     SizedBox(width: 8),
+//                     ElevatedButton(
+//                       onPressed: slotController.isSaving.value
+//                           ? null
+//                           : () => _saveWithCustomLoader(context),
+//                       style: ElevatedButton.styleFrom(
+//                         backgroundColor: slotController.isSaving.value
+//                             ? Colors.grey[400]
+//                             : Colors.blue,
+//                         foregroundColor: Colors.white,
+//                         elevation: 0,
+//                         shape: RoundedRectangleBorder(
+//                           borderRadius: BorderRadius.circular(8),
+//                         ),
+//                       ),
+//                       child: slotController.isSaving.value
+//                           ? SizedBox(
+//                               width: 16,
+//                               height: 16,
+//                               child: CircularProgressIndicator(
+//                                 strokeWidth: 2,
+//                                 valueColor:
+//                                     AlwaysStoppedAnimation<Color>(Colors.white),
+//                               ),
+//                             )
+//                           : Text('Save'),
+//                     ),
+//                     SizedBox(width: 16),
+//                   ],
 //                 )
-//                     : Text('Save'),
-//               ),
-//               SizedBox(width: 16),
-//             ],
-//           )
 //               : IconButton(
-//             onPressed: slotController.toggleEditMode,
-//             icon: Icon(Icons.edit),
-//             tooltip: 'Edit Timings',
-//           )),
+//                   onPressed: slotController.toggleEditMode,
+//                   icon: Icon(Icons.edit),
+//                   tooltip: 'Edit Timings',
+//                 )),
 //         ],
 //       ),
 //       body: Obx(() {
@@ -195,21 +193,21 @@
 //                     ),
 //                     Obx(() => slotController.modifiedSlots.isNotEmpty
 //                         ? Container(
-//                       padding: EdgeInsets.symmetric(
-//                           horizontal: 8, vertical: 4),
-//                       decoration: BoxDecoration(
-//                         color: Colors.orange[100],
-//                         borderRadius: BorderRadius.circular(12),
-//                       ),
-//                       child: Text(
-//                         '${slotController.modifiedSlots.length} modified',
-//                         style: TextStyle(
-//                           color: Colors.orange[800],
-//                           fontSize: 12,
-//                           fontWeight: FontWeight.w600,
-//                         ),
-//                       ),
-//                     )
+//                             padding: EdgeInsets.symmetric(
+//                                 horizontal: 8, vertical: 4),
+//                             decoration: BoxDecoration(
+//                               color: Colors.orange[100],
+//                               borderRadius: BorderRadius.circular(12),
+//                             ),
+//                             child: Text(
+//                               '${slotController.modifiedSlots.length} modified',
+//                               style: TextStyle(
+//                                 color: Colors.orange[800],
+//                                 fontSize: 12,
+//                                 fontWeight: FontWeight.w600,
+//                               ),
+//                             ),
+//                           )
 //                         : SizedBox()),
 //                   ],
 //                 ),
@@ -310,8 +308,10 @@
 //   Widget _buildSlotItem(BuildContext context, Map<String, dynamic> slot) {
 //     final slotCode = slot['code'].toString();
 //     final currentValue = slotController.getCurrentSlotValue(slotCode);
+//     // Now using formatMinutes instead of formatSeconds since values are in minutes
 //     final formattedTime = slotController.formatSeconds(currentValue);
-//     final isOnTime = slot['description'].toString().toLowerCase().contains('on');
+//     final isOnTime =
+//         slot['description'].toString().toLowerCase().contains('on');
 //
 //     return Container(
 //       padding: EdgeInsets.all(16),
@@ -363,68 +363,70 @@
 //
 //           // Time Display/Edit
 //           Obx(() => InkWell(
-//             onTap: slotController.isEditMode.value && !slotController.isSaving.value
-//                 ? () => _showTimePickerDialog(context, slot)
-//                 : null,
-//             borderRadius: BorderRadius.circular(8),
-//             child: Container(
-//               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-//               decoration: BoxDecoration(
-//                 color: slotController.isEditMode.value
-//                     ? (slotController.modifiedSlots.contains(slotCode)
-//                     ? Colors.orange[50]
-//                     : Colors.white)
-//                     : Colors.white,
+//                 onTap: slotController.isEditMode.value &&
+//                         !slotController.isSaving.value
+//                     ? () => _showTimePickerDialog(context, slot)
+//                     : null,
 //                 borderRadius: BorderRadius.circular(8),
-//                 border: Border.all(
-//                   color: slotController.isEditMode.value
-//                       ? (slotController.modifiedSlots.contains(slotCode)
-//                       ? Colors.orange[300]!
-//                       : Colors.grey[300]!)
-//                       : Colors.grey[300]!,
-//                   width: 1,
-//                 ),
-//               ),
-//               child: Column(
-//                 children: [
-//                   Icon(
-//                     Icons.access_time,
-//                     size: 16,
-//                     color: slotController.modifiedSlots.contains(slotCode)
-//                         ? Colors.orange[600]
-//                         : Colors.grey[600],
+//                 child: Container(
+//                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+//                   decoration: BoxDecoration(
+//                     color: slotController.isEditMode.value
+//                         ? (slotController.modifiedSlots.contains(slotCode)
+//                             ? Colors.orange[50]
+//                             : Colors.white)
+//                         : Colors.white,
+//                     borderRadius: BorderRadius.circular(8),
+//                     border: Border.all(
+//                       color: slotController.isEditMode.value
+//                           ? (slotController.modifiedSlots.contains(slotCode)
+//                               ? Colors.orange[300]!
+//                               : Colors.grey[300]!)
+//                           : Colors.grey[300]!,
+//                       width: 1,
+//                     ),
 //                   ),
-//                   SizedBox(height: 4),
-//                   Row(
-//                     mainAxisAlignment: MainAxisAlignment.center,
+//                   child: Column(
 //                     children: [
-//                       Text(
-//                         formattedTime,
-//                         style: TextStyle(
-//                           fontSize: 14,
-//                           fontWeight: FontWeight.w600,
-//                           color: slotController.modifiedSlots.contains(slotCode)
-//                               ? Colors.orange[700]
-//                               : Colors.grey[700],
-//                           fontFamily: 'monospace',
-//                         ),
+//                       Icon(
+//                         Icons.access_time,
+//                         size: 16,
+//                         color: slotController.modifiedSlots.contains(slotCode)
+//                             ? Colors.orange[600]
+//                             : Colors.grey[600],
 //                       ),
-//                       if (slotController.modifiedSlots.contains(slotCode))
-//                         Container(
-//                           margin: EdgeInsets.only(left: 4),
-//                           width: 6,
-//                           height: 6,
-//                           decoration: BoxDecoration(
-//                             color: Colors.orange,
-//                             shape: BoxShape.circle,
+//                       SizedBox(height: 4),
+//                       Row(
+//                         mainAxisAlignment: MainAxisAlignment.center,
+//                         children: [
+//                           Text(
+//                             formattedTime,
+//                             style: TextStyle(
+//                               fontSize: 14,
+//                               fontWeight: FontWeight.w600,
+//                               color: slotController.modifiedSlots
+//                                       .contains(slotCode)
+//                                   ? Colors.orange[700]
+//                                   : Colors.grey[700],
+//                               fontFamily: 'monospace',
+//                             ),
 //                           ),
-//                         ),
+//                           if (slotController.modifiedSlots.contains(slotCode))
+//                             Container(
+//                               margin: EdgeInsets.only(left: 4),
+//                               width: 6,
+//                               height: 6,
+//                               decoration: BoxDecoration(
+//                                 color: Colors.orange,
+//                                 shape: BoxShape.circle,
+//                               ),
+//                             ),
+//                         ],
+//                       ),
 //                     ],
 //                   ),
-//                 ],
-//               ),
-//             ),
-//           )),
+//                 ),
+//               )),
 //         ],
 //       ),
 //     );
@@ -434,7 +436,7 @@
 //     // Call the original save method
 //     await slotController.saveChanges();
 //
-//     // Show custom loader for 8 seconds after successful save
+//     // Show custom loader for 12 seconds after successful save
 //     _showCustomSuccessLoader(context);
 //   }
 //
@@ -443,7 +445,7 @@
 //       context: context,
 //       barrierDismissible: false,
 //       builder: (BuildContext context) {
-//         // Auto dismiss after 8 seconds
+//         // Auto dismiss after 12 seconds
 //         Future.delayed(Duration(seconds: 12), () {
 //           if (Navigator.of(context).canPop()) {
 //             Navigator.of(context).pop();
@@ -509,7 +511,8 @@
 //                       height: 20,
 //                       child: CircularProgressIndicator(
 //                         strokeWidth: 2,
-//                         valueColor: AlwaysStoppedAnimation<Color>(Colors.green[600]!),
+//                         valueColor:
+//                             AlwaysStoppedAnimation<Color>(Colors.green[600]!),
 //                       ),
 //                     ),
 //                     SizedBox(width: 12),
@@ -530,15 +533,15 @@
 //     );
 //   }
 //
+//   // MODIFIED: Time picker dialog now works with minutes-based system
 //   void _showTimePickerDialog(BuildContext context, Map<String, dynamic> slot) {
 //     final slotCode = slot['code'].toString();
-//     final currentValue = slotController.getCurrentSlotValue(slotCode);
-//     final currentTime = slotController.formatSeconds(currentValue);
-//     final timeParts = currentTime.split(':');
+//     final currentValueInMinutes = slotController.getCurrentSlotValue(slotCode);
 //
-//     int selectedHours = int.parse(timeParts[0]);
-//     int selectedMinutes = int.parse(timeParts[1]);
-//     int selectedSeconds = int.parse(timeParts[2]);
+//     // Convert minutes to hours and minutes for display
+//     int selectedHours = (currentValueInMinutes / 60).floor();
+//     int selectedMinutes = currentValueInMinutes % 60;
+//     int selectedSeconds = 0; // Always 0 since we work with minutes
 //
 //     showDialog(
 //       context: context,
@@ -589,7 +592,7 @@
 //                             selectedHours,
 //                             0,
 //                             23,
-//                                 (value) => setState(() => selectedHours = value),
+//                             (value) => setState(() => selectedHours = value),
 //                           ),
 //                           Text(
 //                             ':',
@@ -604,23 +607,24 @@
 //                             selectedMinutes,
 //                             0,
 //                             59,
-//                                 (value) => setState(() => selectedMinutes = value),
+//                             (value) => setState(() => selectedMinutes = value),
 //                           ),
-//                           Text(
-//                             ':',
-//                             style: TextStyle(
-//                               fontSize: 24,
-//                               fontWeight: FontWeight.bold,
-//                               color: Colors.grey[600],
-//                             ),
-//                           ),
-//                           _buildTimeSelector(
-//                             'Seconds',
-//                             selectedSeconds,
-//                             0,
-//                             59,
-//                                 (value) => setState(() => selectedSeconds = value),
-//                           ),
+//                           // Text(
+//                           //   ':',
+//                           //   style: TextStyle(
+//                           //     fontSize: 24,
+//                           //     fontWeight: FontWeight.bold,
+//                           //     color: Colors.grey[600],
+//                           //   ),
+//                           // ),
+//                           // Seconds selector disabled since we work with minutes
+//                           // _buildTimeSelector(
+//                           //   'Seconds',
+//                           //   selectedSeconds,
+//                           //   0,
+//                           //   0, // Max 0 to disable
+//                           //       (value) => setState(() => selectedSeconds = 0),
+//                           // ),
 //                         ],
 //                       ),
 //                     ),
@@ -641,7 +645,7 @@
 //                           SizedBox(width: 8),
 //                           Expanded(
 //                             child: Text(
-//                               'New time: ${selectedHours.toString().padLeft(2, '0')}:${selectedMinutes.toString().padLeft(2, '0')}:${selectedSeconds.toString().padLeft(2, '0')}',
+//                               'New time: ${selectedHours.toString().padLeft(2, '0')}:${selectedMinutes.toString().padLeft(2, '0')}:${selectedSeconds.toString().padLeft(2, '0')} (${(selectedHours * 60) + selectedMinutes} minutes)',
 //                               style: TextStyle(
 //                                 color: Colors.blue[700],
 //                                 fontWeight: FontWeight.w500,
@@ -665,10 +669,9 @@
 //                 ),
 //                 ElevatedButton(
 //                   onPressed: () {
-//                     final newSeconds = (selectedHours * 3600) +
-//                         (selectedMinutes * 60) +
-//                         selectedSeconds;
-//                     slotController.updateSlotValue(slot, newSeconds);
+//                     // Convert hours and minutes to total minutes
+//                     final newMinutes = (selectedHours * 60) + selectedMinutes;
+//                     slotController.updateSlotValue(slot, newMinutes);
 //                     Navigator.of(context).pop();
 //                   },
 //                   style: ElevatedButton.styleFrom(
@@ -718,7 +721,10 @@
 //                   child: Icon(
 //                     Icons.keyboard_arrow_up,
 //                     size: 20,
-//                     color: value < max ? Colors.blue : Colors.grey[400],
+//                     // Disable arrow for seconds since max is 0
+//                     color: (value < max && max > 0)
+//                         ? Colors.blue
+//                         : Colors.grey[400],
 //                   ),
 //                 ),
 //               ),
@@ -730,6 +736,8 @@
 //                     fontSize: 18,
 //                     fontWeight: FontWeight.bold,
 //                     fontFamily: 'monospace',
+//                     // Grey out seconds since they're always 0
+//                     color: label == 'Seconds' ? Colors.grey[400] : Colors.black,
 //                   ),
 //                 ),
 //               ),
@@ -742,7 +750,10 @@
 //                   child: Icon(
 //                     Icons.keyboard_arrow_down,
 //                     size: 20,
-//                     color: value > min ? Colors.blue : Colors.grey[400],
+//                     // Disable arrow for seconds since min/max are both 0
+//                     color: (value > min && max > 0)
+//                         ? Colors.blue
+//                         : Colors.grey[400],
 //                   ),
 //                 ),
 //               ),
@@ -754,10 +765,12 @@
 //   }
 // }
 
+// ------------------------------
 
 
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../Controller/Inspector/manual_controller.dart';
 import '../../Controller/Inspector/slot_controller.dart';
 
@@ -803,55 +816,55 @@ class InfoPage extends StatelessWidget {
         actions: [
           Obx(() => slotController.isEditMode.value
               ? Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextButton(
-                onPressed: slotController.isSaving.value
-                    ? null
-                    : slotController.cancelEdit,
-                child: Text(
-                  'Cancel',
-                  style: TextStyle(
-                      color: slotController.isSaving.value
-                          ? Colors.grey[400]
-                          : Colors.grey[600]),
-                ),
-              ),
-              SizedBox(width: 8),
-              ElevatedButton(
-                onPressed: slotController.isSaving.value
-                    ? null
-                    : () => _saveWithCustomLoader(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: slotController.isSaving.value
-                      ? Colors.grey[400]
-                      : Colors.blue,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: slotController.isSaving.value
-                    ? SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor:
-                    AlwaysStoppedAnimation<Color>(Colors.white),
-                  ),
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextButton(
+                      onPressed: slotController.isSaving.value
+                          ? null
+                          : slotController.cancelEdit,
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(
+                            color: slotController.isSaving.value
+                                ? Colors.grey[400]
+                                : Colors.grey[600]),
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: slotController.isSaving.value
+                          ? null
+                          : () => _saveWithCustomLoader(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: slotController.isSaving.value
+                            ? Colors.grey[400]
+                            : Colors.blue,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: slotController.isSaving.value
+                          ? SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : Text('Save'),
+                    ),
+                    SizedBox(width: 16),
+                  ],
                 )
-                    : Text('Save'),
-              ),
-              SizedBox(width: 16),
-            ],
-          )
               : IconButton(
-            onPressed: slotController.toggleEditMode,
-            icon: Icon(Icons.edit),
-            tooltip: 'Edit Timings',
-          )),
+                  onPressed: slotController.toggleEditMode,
+                  icon: Icon(Icons.edit),
+                  tooltip: 'Edit Timings',
+                )),
         ],
       ),
       body: Obx(() {
@@ -951,21 +964,21 @@ class InfoPage extends StatelessWidget {
                     ),
                     Obx(() => slotController.modifiedSlots.isNotEmpty
                         ? Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.orange[100],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        '${slotController.modifiedSlots.length} modified',
-                        style: TextStyle(
-                          color: Colors.orange[800],
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    )
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.orange[100],
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              '${slotController.modifiedSlots.length} modified',
+                              style: TextStyle(
+                                color: Colors.orange[800],
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          )
                         : SizedBox()),
                   ],
                 ),
@@ -1066,9 +1079,9 @@ class InfoPage extends StatelessWidget {
   Widget _buildSlotItem(BuildContext context, Map<String, dynamic> slot) {
     final slotCode = slot['code'].toString();
     final currentValue = slotController.getCurrentSlotValue(slotCode);
-    // Now using formatMinutes instead of formatSeconds since values are in minutes
     final formattedTime = slotController.formatSeconds(currentValue);
-    final isOnTime = slot['description'].toString().toLowerCase().contains('on');
+    final isOnTime =
+        slot['description'].toString().toLowerCase().contains('on');
 
     return Container(
       padding: EdgeInsets.all(16),
@@ -1120,78 +1133,131 @@ class InfoPage extends StatelessWidget {
 
           // Time Display/Edit
           Obx(() => InkWell(
-            onTap: slotController.isEditMode.value && !slotController.isSaving.value
-                ? () => _showTimePickerDialog(context, slot)
-                : null,
-            borderRadius: BorderRadius.circular(8),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: slotController.isEditMode.value
-                    ? (slotController.modifiedSlots.contains(slotCode)
-                    ? Colors.orange[50]
-                    : Colors.white)
-                    : Colors.white,
+                onTap: slotController.isEditMode.value &&
+                        !slotController.isSaving.value
+                    ? () => _showKeyboardTimeDialog(context, slot)
+                    : null,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: slotController.isEditMode.value
-                      ? (slotController.modifiedSlots.contains(slotCode)
-                      ? Colors.orange[300]!
-                      : Colors.grey[300]!)
-                      : Colors.grey[300]!,
-                  width: 1,
-                ),
-              ),
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.access_time,
-                    size: 16,
-                    color: slotController.modifiedSlots.contains(slotCode)
-                        ? Colors.orange[600]
-                        : Colors.grey[600],
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: slotController.isEditMode.value
+                        ? (slotController.modifiedSlots.contains(slotCode)
+                            ? Colors.orange[50]
+                            : Colors.white)
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: slotController.isEditMode.value
+                          ? (slotController.modifiedSlots.contains(slotCode)
+                              ? Colors.orange[300]!
+                              : Colors.grey[300]!)
+                          : Colors.grey[300]!,
+                      width: 1,
+                    ),
                   ),
-                  SizedBox(height: 4),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: Column(
                     children: [
-                      Text(
-                        formattedTime,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: slotController.modifiedSlots.contains(slotCode)
-                              ? Colors.orange[700]
-                              : Colors.grey[700],
-                          fontFamily: 'monospace',
-                        ),
+                      Icon(
+                        Icons.access_time,
+                        size: 16,
+                        color: slotController.modifiedSlots.contains(slotCode)
+                            ? Colors.orange[600]
+                            : Colors.grey[600],
                       ),
-                      if (slotController.modifiedSlots.contains(slotCode))
-                        Container(
-                          margin: EdgeInsets.only(left: 4),
-                          width: 6,
-                          height: 6,
-                          decoration: BoxDecoration(
-                            color: Colors.orange,
-                            shape: BoxShape.circle,
+                      SizedBox(height: 4),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            formattedTime,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: slotController.modifiedSlots
+                                      .contains(slotCode)
+                                  ? Colors.orange[700]
+                                  : Colors.grey[700],
+                              fontFamily: 'monospace',
+                            ),
                           ),
-                        ),
+                          if (slotController.modifiedSlots.contains(slotCode))
+                            Container(
+                              margin: EdgeInsets.only(left: 4),
+                              width: 6,
+                              height: 6,
+                              decoration: BoxDecoration(
+                                color: Colors.orange,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                        ],
+                      ),
                     ],
                   ),
-                ],
-              ),
-            ),
-          )),
+                ),
+              )),
         ],
       ),
     );
   }
 
+// Enhanced save method with pre-save validation
   void _saveWithCustomLoader(BuildContext context) async {
-    // Call the original save method
-    await slotController.saveChanges();
+    // Pre-save validation for all modified slots
+    List<String> overlapErrors = [];
 
-    // Show custom loader for 12 seconds after successful save
+    for (String slotCode in slotController.modifiedSlots) {
+      final newMinutes = slotController.modifiedValues[slotCode] ?? 0;
+      final validationResult = _validateSlotOverlap(slotCode, newMinutes);
+
+      if (!validationResult['isValid']) {
+        final slotNumber = _getSlotNumberFromCode(slotCode);
+        final isOn = _isOnSlot(slotCode);
+        overlapErrors.add(
+            'Slot $slotNumber ${isOn ? "ON" : "OFF"}: ${validationResult['message']}');
+      }
+    }
+
+    if (overlapErrors.isNotEmpty) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('⚠️ Overlap Detected'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Cannot save due to overlapping time slots:',
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
+              SizedBox(height: 12),
+              ...overlapErrors
+                  .map((error) => Padding(
+                        padding: EdgeInsets.only(bottom: 8),
+                        child: Text(
+                          '• $error',
+                          style:
+                              TextStyle(color: Colors.red[700], fontSize: 13),
+                        ),
+                      ))
+                  .toList(),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    // If validation passes, proceed with save
+    await slotController.saveChanges();
     _showCustomSuccessLoader(context);
   }
 
@@ -1266,7 +1332,8 @@ class InfoPage extends StatelessWidget {
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.green[600]!),
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(Colors.green[600]!),
                       ),
                     ),
                     SizedBox(width: 12),
@@ -1287,109 +1354,174 @@ class InfoPage extends StatelessWidget {
     );
   }
 
-  // MODIFIED: Time picker dialog now works with minutes-based system
-  void _showTimePickerDialog(BuildContext context, Map<String, dynamic> slot) {
+// Enhanced time input dialog with overlap prevention
+  void _showKeyboardTimeDialog(
+      BuildContext context, Map<String, dynamic> slot) {
     final slotCode = slot['code'].toString();
     final currentValueInMinutes = slotController.getCurrentSlotValue(slotCode);
 
     // Convert minutes to hours and minutes for display
-    int selectedHours = (currentValueInMinutes / 60).floor();
-    int selectedMinutes = currentValueInMinutes % 60;
-    int selectedSeconds = 0; // Always 0 since we work with minutes
+    int hours = (currentValueInMinutes / 60).floor();
+    int minutes = currentValueInMinutes % 60;
+
+    final hoursController =
+        TextEditingController(text: hours.toString().padLeft(2, '0'));
+    final minutesController =
+        TextEditingController(text: minutes.toString().padLeft(2, '0'));
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Edit Time',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Edit Time',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    slot['description'],
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                ],
+              SizedBox(height: 4),
+              Text(
+                slot['description'],
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.normal,
+                ),
               ),
-              content: Container(
-                width: double.maxFinite,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+            ],
+          ),
+          content: Container(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Show current active slots
+                _buildActiveSlotsSummary(),
+
+                SizedBox(height: 16),
+
+                Row(
                   children: [
-                    Container(
-                      padding: EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[50],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    // Hours input
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildTimeSelector(
-                            'Hours',
-                            selectedHours,
-                            0,
-                            23,
-                                (value) => setState(() => selectedHours = value),
-                          ),
                           Text(
-                            ':',
+                            'Hours',
                             style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
                               color: Colors.grey[600],
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
-                          _buildTimeSelector(
-                            'Minutes',
-                            selectedMinutes,
-                            0,
-                            59,
-                                (value) => setState(() => selectedMinutes = value),
+                          SizedBox(height: 8),
+                          TextFormField(
+                            controller: hoursController,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(2),
+                              _NumericRangeFormatter(min: 0, max: 23),
+                            ],
+                            decoration: InputDecoration(
+                              hintText: '00',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                            ),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'monospace',
+                            ),
                           ),
-                          // Text(
-                          //   ':',
-                          //   style: TextStyle(
-                          //     fontSize: 24,
-                          //     fontWeight: FontWeight.bold,
-                          //     color: Colors.grey[600],
-                          //   ),
-                          // ),
-                          // Seconds selector disabled since we work with minutes
-                          // _buildTimeSelector(
-                          //   'Seconds',
-                          //   selectedSeconds,
-                          //   0,
-                          //   0, // Max 0 to disable
-                          //       (value) => setState(() => selectedSeconds = 0),
-                          // ),
                         ],
                       ),
                     ),
-                    SizedBox(height: 16),
-                    Container(
-                      padding: EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.blue[50],
-                        borderRadius: BorderRadius.circular(8),
+
+                    SizedBox(width: 16),
+
+                    // Separator
+                    Text(
+                      ':',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[600],
                       ),
-                      child: Row(
+                    ),
+
+                    SizedBox(width: 16),
+
+                    // Minutes input
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Minutes',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          TextFormField(
+                            controller: minutesController,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(2),
+                              _NumericRangeFormatter(min: 0, max: 59),
+                            ],
+                            decoration: InputDecoration(
+                              hintText: '00',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                            ),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'monospace',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 16),
+
+                Container(
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue[50],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
                         children: [
                           Icon(
                             Icons.info_outline,
@@ -1399,118 +1531,340 @@ class InfoPage extends StatelessWidget {
                           SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              'New time: ${selectedHours.toString().padLeft(2, '0')}:${selectedMinutes.toString().padLeft(2, '0')}:${selectedSeconds.toString().padLeft(2, '0')} (${(selectedHours * 60) + selectedMinutes} minutes)',
+                              'No overlapping allowed between different slots',
                               style: TextStyle(
                                 color: Colors.blue[700],
                                 fontWeight: FontWeight.w500,
-                                fontFamily: 'monospace',
+                                fontSize: 12,
                               ),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(color: Colors.grey[600]),
+                      SizedBox(height: 4),
+                      Text(
+                        'Format: HH:MM (24-hour format)',
+                        style: TextStyle(
+                          color: Colors.blue[600],
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    // Convert hours and minutes to total minutes
-                    final newMinutes = (selectedHours * 60) + selectedMinutes;
-                    slotController.updateSlotValue(slot, newMinutes);
-                    Navigator.of(context).pop();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: Text('Update'),
                 ),
               ],
-            );
-          },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: Colors.grey[600]),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final inputHours = int.tryParse(hoursController.text) ?? 0;
+                final inputMinutes = int.tryParse(minutesController.text) ?? 0;
+
+                // Validate input ranges
+                if (inputHours < 0 || inputHours > 23) {
+                  Get.snackbar(
+                    'Invalid Input',
+                    'Hours must be between 00 and 23',
+                    snackPosition: SnackPosition.BOTTOM,
+                    backgroundColor: Colors.red,
+                    colorText: Colors.white,
+                  );
+                  return;
+                }
+
+                if (inputMinutes < 0 || inputMinutes > 59) {
+                  Get.snackbar(
+                    'Invalid Input',
+                    'Minutes must be between 00 and 59',
+                    snackPosition: SnackPosition.BOTTOM,
+                    backgroundColor: Colors.red,
+                    colorText: Colors.white,
+                  );
+                  return;
+                }
+
+                // Convert to total minutes
+                final newMinutes = (inputHours * 60) + inputMinutes;
+
+                // Use enhanced validation
+                final validationResult =
+                    _validateSlotOverlap(slotCode, newMinutes);
+                if (!validationResult['isValid']) {
+                  Get.snackbar(
+                    'Time Overlap Detected',
+                    validationResult['message'],
+                    snackPosition: SnackPosition.BOTTOM,
+                    backgroundColor: Colors.red,
+                    colorText: Colors.white,
+                    duration: Duration(seconds: 5),
+                  );
+                  return;
+                }
+
+                slotController.updateSlotValue(slot, newMinutes);
+                Navigator.of(context).pop();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text('Update'),
+            ),
+          ],
         );
       },
     );
   }
 
-  Widget _buildTimeSelector(
-      String label, int value, int min, int max, ValueChanged<int> onChanged) {
-    return Column(
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-            fontWeight: FontWeight.w500,
-          ),
+// Widget to show currently active slots
+  Widget _buildActiveSlotsSummary() {
+    List<String> activeSlots = [];
+
+    for (int i = 1; i <= 4; i++) {
+      final onCode = _getSlotCode(i, true);
+      final offCode = _getSlotCode(i, false);
+
+      final onTime = slotController.getCurrentSlotValue(onCode);
+      final offTime = slotController.getCurrentSlotValue(offCode);
+
+      if (onTime < offTime) {
+        activeSlots.add(
+            'Slot $i: ${slotController.formatSeconds(onTime)} - ${slotController.formatSeconds(offTime)}');
+      }
+    }
+
+    if (activeSlots.isEmpty) {
+      return Container(
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.green[50],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.green[200]!),
         ),
-        SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey[300]!),
-          ),
-          child: Column(
+        child: Row(
+          children: [
+            Icon(Icons.check_circle, size: 16, color: Colors.green[600]),
+            SizedBox(width: 8),
+            Text(
+              'No active time slots - all slots available',
+              style: TextStyle(
+                color: Colors.green[700],
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.orange[50],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.orange[200]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              InkWell(
-                onTap: () {
-                  if (value < max) onChanged(value + 1);
-                },
-                child: Container(
-                  padding: EdgeInsets.all(8),
-                  child: Icon(
-                    Icons.keyboard_arrow_up,
-                    size: 20,
-                    // Disable arrow for seconds since max is 0
-                    color: (value < max && max > 0) ? Colors.blue : Colors.grey[400],
-                  ),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                child: Text(
-                  value.toString().padLeft(2, '0'),
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'monospace',
-                    // Grey out seconds since they're always 0
-                    color: label == 'Seconds' ? Colors.grey[400] : Colors.black,
-                  ),
-                ),
-              ),
-              InkWell(
-                onTap: () {
-                  if (value > min) onChanged(value - 1);
-                },
-                child: Container(
-                  padding: EdgeInsets.all(8),
-                  child: Icon(
-                    Icons.keyboard_arrow_down,
-                    size: 20,
-                    // Disable arrow for seconds since min/max are both 0
-                    color: (value > min && max > 0) ? Colors.blue : Colors.grey[400],
-                  ),
+              Icon(Icons.schedule, size: 16, color: Colors.orange[600]),
+              SizedBox(width: 8),
+              Text(
+                'Currently Occupied Time Slots:',
+                style: TextStyle(
+                  color: Colors.orange[700],
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
           ),
-        ),
-      ],
+          SizedBox(height: 8),
+          ...activeSlots
+              .map((slot) => Padding(
+                    padding: EdgeInsets.only(left: 24, bottom: 4),
+                    child: Text(
+                      slot,
+                      style: TextStyle(
+                        color: Colors.orange[600],
+                        fontSize: 11,
+                        fontFamily: 'monospace',
+                      ),
+                    ),
+                  ))
+              .toList(),
+        ],
+      ),
     );
   }
+
+  // Enhanced overlap validation method
+  Map<String, dynamic> _validateSlotOverlap(String slotCode, int newMinutes) {
+    print('=== OVERLAP VALIDATION ===');
+    print('Validating slot: $slotCode, newMinutes: $newMinutes');
+
+    // Get current slot number and type
+    final slotNumber = _getSlotNumberFromCode(slotCode);
+    final isOnSlot = _isOnSlot(slotCode);
+
+    // Get paired slot code and its current value
+    final pairedSlotCode = _getPairedSlotCode(slotCode);
+    final pairedSlotMinutes =
+        slotController.getCurrentSlotValue(pairedSlotCode);
+
+    // Validate ON/OFF relationship within same slot
+    if (isOnSlot && newMinutes >= pairedSlotMinutes) {
+      return {
+        'isValid': false,
+        'message':
+            'ON time must be earlier than OFF time (${slotController.formatSeconds(pairedSlotMinutes)})'
+      };
+    }
+
+    if (!isOnSlot && newMinutes <= pairedSlotMinutes) {
+      return {
+        'isValid': false,
+        'message':
+            'OFF time must be later than ON time (${slotController.formatSeconds(pairedSlotMinutes)})'
+      };
+    }
+
+    // Get the complete time range for current slot
+    int currentSlotOnTime, currentSlotOffTime;
+    if (isOnSlot) {
+      currentSlotOnTime = newMinutes;
+      currentSlotOffTime = pairedSlotMinutes;
+    } else {
+      currentSlotOnTime = pairedSlotMinutes;
+      currentSlotOffTime = newMinutes;
+    }
+
+    // Skip overlap check if current slot doesn't have valid range
+    if (currentSlotOnTime >= currentSlotOffTime) {
+      return {'isValid': true, 'message': 'Valid'};
+    }
+
+    // Check for overlaps with all other slots
+    List<String> overlappingSlots = [];
+
+    for (int i = 1; i <= 4; i++) {
+      if (i == slotNumber) continue; // Skip current slot
+
+      final otherOnCode = _getSlotCode(i, true);
+      final otherOffCode = _getSlotCode(i, false);
+
+      final otherOnTime = slotController.getCurrentSlotValue(otherOnCode);
+      final otherOffTime = slotController.getCurrentSlotValue(otherOffCode);
+
+      // Skip if other slot doesn't have valid range
+      if (otherOnTime >= otherOffTime) continue;
+
+      // Check for overlap: Two ranges overlap if start1 < end2 AND start2 < end1
+      bool hasOverlap = (currentSlotOnTime < otherOffTime &&
+          otherOnTime < currentSlotOffTime);
+
+      if (hasOverlap) {
+        overlappingSlots.add(
+            'Slot $i (${slotController.formatSeconds(otherOnTime)} - ${slotController.formatSeconds(otherOffTime)})');
+      }
+    }
+
+    if (overlappingSlots.isNotEmpty) {
+      return {
+        'isValid': false,
+        'message':
+            'Time range ${slotController.formatSeconds(currentSlotOnTime)} - ${slotController.formatSeconds(currentSlotOffTime)} overlaps with: ${overlappingSlots.join(", ")}'
+      };
+    }
+
+    return {'isValid': true, 'message': 'Valid timing'};
+  }
+
+  // Helper methods
+  int _getSlotNumberFromCode(String slotCode) {
+    switch (slotCode) {
+      case '550':
+      case '554':
+        return 1;
+      case '551':
+      case '555':
+        return 2;
+      case '552':
+      case '556':
+        return 3;
+      case '553':
+      case '557':
+        return 4;
+      default:
+        return 0;
+    }
+  }
+
+  bool _isOnSlot(String slotCode) {
+    return ['550', '551', '552', '553'].contains(slotCode);
+  }
+
+  String _getPairedSlotCode(String slotCode) {
+    const pairMap = {
+      '550': '554', '554': '550', // Slot 1
+      '551': '555', '555': '551', // Slot 2
+      '552': '556', '556': '552', // Slot 3
+      '553': '557', '557': '553', // Slot 4
+    };
+    return pairMap[slotCode] ?? '';
+  }
+
+  String _getSlotCode(int slotNumber, bool isOn) {
+    const slotCodes = {
+      1: {'on': '550', 'off': '554'},
+      2: {'on': '551', 'off': '555'},
+      3: {'on': '552', 'off': '556'},
+      4: {'on': '553', 'off': '557'},
+    };
+    return slotCodes[slotNumber]?[isOn ? 'on' : 'off'] ?? '';
+  }
 }
+
+// Custom input formatter to restrict numeric input to a range
+class _NumericRangeFormatter extends TextInputFormatter {
+  final int min;
+  final int max;
+
+  _NumericRangeFormatter({required this.min, required this.max});
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (newValue.text.isEmpty) {
+      return newValue;
+    }
+
+    final int? value = int.tryParse(newValue.text);
+    if (value == null) {
+      return oldValue;
+    }
+
+    if (value < min || value > max) {
+      return oldValue;
+    }
+
+    return newValue;
+  }
+}
+

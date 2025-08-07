@@ -12,8 +12,7 @@ class InfoPlantDetailsView extends StatelessWidget {
   Widget build(BuildContext context) {
     final Map<String, dynamic>? plantData = Get.arguments;
 
-    final InfoPlantDetailController controller = Get.put(
-        InfoPlantDetailController());
+    final InfoPlantDetailController controller = Get.put(InfoPlantDetailController());
 
 
     print('Received plant data: $plantData');

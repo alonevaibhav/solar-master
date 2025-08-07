@@ -938,7 +938,7 @@ class InfoPlantDetailsView extends StatelessWidget {
               ),
               SizedBox(width: 8.w),
               Text(
-                'Solar Health',
+                'System Health',
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
@@ -969,7 +969,7 @@ class InfoPlantDetailsView extends StatelessWidget {
       children: [
         Expanded(
           child: _buildHealthStatCard(
-            'Water',
+            'Water Availability',
             Icons.water_drop,
             const Color(0xFF2563EB),
             controller.flootStatus,
@@ -979,7 +979,7 @@ class InfoPlantDetailsView extends StatelessWidget {
         SizedBox(width: 12.w),
         Expanded(
           child: _buildHealthStatCard(
-            'Pressure',
+            'Line Pressure',
             Icons.compress,
             const Color(0xFF2563EB),
             controller.pressureStatus,
@@ -1148,9 +1148,9 @@ class InfoPlantDetailsView extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              fontSize: 12.sp,
+              fontSize: 10.sp,
               color: Colors.black,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w700,
             ),
           ),
           // Only show value if showValue is true and value is provided

@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,7 +9,8 @@ import 'history_controller.dart';
 class HistoryInspector extends StatelessWidget {
   HistoryInspector({super.key});
 
-  final InspectorHistoryController controller = Get.put(InspectorHistoryController());
+  final InspectorHistoryController controller =
+      Get.put(InspectorHistoryController());
 
   @override
   Widget build(BuildContext context) {
@@ -203,7 +202,8 @@ class HistoryInspector extends StatelessWidget {
     if (item['created_at'] != null) {
       try {
         DateTime dateTime = DateTime.parse(item['created_at']);
-        formattedDate = DateFormat('MMM dd, yyyy - hh:mm a').format(dateTime.toLocal());
+        formattedDate =
+            DateFormat('MMM dd, yyyy - hh:mm a').format(dateTime.toLocal());
       } catch (e) {
         formattedDate = item['created_at'].toString();
       }

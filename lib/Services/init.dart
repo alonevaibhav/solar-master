@@ -1,6 +1,3 @@
-
-
-
 import 'dart:typed_data';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -11,7 +8,7 @@ import '../View/Cleaner/CleanupManegment/cleanup_controller.dart';
 import 'mqtt-service.dart';
 
 class AppInitializer {
-  static SolarMQTTService? mqttService; // Changed from late to nullable
+  static SolarMQTTService? mqttService;
   static late ModbusParametersController modbusController;
   static late ManualController manualController;
   static late CleaningManagementController cleaningManagementController;
@@ -34,8 +31,9 @@ class AppInitializer {
   static Future<void> reinitializeWithUUID(String uuid) async {
     try {
       // Disconnect existing connection if any
-      if (mqttService != null) { // Check if mqttService exists before disconnecting
-         mqttService!.disconnect();
+      if (mqttService != null) {
+        // Check if mqttService exists before disconnecting
+        mqttService!.disconnect();
         mqttService = null; // Clear the reference
       }
 
@@ -58,7 +56,6 @@ class AppInitializer {
       await mqttService!.initialize();
       await mqttService!.connect();
       await mqttService!.subscribe('vidani/vm/$uuid/data');
-
     } catch (e) {
       print('❌ Error reinitializing MQTT: $e');
       throw e;
@@ -68,7 +65,7 @@ class AppInitializer {
   // Optional: Method to safely disconnect MQTT
   static Future<void> disconnectMQTT() async {
     if (mqttService != null) {
-       mqttService!.disconnect();
+      mqttService!.disconnect();
       mqttService = null;
     }
   }
@@ -77,4 +74,5 @@ class AppInitializer {
   static bool get isMQTTConnected {
     return mqttService?.isConnected ?? false;
   }
+
 }

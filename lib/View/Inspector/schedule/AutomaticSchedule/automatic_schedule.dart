@@ -839,8 +839,7 @@ class ModbusParametersView extends StatelessWidget {
 
   // Replace your _showAddValvesDialog method with this version that has an 8-second custom loader
   void _showAddValvesDialog(ModbusParametersController controller) {
-    final textController =
-        TextEditingController(text: controller.numberOfBoxes.value.toString());
+    final textController = TextEditingController(text: controller.numberOfBoxes.value.toString());
 
     Get.dialog(
       AlertDialog(

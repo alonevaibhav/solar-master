@@ -909,8 +909,6 @@ class InfoPlantDetailsView extends StatelessWidget {
       return dateTime.toString();
     }
   }
-
-
   Widget _buildSolarHealthSection(InfoPlantDetailController controller) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 2.w, vertical: 8.h),
@@ -954,6 +952,9 @@ class InfoPlantDetailsView extends StatelessWidget {
           // Health Stats Row (Water and Pressure only)
           Obx(() => _buildSolarHealthStatsRow(controller)),
 
+          // Critical Status Messages (appears between health stats and RTC time)
+          Obx(() => _buildCriticalStatusMessages(controller)),
+
           SizedBox(height: 12.h),
 
           // RTC Time Row (Full width)
@@ -969,41 +970,123 @@ class InfoPlantDetailsView extends StatelessWidget {
         Expanded(
           child: _buildHealthStatCard(
             'Water',
-            '${controller.floot.value}',
             Icons.water_drop,
             const Color(0xFF2563EB),
             controller.flootStatus,
+            showValue: false, // Don't show value for water
           ),
         ),
         SizedBox(width: 12.w),
         Expanded(
           child: _buildHealthStatCard(
             'Pressure',
-            '${controller.pressure.value} PSI',
             Icons.compress,
             const Color(0xFF2563EB),
             controller.pressureStatus,
+            showValue: false, // Don't show value for pressure
           ),
         ),
       ],
     );
   }
 
-  Widget _buildRtcTimeRow(InfoPlantDetailController controller) {
-    return _buildHealthStatCard(
-      'RTC Time',
-      controller.formattedRtcTime,
-      Icons.access_time,
-      const Color(0xFF3B82F6),
-      HealthStatus.good, // Time is always shown as good
+// New method to build critical status messages
+  Widget _buildCriticalStatusMessages(InfoPlantDetailController controller) {
+    List<String> criticalMessages = [];
+
+    // Check water status
+    if (controller.flootStatus == HealthStatus.critical) {
+      criticalMessages.add("Water is empty");
+    }
+
+    // Check pressure status
+    if (controller.pressureStatus == HealthStatus.critical) {
+      criticalMessages.add("Pressure is high");
+    }
+
+    // Return empty container if no critical messages
+    if (criticalMessages.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      margin: EdgeInsets.only(top: 12.h),
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEF4444).withOpacity(0.1), // Red background
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(
+          color: const Color(0xFFEF4444).withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.warning,
+                color: const Color(0xFFEF4444),
+                size: 20.sp,
+              ),
+              SizedBox(width: 8.w),
+              Text(
+                'Critical Alert${criticalMessages.length > 1 ? 's' : ''}',
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFFEF4444),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 8.h),
+          ...criticalMessages.map((message) => Padding(
+            padding: EdgeInsets.only(bottom: 4.h),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  color: const Color(0xFFEF4444),
+                  size: 16.sp,
+                ),
+                SizedBox(width: 8.w),
+                Text(
+                  message,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: const Color(0xFFEF4444),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          )).toList(),
+        ],
+      ),
     );
   }
 
-  Widget _buildHealthStatCard(String title,
-      String value,
+  Widget _buildRtcTimeRow(InfoPlantDetailController controller) {
+    return _buildHealthStatCard(
+      'RTC Time',
+      Icons.access_time,
+      const Color(0xFF3B82F6),
+      HealthStatus.good, // Time is always shown as good
+      value: controller.formattedRtcTime, // RTC Time still shows value
+      showValue: true, // Show value for RTC time
+    );
+  }
+
+  Widget _buildHealthStatCard(
+      String title,
       IconData icon,
       Color color,
-      HealthStatus status,) {
+      HealthStatus? status, {
+        String? value,
+        bool showValue = true,
+      }) {
     // Determine container color based on status
     Color containerColor;
     Color borderColor;
@@ -1013,10 +1096,10 @@ class InfoPlantDetailsView extends StatelessWidget {
     switch (status) {
       case HealthStatus.good:
         containerColor =
-            const Color(0xFF2563EB).withOpacity(0.1); // Green background
+            const Color(0xFF10B981).withOpacity(0.1); // Green background
         borderColor = const Color(0xFF10B981).withOpacity(0.2);
-        iconColor = const Color(0xFF2563EB);
-        textColor = const Color(0xFF151A21);
+        iconColor = const Color(0xFF10B981);
+        textColor = const Color(0xFF10B981);
         break;
       case HealthStatus.warning:
         containerColor =
@@ -1032,6 +1115,9 @@ class InfoPlantDetailsView extends StatelessWidget {
         iconColor = const Color(0xFFEF4444);
         textColor = const Color(0xFF1F2937);
         break;
+      case null:
+      // TODO: Handle this case.
+        throw UnimplementedError();
     }
 
     return Container(
@@ -1063,19 +1149,22 @@ class InfoPlantDetailsView extends StatelessWidget {
             title,
             style: TextStyle(
               fontSize: 12.sp,
-              color: Colors.grey[600],
+              color: Colors.black,
               fontWeight: FontWeight.w500,
             ),
           ),
-          SizedBox(height: 4.h),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 12.sp,
-              fontWeight: FontWeight.bold,
-              color: textColor,
+          // Only show value if showValue is true and value is provided
+          if (showValue && value != null) ...[
+            SizedBox(height: 4.h),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.bold,
+                color: textColor,
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );

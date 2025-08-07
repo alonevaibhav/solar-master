@@ -297,6 +297,105 @@ class ModbusParametersController extends GetxController {
     }
   }
 
+  // Future<void> saveParameters() async {
+  //   if (modifiedParameters.isEmpty) {
+  //     Get.snackbar(
+  //       'No Changes',
+  //       'No parameters have been modified',
+  //       snackPosition: SnackPosition.BOTTOM,
+  //     );
+  //     return;
+  //   }
+  //
+  //   try {
+  //     isLoading.value = true;
+  //     errorMessage.value = '';
+  //
+  //     // Prepare the value string for the API call
+  //     String valueString = "";
+  //     for (int i = 50; i < 50 + numberOfBoxes.value; i++) {
+  //       // Format each value as 5 digits with leading zeros
+  //       valueString += parameterValues[i]!.value.toString().padLeft(5, '0');
+  //       if (i < 49 + numberOfBoxes.value) {
+  //         valueString += ',';
+  //       }
+  //     }
+  //
+  //     // Prepare the request body
+  //     final requestBody = {
+  //       "type": "config",
+  //       "id": 1,
+  //       "key": "upvlt1",
+  //       "value": valueString,
+  //     };
+  //
+  //     // Make the POST request using ApiService
+  //     final response = await ApiService.post<Map<String, dynamic>>(
+  //       endpoint: mqttSchedulePost(uuid!),
+  //       body: requestBody,
+  //       fromJson: (json) => json as Map<String, dynamic>,
+  //       includeToken: true,
+  //     );
+  //
+  //     if (response.success) {
+  //       // Update main data structure with only active parameters
+  //       parametersData.value = {
+  //         ...parametersData.value ?? {},
+  //         'parameters': _getActiveParametersMap(),
+  //         'lastModified': DateTime.now().toIso8601String(),
+  //         'modifiedCount': modifiedParameters.length,
+  //       };
+  //
+  //       // Clear modified parameters tracking
+  //       modifiedParameters.clear();
+  //
+  //       // Show success message
+  //       Get.snackbar(
+  //         'Success',
+  //         'Parameters saved successfully',
+  //         snackPosition: SnackPosition.BOTTOM,
+  //         backgroundColor: Colors.green,
+  //         colorText: Colors.white,
+  //       );
+  //     } else {
+  //       // Handle error response from ApiService
+  //       String errorMsg = response.errorMessage ?? 'Failed to save parameters';
+  //
+  //       // Customize error message based on status code
+  //       if (response.statusCode == 401) {
+  //         errorMsg = 'Authentication failed. Please login again.';
+  //       } else if (response.statusCode == 400) {
+  //         errorMsg = 'Invalid request: ${response.errorMessage}';
+  //       } else if (response.statusCode == 404) {
+  //         errorMsg = 'Device not found. Please check the UUID.';
+  //       }
+  //
+  //       throw Exception(errorMsg);
+  //     }
+  //   } catch (e) {
+  //     // Handle any errors (network, timeout, etc.)
+  //     String errorMsg = e.toString();
+  //
+  //     // Clean up error message if it contains 'Exception: '
+  //     if (errorMsg.startsWith('Exception: ')) {
+  //       errorMsg = errorMsg.substring(11);
+  //     }
+  //
+  //     errorMessage.value = errorMsg;
+  //     Get.snackbar(
+  //       'Save Error',
+  //       errorMsg,
+  //       snackPosition: SnackPosition.BOTTOM,
+  //       backgroundColor: Colors.red,
+  //       colorText: Colors.white,
+  //       duration: const Duration(seconds: 4),
+  //     );
+  //     rethrow;
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
+
   Future<void> saveParameters() async {
     if (modifiedParameters.isEmpty) {
       Get.snackbar(
@@ -311,15 +410,25 @@ class ModbusParametersController extends GetxController {
       isLoading.value = true;
       errorMessage.value = '';
 
-      // Prepare the value string for the API call
-      String valueString = '';
-      for (int i = 50; i < 50 + numberOfBoxes.value; i++) {
-        // Format each value as 5 digits with leading zeros
-        valueString += parameterValues[i]!.value.toString().padLeft(5, '0');
-        if (i < 49 + numberOfBoxes.value) {
-          valueString += ',';
+      // Prepare the value string for all 50 parameters (indices 50-99)
+      List<String> valuesList = [];
+
+      for (int i = 50; i < 100; i++) { // Changed from 50 + numberOfBoxes.value to 100
+        if (i < 50 + numberOfBoxes.value) {
+          // Active valve: use actual parameter value
+          valuesList.add(parameterValues[i]!.value.toString().padLeft(5, '0'));
+        } else {
+          // Inactive valve: use "00000"
+          valuesList.add("00000");
         }
       }
+
+      // Join all values with comma
+      String valueString = valuesList.join(',');
+
+      print("🔧 Sending all 50 parameters - Active: ${numberOfBoxes.value}, Inactive: ${50 - numberOfBoxes.value}");
+      print("🔧 Value string length: ${valueString.length}");
+      print("🔧 Value string preview: ${valueString.length > 100 ? valueString.substring(0, 100) + '...' : valueString}");
 
       // Prepare the request body
       final requestBody = {
@@ -329,9 +438,13 @@ class ModbusParametersController extends GetxController {
         "value": valueString,
       };
 
+      // Check if UUID is valid
+      if (uuid == null || uuid!.isEmpty) {
+        throw Exception("UUID is null or empty. Cannot make API call.");
+      }
+
       // Make the POST request using ApiService
       final response = await ApiService.post<Map<String, dynamic>>(
-        // endpoint: '/api/mqtt/publish/$uuid',
         endpoint: mqttSchedulePost(uuid!),
         body: requestBody,
         fromJson: (json) => json as Map<String, dynamic>,
@@ -345,6 +458,9 @@ class ModbusParametersController extends GetxController {
           'parameters': _getActiveParametersMap(),
           'lastModified': DateTime.now().toIso8601String(),
           'modifiedCount': modifiedParameters.length,
+          'totalParametersSent': 50, // All 50 parameters sent
+          'activeParameters': numberOfBoxes.value,
+          'inactiveParameters': 50 - numberOfBoxes.value,
         };
 
         // Clear modified parameters tracking
@@ -353,10 +469,11 @@ class ModbusParametersController extends GetxController {
         // Show success message
         Get.snackbar(
           'Success',
-          'Parameters saved successfully',
+          'All 50 parameters saved successfully (${numberOfBoxes.value} active, ${50 - numberOfBoxes.value} inactive)',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.green,
           colorText: Colors.white,
+          duration: Duration(seconds: 3),
         );
       } else {
         // Handle error response from ApiService

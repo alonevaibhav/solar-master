@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -27,8 +25,9 @@ class InfoPlantDetailController extends GetxController {
 
   // Additional parameters with validation
   final rtcTime = 0.obs; // Parameter 560 - Time in seconds
-  final floot = 0.obs;   // Parameter 595 - Validation: <500 = red, >=500 = green
-  final pressure = 0.obs; // Parameter 596 - Validation: <500 = red, >=500 = green
+  final floot = 0.obs; // Parameter 595 - Validation: <500 = red, >=500 = green
+  final pressure =
+      0.obs; // Parameter 596 - Validation: <500 = red, >=500 = green
 
   @override
   void onInit() {
@@ -62,16 +61,26 @@ class InfoPlantDetailController extends GetxController {
     print("========================");
   }
 
-  // Convert seconds to HH:MM:SS format
+  // // Convert seconds to HH:MM:SS format
+  // String get formattedRtcTime {
+  //   int totalSeconds = rtcTime.value;
+  //   int hours = totalSeconds ~/ 3600;
+  //   int minutes = (totalSeconds % 3600) ~/ 60;
+  //   int seconds = totalSeconds % 60;
+  //
+  //   return '${hours.toString().padLeft(2, '0')}:'
+  //       '${minutes.toString().padLeft(2, '0')}:'
+  //       '${seconds.toString().padLeft(2, '0')}';
+  // }
+
+  // Convert minutes to HH:MM format
   String get formattedRtcTime {
-    int totalSeconds = rtcTime.value;
-    int hours = totalSeconds ~/ 3600;
-    int minutes = (totalSeconds % 3600) ~/ 60;
-    int seconds = totalSeconds % 60;
+    int totalMinutes = rtcTime.value;
+    int hours = totalMinutes ~/ 60;
+    int minutes = totalMinutes % 60;
 
     return '${hours.toString().padLeft(2, '0')}:'
-        '${minutes.toString().padLeft(2, '0')}:'
-        '${seconds.toString().padLeft(2, '0')}';
+        '${minutes.toString().padLeft(2, '0')}';
   }
 
   // Get status for floot parameter
@@ -160,9 +169,10 @@ class InfoPlantDetailController extends GetxController {
       final allParameters = ModbusDataParser.parseParameters(payloadBytes);
 
       // Update parameter 560 (RTC Time)
-      if (560 < allParameters.length) {
-        rtcTime.value = allParameters[560];
-        print('🕒 RTC Time (560): ${rtcTime.value} - Formatted: $formattedRtcTime');
+      if (559 < allParameters.length) {
+        rtcTime.value = allParameters[559];
+        print(
+            '🕒 RTC Time (560): ${rtcTime.value} - Formatted: $formattedRtcTime');
       }
 
       // Update parameter 561 (number of boxes)
@@ -173,13 +183,15 @@ class InfoPlantDetailController extends GetxController {
       // Update parameter 595 (Floot) with validation
       if (595 < allParameters.length) {
         floot.value = allParameters[595];
-        print('🌊 Floot (595): ${floot.value} - Status: ${flootStatus == HealthStatus.good ? "GOOD" : "CRITICAL"}');
+        print(
+            '🌊 Floot (595): ${floot.value} - Status: ${flootStatus == HealthStatus.good ? "GOOD" : "CRITICAL"}');
       }
 
       // Update parameter 596 (Pressure) with validation
       if (596 < allParameters.length) {
         pressure.value = allParameters[596];
-        print('🔘 Pressure (596): ${pressure.value} - Status: ${pressureStatus == HealthStatus.good ? "GOOD" : "CRITICAL"}');
+        print(
+            '🔘 Pressure (596): ${pressure.value} - Status: ${pressureStatus == HealthStatus.good ? "GOOD" : "CRITICAL"}');
       }
 
       // Update LIVE data for active boxes only (50 to 49+numberOfBoxes)
@@ -196,8 +208,10 @@ class InfoPlantDetailController extends GetxController {
         }
       }
 
-      print('📊 Live data for ${numberOfBoxes.value} boxes, dummy (0) for remaining ${50 - numberOfBoxes.value} boxes');
-      print('📊 Additional Parameters - RTC: $formattedRtcTime, Floot: ${floot.value} (${flootStatus == HealthStatus.good ? "✅" : "❌"}), Pressure: ${pressure.value} (${pressureStatus == HealthStatus.good ? "✅" : "❌"})');
+      print(
+          '📊 Live data for ${numberOfBoxes.value} boxes, dummy (0) for remaining ${50 - numberOfBoxes.value} boxes');
+      print(
+          '📊 Additional Parameters - RTC: $formattedRtcTime, Floot: ${floot.value} (${flootStatus == HealthStatus.good ? "✅" : "❌"}), Pressure: ${pressure.value} (${pressureStatus == HealthStatus.good ? "✅" : "❌"})');
     } catch (e) {
       errorMessage.value = 'Error parsing MQTT message: $e';
     }

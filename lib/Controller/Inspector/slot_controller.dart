@@ -490,6 +490,8 @@ import '../../Controller/Inspector/manual_controller.dart';
 import '../../utils/constants.dart';
 
 class SlotController extends GetxController {
+
+
   String? uuid;
 
   SlotController();

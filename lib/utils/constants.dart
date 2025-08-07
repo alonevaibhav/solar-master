@@ -53,6 +53,8 @@ String mqttSchedulePost(String uuid) => "/api/mqtt/publish/$uuid";
 
 String mqttCleanerPost(String uuid) => "/api/mqtt/cleaner/publish/$uuid";
 
+String mqttHistoryGet(String uuid) => "/api/mqtt/notifications/$uuid";
+
 String raiseTicket = "/api/tickets/create/inspector";
 
 

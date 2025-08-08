@@ -677,31 +677,31 @@ class CleanerDetailsPage extends StatelessWidget {
                     SizedBox(height: 20.h),
                     _buildAdditionalInfo(plantData),
                   ],
-                  SizedBox(height: 32.h),
-                  Obx(() => ElevatedButton(
-                        onPressed: controller.isLoading.value
-                            ? null
-                            : controller.toggleMaintenanceMode,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              controller.isMaintenanceModeEnabled.value
-                                  ? Colors.red
-                                  : Colors.green,
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 32, vertical: 16),
-                        ),
-                        child: controller.isLoading.value
-                            ? CircularProgressIndicator(color: Colors.white)
-                            : Text(
-                                controller.isMaintenanceModeEnabled.value
-                                    ? 'STOP MAINTENANCE'
-                                    : 'START MAINTENANCE',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                      )),
+                  // SizedBox(height: 32.h),
+                  // Obx(() => ElevatedButton(
+                  //       onPressed: controller.isLoading.value
+                  //           ? null
+                  //           : controller.toggleMaintenanceMode,
+                  //       style: ElevatedButton.styleFrom(
+                  //         backgroundColor:
+                  //             controller.isMaintenanceModeEnabled.value
+                  //                 ? Colors.red
+                  //                 : Colors.green,
+                  //         padding: EdgeInsets.symmetric(
+                  //             horizontal: 32, vertical: 16),
+                  //       ),
+                  //       child: controller.isLoading.value
+                  //           ? CircularProgressIndicator(color: Colors.white)
+                  //           : Text(
+                  //               controller.isMaintenanceModeEnabled.value
+                  //                   ? 'STOP MAINTENANCE'
+                  //                   : 'START MAINTENANCE',
+                  //               style: TextStyle(
+                  //                 color: Colors.white,
+                  //                 fontWeight: FontWeight.bold,
+                  //               ),
+                  //             ),
+                  //     )),
                 ],
               ),
             ),

@@ -41,7 +41,7 @@ class ProfileView extends GetView<ProfileController> {
 
             _buildMenuOption(
               icon: Icons.info_outline,
-              title: 'Plant Info',
+              title: 'Plant Information',
               onTap: controller.goToPlantInfo,
             ),
 

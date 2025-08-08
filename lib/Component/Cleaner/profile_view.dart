@@ -45,11 +45,11 @@ class ProfileView extends GetView<ProfileController> {
               onTap: controller.goToPlantInfo,
             ),
 
-            _buildMenuOption(
-              icon: Icons.headset_mic,
-              title: 'Help & Support',
-              onTap: controller.goToHelpAndSupport,
-            ),
+            // _buildMenuOption(
+            //   icon: Icons.headset_mic,
+            //   title: 'Help & Support',
+            //   onTap: controller.goToHelpAndSupport,
+            // ),
 
             // _buildMenuOption(
             //   icon: Icons.history,
@@ -80,12 +80,12 @@ class ProfileView extends GetView<ProfileController> {
 
             SizedBox(height: 5.4.h),
 
-            _buildActionButton(
-              icon: Icons.delete_outline,
-              title: 'Delete Account',
-              color: Colors.red,
-              onTap: controller.showDeleteConfirmation,
-            ),
+            // _buildActionButton(
+            //   icon: Icons.delete_outline,
+            //   title: 'Delete Account',
+            //   color: Colors.red,
+            //   onTap: controller.showDeleteConfirmation,
+            // ),
           ],
         ),
       ),

@@ -59,13 +59,9 @@ class CleanerHomeTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    // final TodayInspectionsController controller = Get.put(TodayInspectionsController());
-    // final CleanupScheduleController controller = Get.put(CleanupScheduleController());
     final CleaningManagementController controller = Get.put(CleaningManagementController());
 
     return Scaffold(
-      // body: TodayInspectionsView(),
-      // body: CleanupScheduleView(),
       body: CleaningManagementView(),
     );
   }

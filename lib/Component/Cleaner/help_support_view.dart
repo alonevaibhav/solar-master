@@ -783,6 +783,7 @@ class InfoPage extends StatelessWidget {
     final Map<String, dynamic>? plantData = Get.arguments;
 
     print('Received plant data: $plantData');
+
     final String? uuid = plantData?['uuid']?.toString();
     print('UUID: $uuid');
 

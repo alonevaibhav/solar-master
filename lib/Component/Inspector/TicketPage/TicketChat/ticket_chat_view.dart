@@ -1,10 +1,8 @@
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:solar_app/Component/Inspector/TicketPage/TicketChat/ticket_chat_controller.dart';
-
 import '../../../../utils/video_player.dart';
 
 class TicketChatView extends StatelessWidget {
@@ -17,14 +15,14 @@ class TicketChatView extends StatelessWidget {
     print('Ticket ID: $ticketId');
     final TicketChatController controller = Get.put(TicketChatController(initialTicketId: ticketId));
 
-
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.grey.shade700, size: 20.sp),
+          icon: Icon(Icons.arrow_back_ios,
+              color: Colors.grey.shade700, size: 20.sp),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Column(
@@ -62,7 +60,8 @@ class TicketChatView extends StatelessWidget {
               if (controller.isLoading.value && controller.messages.isEmpty) {
                 return const Center(
                   child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2196F3)),
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(Color(0xFF2196F3)),
                   ),
                 );
               }
@@ -104,13 +103,15 @@ class TicketChatView extends StatelessWidget {
                 color: const Color(0xFF2196F3),
                 child: ListView.builder(
                   controller: controller.scrollController,
-                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                   itemCount: controller.messages.length,
                   itemBuilder: (context, index) {
                     final message = controller.messages[index];
                     final isMyMessage = controller.isMyMessage(message);
                     final showDate = index == 0 ||
-                        controller.getMessageDate(controller.messages[index - 1]) !=
+                        controller.getMessageDate(
+                                controller.messages[index - 1]) !=
                             controller.getMessageDate(message);
 
                     return Column(
@@ -118,7 +119,8 @@ class TicketChatView extends StatelessWidget {
                         if (showDate) ...[
                           SizedBox(height: 16.h),
                           Container(
-                            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12.w, vertical: 4.h),
                             decoration: BoxDecoration(
                               color: Colors.grey.shade200,
                               borderRadius: BorderRadius.circular(12.r),
@@ -149,31 +151,30 @@ class TicketChatView extends StatelessWidget {
 
             return hasMedia
                 ? Container(
-              height: 100.h,
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: controller.uploadedImagePaths.length +
-                    controller.uploadedVideoPaths.length,
-                itemBuilder: (context, index) {
-                  if (index < controller.uploadedImagePaths.length) {
-                    return _buildImagePreview(
-                        controller.uploadedImagePaths[index],
-                        index,
-                        controller,
-                        isImage: true
-                    );
-                  } else {
-                    final videoIndex = index - controller.uploadedImagePaths.length;
-                    return _buildVideoPreview(
-                        controller.uploadedVideoPaths[videoIndex],
-                        videoIndex,
-                        controller
-                    );
-                  }
-                },
-              ),
-            )
+                    height: 100.h,
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: controller.uploadedImagePaths.length +
+                          controller.uploadedVideoPaths.length,
+                      itemBuilder: (context, index) {
+                        if (index < controller.uploadedImagePaths.length) {
+                          return _buildImagePreview(
+                              controller.uploadedImagePaths[index],
+                              index,
+                              controller,
+                              isImage: true);
+                        } else {
+                          final videoIndex =
+                              index - controller.uploadedImagePaths.length;
+                          return _buildVideoPreview(
+                              controller.uploadedVideoPaths[videoIndex],
+                              videoIndex,
+                              controller);
+                        }
+                      },
+                    ),
+                  )
                 : SizedBox.shrink();
           }),
           Container(
@@ -192,7 +193,8 @@ class TicketChatView extends StatelessWidget {
               child: Row(
                 children: [
                   IconButton(
-                    icon: Icon(Icons.attachment, color: Colors.grey.shade700, size: 24.sp),
+                    icon: Icon(Icons.attachment,
+                        color: Colors.grey.shade700, size: 24.sp),
                     onPressed: controller.uploadMedia,
                   ),
                   Expanded(
@@ -228,39 +230,42 @@ class TicketChatView extends StatelessWidget {
                   ),
                   SizedBox(width: 8.w),
                   Obx(() => GestureDetector(
-                    onTap: controller.isSending.value ? null : controller.sendMessage,
-                    child: Container(
-                      width: 44.w,
-                      height: 44.w,
-                      decoration: BoxDecoration(
-                        color: controller.isSending.value
-                            ? Colors.grey.shade300
-                            : const Color(0xFF2196F3),
-                        borderRadius: BorderRadius.circular(22.r),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF2196F3).withOpacity(0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
+                        onTap: controller.isSending.value
+                            ? null
+                            : controller.sendMessage,
+                        child: Container(
+                          width: 44.w,
+                          height: 44.w,
+                          decoration: BoxDecoration(
+                            color: controller.isSending.value
+                                ? Colors.grey.shade300
+                                : const Color(0xFF2196F3),
+                            borderRadius: BorderRadius.circular(22.r),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF2196F3).withOpacity(0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      child: controller.isSending.value
-                          ? SizedBox(
-                        width: 20.w,
-                        height: 20.w,
-                        child: const CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          child: controller.isSending.value
+                              ? SizedBox(
+                                  width: 20.w,
+                                  height: 20.w,
+                                  child: const CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
+                                  ),
+                                )
+                              : Icon(
+                                  Icons.send_rounded,
+                                  color: Colors.white,
+                                  size: 20.sp,
+                                ),
                         ),
-                      )
-                          : Icon(
-                        Icons.send_rounded,
-                        color: Colors.white,
-                        size: 20.sp,
-                      ),
-                    ),
-                  )),
+                      )),
                 ],
               ),
             ),
@@ -270,9 +275,11 @@ class TicketChatView extends StatelessWidget {
     );
   }
 
-  Widget _buildMessageBubble(Map<String, dynamic> message, bool isMyMessage, TicketChatController controller) {
+  Widget _buildMessageBubble(Map<String, dynamic> message, bool isMyMessage,
+      TicketChatController controller) {
     final attachments = controller.getAttachments(message);
-    final hasText = message['msg'] != null && message['msg'].toString().trim().isNotEmpty;
+    final hasText =
+        message['msg'] != null && message['msg'].toString().trim().isNotEmpty;
 
     return Align(
       alignment: isMyMessage ? Alignment.centerRight : Alignment.centerLeft,
@@ -283,7 +290,8 @@ class TicketChatView extends StatelessWidget {
           right: isMyMessage ? 0 : 60.w,
         ),
         child: Column(
-          crossAxisAlignment: isMyMessage ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          crossAxisAlignment:
+              isMyMessage ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
             if (!isMyMessage) ...[
               Padding(
@@ -310,7 +318,9 @@ class TicketChatView extends StatelessWidget {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: isMyMessage ? const Color(0xFF2196F3).withOpacity(0.3) : Colors.black.withOpacity(0.08),
+                      color: isMyMessage
+                          ? const Color(0xFF2196F3).withOpacity(0.3)
+                          : Colors.black.withOpacity(0.08),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -321,11 +331,14 @@ class TicketChatView extends StatelessWidget {
                   children: [
                     if (hasText) ...[
                       Padding(
-                        padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, attachments.isEmpty ? 4.h : 8.h),
+                        padding: EdgeInsets.fromLTRB(
+                            16.w, 12.h, 16.w, attachments.isEmpty ? 4.h : 8.h),
                         child: Text(
                           message['msg'] ?? '',
                           style: TextStyle(
-                            color: isMyMessage ? Colors.white : Colors.grey.shade800,
+                            color: isMyMessage
+                                ? Colors.white
+                                : Colors.grey.shade800,
                             fontSize: 15.sp,
                             fontWeight: FontWeight.w400,
                             height: 1.3,
@@ -341,7 +354,9 @@ class TicketChatView extends StatelessWidget {
                       child: Text(
                         controller.getMessageTime(message),
                         style: TextStyle(
-                          color: isMyMessage ? Colors.white.withOpacity(0.7) : Colors.grey.shade500,
+                          color: isMyMessage
+                              ? Colors.white.withOpacity(0.7)
+                              : Colors.grey.shade500,
                           fontSize: 11.sp,
                           fontWeight: FontWeight.w400,
                         ),
@@ -357,9 +372,10 @@ class TicketChatView extends StatelessWidget {
     );
   }
 
-  Widget _buildAttachments(List<Map<String, dynamic>> attachments, bool isMyMessage, TicketChatController controller) {
-    final imageAttachments = controller.getImageAttachments(attachments );
-    final videoAttachments = controller.getVideoAttachments(attachments );
+  Widget _buildAttachments(List<Map<String, dynamic>> attachments,
+      bool isMyMessage, TicketChatController controller) {
+    final imageAttachments = controller.getImageAttachments(attachments);
+    final videoAttachments = controller.getVideoAttachments(attachments);
 
     return Column(
       children: [
@@ -371,7 +387,8 @@ class TicketChatView extends StatelessWidget {
     );
   }
 
-  Widget _buildImageAttachments(List<Map<String, dynamic>> attachments, bool isMyMessage, TicketChatController controller) {
+  Widget _buildImageAttachments(List<Map<String, dynamic>> attachments,
+      bool isMyMessage, TicketChatController controller) {
     final imageUrls = attachments
         .map((attachment) => controller.getImageUrl(attachment['path'] ?? ''))
         .where((url) => url.isNotEmpty)
@@ -385,7 +402,8 @@ class TicketChatView extends StatelessWidget {
     );
   }
 
-  Widget _buildVideoAttachments(List<Map<String, dynamic>> attachments, bool isMyMessage, TicketChatController controller) {
+  Widget _buildVideoAttachments(List<Map<String, dynamic>> attachments,
+      bool isMyMessage, TicketChatController controller) {
     return Container(
       margin: EdgeInsets.fromLTRB(8.w, 0, 8.w, 8.h),
       child: Column(
@@ -416,20 +434,24 @@ class TicketChatView extends StatelessWidget {
     );
   }
 
-  Widget _buildImageGrid(List<String> imageUrls, TicketChatController controller) {
+  Widget _buildImageGrid(
+      List<String> imageUrls, TicketChatController controller) {
     if (imageUrls.isEmpty) return const SizedBox.shrink();
 
     if (imageUrls.length == 1) {
-      return _buildImageThumbnail(imageUrls[0], imageUrls, 0, controller, width: 200.w, height: 150.h);
+      return _buildImageThumbnail(imageUrls[0], imageUrls, 0, controller,
+          width: 200.w, height: 150.h);
     } else if (imageUrls.length == 2) {
       return Row(
         children: [
           Expanded(
-            child: _buildImageThumbnail(imageUrls[0], imageUrls, 0, controller, width: 140.w, height: 120.h),
+            child: _buildImageThumbnail(imageUrls[0], imageUrls, 0, controller,
+                width: 140.w, height: 120.h),
           ),
           SizedBox(width: 4.w),
           Expanded(
-            child: _buildImageThumbnail(imageUrls[1], imageUrls, 1, controller, width: 140.w, height: 120.h),
+            child: _buildImageThumbnail(imageUrls[1], imageUrls, 1, controller,
+                width: 140.w, height: 120.h),
           ),
         ],
       );
@@ -445,13 +467,17 @@ class TicketChatView extends StatelessWidget {
         ),
         itemCount: imageUrls.length,
         itemBuilder: (context, index) {
-          return _buildImageThumbnail(imageUrls[index], imageUrls, index, controller, width: 140.w, height: 120.h);
+          return _buildImageThumbnail(
+              imageUrls[index], imageUrls, index, controller,
+              width: 140.w, height: 120.h);
         },
       );
     }
   }
 
-  Widget _buildImageThumbnail(String imagePath, List<String> allImageUrls, int index, TicketChatController controller, {required double width, required double height}) {
+  Widget _buildImageThumbnail(String imagePath, List<String> allImageUrls,
+      int index, TicketChatController controller,
+      {required double width, required double height}) {
     return GestureDetector(
       onTap: () {
         controller.openImageFullScreen(imagePath, allImageUrls, index);
@@ -460,57 +486,58 @@ class TicketChatView extends StatelessWidget {
         margin: EdgeInsets.only(bottom: 4.h),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8.r),
-          child: imagePath.startsWith('http://') || imagePath.startsWith('https://')
+          child: imagePath.startsWith('http://') ||
+                  imagePath.startsWith('https://')
               ? Image.network(
-            imagePath,
-            width: width,
-            height: height,
-            fit: BoxFit.cover,
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) {
-                return child;
-              } else {
-                return Container(
+                  imagePath,
                   width: width,
                   height: height,
-                  color: Colors.grey.shade200,
-                  child: const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                );
-              }
-            },
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                width: width,
-                height: height,
-                color: Colors.grey.shade200,
-                child: const Icon(Icons.error),
-              );
-            },
-          )
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) {
+                      return child;
+                    } else {
+                      return Container(
+                        width: width,
+                        height: height,
+                        color: Colors.grey.shade200,
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: width,
+                      height: height,
+                      color: Colors.grey.shade200,
+                      child: const Icon(Icons.error),
+                    );
+                  },
+                )
               : Image.file(
-            File(imagePath),
-            width: width,
-            height: height,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                width: width,
-                height: height,
-                color: Colors.grey.shade200,
-                child: const Icon(Icons.error),
-              );
-            },
-          ),
+                  File(imagePath),
+                  width: width,
+                  height: height,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: width,
+                      height: height,
+                      color: Colors.grey.shade200,
+                      child: const Icon(Icons.error),
+                    );
+                  },
+                ),
         ),
       ),
     );
   }
 
-
-
-  Widget _buildImagePreview(String imagePath, int index, TicketChatController controller, {required bool isImage}) {
+  Widget _buildImagePreview(
+      String imagePath, int index, TicketChatController controller,
+      {required bool isImage}) {
     return Stack(
       children: [
         Container(
@@ -539,7 +566,8 @@ class TicketChatView extends StatelessWidget {
     );
   }
 
-  Widget _buildVideoPreview(String videoPath, int index, TicketChatController controller) {
+  Widget _buildVideoPreview(
+      String videoPath, int index, TicketChatController controller) {
     return GestureDetector(
       onTap: () {
         _navigateToVideoPlayer(Get.context!, videoPath);

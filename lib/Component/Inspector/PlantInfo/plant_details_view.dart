@@ -1231,7 +1231,7 @@ class InfoPlantDetailsView extends StatelessWidget {
       backgroundColor: const Color(0xFFF8FAFC),
       body: CustomScrollView(
         slivers: [
-          _buildSliverAppBar(plantData),
+          _buildSliverAppBar(plantData,context),
           SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.all(20.w),
@@ -1294,7 +1294,7 @@ class InfoPlantDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _buildSliverAppBar(Map<String, dynamic> plantData) {
+  Widget _buildSliverAppBar(Map<String, dynamic> plantData,context) {
     final isActive = plantData['isActive'] == 1;
     final underMaintenance = plantData['under_maintenance'] == 1;
     Color statusColor = Colors.grey.shade400;
@@ -1333,7 +1333,7 @@ class InfoPlantDetailsView extends StatelessWidget {
         ),
         child: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black, size: 20.sp),
-          onPressed: () => Get.back(),
+          onPressed: () =>Navigator.of(context).pop(),
         ),
       ),
       actions: [

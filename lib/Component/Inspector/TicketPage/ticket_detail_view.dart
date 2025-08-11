@@ -24,7 +24,7 @@ class TicketDetailView extends GetView<TicketController> {
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Get.back(),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           'Issue Detail',

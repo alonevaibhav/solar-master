@@ -706,7 +706,7 @@ class DetailsViewTask extends StatelessWidget {
               size: 16.2.w,
             ),
           ),
-          onPressed: () => Get.back(),
+          onPressed: () =>Navigator.of(context).pop(),
         ),
         title: Text(
           'Task Details',

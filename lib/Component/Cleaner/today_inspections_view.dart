@@ -72,8 +72,7 @@ class TodayInspectionsView extends GetView<TodayInspectionsController> {
 
                   return ListView.separated(
                     itemCount: inspections.length,
-                    separatorBuilder: (context, index) =>
-                        SizedBox(height: 12.h),
+                    separatorBuilder: (context, index) => SizedBox(height: 12.h),
                     itemBuilder: (context, index) {
                       final inspection = inspections[index];
                       return _buildInspectionCard(inspection);

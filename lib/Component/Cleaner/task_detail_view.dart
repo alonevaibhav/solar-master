@@ -12,9 +12,11 @@ class TaskDetailView extends GetView<TodayInspectionsController> {
     // Initialize the controller with the task ID from arguments
     if (Get.arguments != null) {
       final args = Get.arguments as Map<String, dynamic>;
-      if (args.containsKey('taskId')) {controller.currentTaskId.value = args['taskId'];
+      if (args.containsKey('taskId')) {
+        controller.currentTaskId.value = args['taskId'];
       }
-      if (args.containsKey('status')) {controller.taskStatus.value = args['status'];
+      if (args.containsKey('status')) {
+        controller.taskStatus.value = args['status'];
       }
     }
 

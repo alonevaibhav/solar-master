@@ -27,8 +27,8 @@ class CleaningManagementView extends StatelessWidget {
                     SizedBox(height: 19.2.h),
                     _buildStatusCards(controller),
                     SizedBox(height: 19.2.h),
-                    _buildAreaSection(controller),
-                    SizedBox(height: 12.8.h),
+                    // _buildAreaSection(controller),
+                    // SizedBox(height: 12.8.h),
                     Expanded(
                       child: _buildTaskList(controller),
                     ),

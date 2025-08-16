@@ -43,6 +43,9 @@ String getChatByID(int ticketId) => "/ticketChat/chat/ticket/inspector/$ticketId
 String postChatByIDInspector(int ticketId) => "/ticketChat/chat/inspector";
 
 
+String postTicket = "/api/tickets/create/inspector";
+
+
 
 
 

@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../../API Service/api_service.dart';
 import '../../../../Route Manager/app_routes.dart';
+import '../../../../utils/constants.dart';
 
 class TicketRaisingController extends GetxController {
   final Map<String, dynamic>? plantData;
@@ -297,8 +298,7 @@ class TicketRaisingController extends GetxController {
       ),
     );
   }
-
-  Future<void> submitTicket() async {
+  Future<void> submitTicket( context) async {
     if (!formKey.currentState!.validate()) {
       Get.snackbar(
         'Validation Error',
@@ -339,50 +339,153 @@ class TicketRaisingController extends GetxController {
 
       // Make the API call
       final response = await ApiService.multipartPost<Map<String, dynamic>>(
-        endpoint: '/api/tickets/create/inspector',
+        endpoint:postTicket,
         fields: fields,
         files: files,
         fromJson: (json) => json as Map<String, dynamic>,
       );
 
-      if (response.success == true) {
-        print('Success response: ${response.data}');
+      if (response.statusCode == 201) {
 
-        Get.showSnackbar(
-          GetSnackBar(
-            title: 'Success',
-            message: 'Ticket created successfully',
-            backgroundColor: Colors.green,
-            icon: Icon(Icons.check_circle_outline, color: Colors.white),
-            duration: Duration(seconds: 3),
-            snackPosition: SnackPosition.TOP,
-            margin: EdgeInsets.all(16),
-            borderRadius: 8,
-            isDismissible: true,
-          ),
+        // Show success snackbar with proper configuration
+        Get.snackbar(
+          'Success',
+          'Ticket created successfully.',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.green, // Changed to green for success
+          colorText: Colors.white,
+          icon: const Icon(Icons.check_circle_outline, color: Colors.white),
+          margin: const EdgeInsets.all(16),
+          borderRadius: 8,
         );
 
-        Get.offNamed(AppRoutes.inspectorPlantInfo);
+        // Add a small delay before navigation to ensure snackbar is shown
+        await Future.delayed(const Duration(milliseconds: 1000));
+
+        Navigator.of(context!).pop(); // Close the current screen
+
+
       } else {
+        // Handle non-201 status codes
+        final errorMsg = response.data?['message'] ??
+            response.errorMessage ??
+            'Failed to create ticket. Please try again.';
+
         Get.snackbar(
           'Error',
-          response.errorMessage ?? 'Failed to create ticket. Please try again.',
-          backgroundColor: Colors.red.withOpacity(0.1),
-          colorText: Colors.red,
-          icon: const Icon(Icons.error_outline, color: Colors.red),
+          errorMsg,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.withOpacity(0.9),
+          colorText: Colors.white,
+          icon: const Icon(Icons.error_outline, color: Colors.white),
+          duration: const Duration(seconds: 4),
+          margin: const EdgeInsets.all(16),
+          borderRadius: 8,
         );
       }
     } catch (e) {
+      print('Error creating ticket: $e'); // Add logging
       errorMessage.value = e.toString();
+
       Get.snackbar(
         'Error',
         'Failed to create ticket. Please try again.',
-        backgroundColor: Colors.red.withOpacity(0.1),
-        colorText: Colors.red,
-        icon: const Icon(Icons.error_outline, color: Colors.red),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.withOpacity(0.9),
+        colorText: Colors.white,
+        icon: const Icon(Icons.error_outline, color: Colors.white),
+        duration: const Duration(seconds: 4),
+        margin: const EdgeInsets.all(16),
+        borderRadius: 8,
       );
     } finally {
       isLoading.value = false;
     }
   }
+
+
+  // Future<void> submitTicket() async {
+  //   if (!formKey.currentState!.validate()) {
+  //     Get.snackbar(
+  //       'Validation Error',
+  //       'Please fill all required fields correctly',
+  //       backgroundColor: Colors.red.withOpacity(0.1),
+  //       colorText: Colors.red,
+  //       icon: const Icon(Icons.error_outline, color: Colors.red),
+  //     );
+  //     return;
+  //   }
+  //
+  //   try {
+  //     isLoading.value = true;
+  //     errorMessage.value = '';
+  //
+  //     // Collect data from the form with default values for potentially null fields
+  //     final fields = {
+  //       'title': titleController.text.trim(),
+  //       'description': descriptionController.text.trim(),
+  //       'priority': selectedPriority.value ?? '3',
+  //       'ticket_type': selectedTicketType.value ?? 'software',
+  //       'plant_id': plantData?['id'].toString() ?? '',
+  //       'department': selectedDepartment.value ?? 'technical',
+  //       'inspector_id': plantData?['inspector_id'].toString() ?? '',
+  //       'distributor_admin_id': plantData?['distributor_admin_id'].toString() ?? '',
+  //       'ip': '192.168.1.1', // Replace with actual IP retrieval logic
+  //       'creator_type': 'inspector',
+  //       'user_id': plantData?['user_id'].toString() ?? '',
+  //     };
+  //
+  //     // Prepare the files for the multipart request
+  //     final files = uploadedImagePaths.map((path) {
+  //       return MultipartFiles(
+  //         field: 'attachments',
+  //         filePath: path,
+  //       );
+  //     }).toList();
+  //
+  //     // Make the API call
+  //     final response = await ApiService.multipartPost<Map<String, dynamic>>(
+  //       endpoint: '/api/tickets/create/inspector',
+  //       fields: fields,
+  //       files: files,
+  //       fromJson: (json) => json as Map<String, dynamic>,
+  //     );
+  //
+  //     if (response.statusCode == 201) {
+  //       print('Success response: ${response.data}');
+  //
+  //       Get.snackbar(
+  //         'Success',
+  //         'Ticket created successfully.',
+  //         snackPosition: SnackPosition.BOTTOM,
+  //         backgroundColor: Colors.blue,
+  //         colorText: Colors.white,
+  //         icon: Icon(Icons.check_circle_outline, color: Colors.white),
+  //         duration: const Duration(seconds: 5),
+  //       );
+  //
+  //       Get.back(); // Navigate back after successful ticket creation
+  //
+  //     } else {
+  //       Get.snackbar(
+  //         'Error',
+  //         response.errorMessage ?? 'Failed to create ticket. Please try again.',
+  //         backgroundColor: Colors.red.withOpacity(0.1),
+  //         colorText: Colors.red,
+  //         icon: const Icon(Icons.error_outline, color: Colors.red),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     errorMessage.value = e.toString();
+  //     Get.snackbar(
+  //       'Error',
+  //       'Failed to create ticket. Please try again.',
+  //       backgroundColor: Colors.red.withOpacity(0.1),
+  //       colorText: Colors.red,
+  //       icon: const Icon(Icons.error_outline, color: Colors.red),
+  //     );
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
 }

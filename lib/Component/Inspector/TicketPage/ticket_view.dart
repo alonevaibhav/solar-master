@@ -53,7 +53,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
               child: TextField(
                 onChanged: controller.setSearchQuery,
                 decoration: InputDecoration(
-                  hintText: 'Search Area...',
+                  hintText: 'Search ...',
                   prefixIcon: const Icon(Icons.search, color: Colors.grey),
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.symmetric(vertical: 12.h),
@@ -62,31 +62,6 @@ import 'package:dropdown_button2/dropdown_button2.dart';
             ),
           ),
           SizedBox(width: 12.w),
-          Container(
-            height: 44.h,
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFD380),
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-            child: TextButton.icon(
-              onPressed: () {
-                Get.snackbar(
-                  'History',
-                  'Viewing ticket history',
-                  snackPosition: SnackPosition.BOTTOM,
-                );
-              },
-              icon: const Icon(Icons.history, color: Colors.black),
-              label: Text(
-                'History',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14.sp,
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );

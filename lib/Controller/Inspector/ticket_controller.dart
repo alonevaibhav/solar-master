@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../API Service/Model/Request/ticket_model.dart';
@@ -13,7 +12,6 @@ class TicketController extends GetxController {
   final filteredTickets = <Map<String, dynamic>>[].obs;
 
   final allTicketsStats = Rxn<Map<String, dynamic>>();
-
 
   var selectedTicketTab = 'all'.obs;
 
@@ -129,7 +127,6 @@ class TicketController extends GetxController {
       };
     }
   }
-
 
   void applyFilters() {
     List<Map<String, dynamic>> currentTickets =
@@ -307,7 +304,8 @@ class TicketController extends GetxController {
     }
   }
 
-  Future<void> updateTicketDetails(Map<String, dynamic> ticketData) async {
+  Future<void> updateTicketDetails(
+      Map<String, dynamic> ticketData, context) async {
     try {
       isLoading.value = true;
 
@@ -337,14 +335,22 @@ class TicketController extends GetxController {
 
         currentTicket.value = updatedTicket;
         applyFilters();
-       await refreshAllTickets();
-        Get.back(); // Navigate back after updating
+        await refreshAllTickets();
+        // await Future.delayed(const Duration(milliseconds: 1000));
+        Get.back(); // Close the dialog or screen after update
+
 
         Get.snackbar(
           'Success',
-          'Ticket updated successfully',
-          snackPosition: SnackPosition.BOTTOM,
+          'Ticket updated successfully.',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.green, // Changed to green for success
+          colorText: Colors.white,
+          icon: const Icon(Icons.check_circle_outline, color: Colors.white),
+          margin: const EdgeInsets.all(16),
+          borderRadius: 8,
         );
+
       } else {
         errorMessage.value = response.errorMessage ?? 'Failed to update ticket';
         Get.snackbar(
@@ -368,7 +374,6 @@ class TicketController extends GetxController {
       isLoading.value = false;
     }
   }
-
 
   Future<void> sendMessage() async {
     if (messageController.text.trim().isEmpty) {

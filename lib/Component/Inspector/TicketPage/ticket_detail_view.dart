@@ -168,86 +168,10 @@ class TicketDetailView extends GetView<TicketController> {
               SizedBox(height: 14.4.h),
               _buildDropdownSection(ticketData),
               SizedBox(height: 14.4.h),
-              // Container(
-              //   padding: EdgeInsets.all(14.4.r),
-              //   decoration: BoxDecoration(
-              //     color: Colors.white,
-              //     borderRadius: BorderRadius.circular(10.8.r),
-              //     boxShadow: [
-              //       BoxShadow(
-              //         color: Colors.black.withOpacity(0.05),
-              //         blurRadius: 4.5,
-              //         offset: const Offset(0, 2),
-              //       ),
-              //     ],
-              //   ),
-              //   child: Column(
-              //     crossAxisAlignment: CrossAxisAlignment.start,
-              //     children: [
-              //       SizedBox(height: 14.4.h),
-              //       Container(
-              //         decoration: BoxDecoration(
-              //           color: Colors.grey[100],
-              //           borderRadius: BorderRadius.circular(10.8.r),
-              //         ),
-              //         padding: EdgeInsets.all(14.4.r),
-              //         height: 200.h,
-              //         child: Column(
-              //           mainAxisAlignment: MainAxisAlignment.end,
-              //           children: [
-              //             Spacer(),
-              //             Container(
-              //               decoration: BoxDecoration(
-              //                 color: Colors.white,
-              //                 borderRadius: BorderRadius.circular(21.6.r),
-              //                 border: Border.all(color: Colors.grey[300]!),
-              //               ),
-              //               child: TextField(
-              //                 controller: controller.messageController,
-              //                 decoration: InputDecoration(
-              //                   hintText: 'Send message...',
-              //                   hintStyle: TextStyle(color: Colors.grey),
-              //                   contentPadding: EdgeInsets.symmetric(
-              //                     horizontal: 14.4.w,
-              //                     vertical: 7.2.h,
-              //                   ),
-              //                   border: InputBorder.none,
-              //                   suffixIcon: IconButton(
-              //                     icon: Icon(Icons.send, color: Colors.black),
-              //                     onPressed: controller.sendMessage,
-              //                   ),
-              //                 ),
-              //               ),
-              //             ),
-              //           ],
-              //         ),
-              //       ),
-              //       SizedBox(height: 14.4.h),
-              //       Container(
-              //         decoration: BoxDecoration(
-              //           color: Colors.white,
-              //           borderRadius: BorderRadius.circular(10.8.r),
-              //           border: Border.all(color: Colors.grey[300]!),
-              //         ),
-              //         padding: EdgeInsets.symmetric(horizontal: 14.4.w),
-              //         child: TextField(
-              //           controller: controller.remarkController,
-              //           decoration: InputDecoration(
-              //             hintText: 'Add remark...',
-              //             hintStyle: TextStyle(color: Colors.grey),
-              //             border: InputBorder.none,
-              //           ),
-              //           maxLines: 3,
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-              // ),
-              SizedBox(height: 21.6.h),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => controller.updateTicketDetails(ticketData),
+                  onPressed: () => controller.updateTicketDetails(ticketData,context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
                     padding: EdgeInsets.symmetric(vertical: 14.4.h),

@@ -12,22 +12,14 @@ class TicketRaisingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final Map<String, dynamic>? plantData = Get.arguments;
     // Example of using plantData
     if (plantData != null) {
       // You can now use the plantData to build your UI or pass it to the controller
       print('plant_id: ${plantData['id']}');
-      print('inspector_id: ${plantData['inspector_id']}');
-      print('distributor_admin_id: ${plantData['distributor_admin_id']}');
-      print('creator_type: ${plantData['creator_type']}'); // by default Inspector
-      print('user_id: ${plantData['user_id']}');
-      print('ip'); // took from mobile app
-
-
-      // Add more fields as needed
     }
-    final TicketRaisingController controller = Get.put(TicketRaisingController(plantData: plantData));
+    final TicketRaisingController controller =
+        Get.put(TicketRaisingController(plantData: plantData));
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -44,7 +36,7 @@ class TicketRaisingView extends StatelessWidget {
         backgroundColor: const Color(0xFF1565C0),
         elevation: 0,
         leading: IconButton(
-          onPressed: () => Get.back(),
+          onPressed: () => Navigator.of(context).pop(),
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
         ),
       ),
@@ -81,8 +73,10 @@ class TicketRaisingView extends StatelessWidget {
                               Container(
                                 padding: EdgeInsets.all(12.w * 0.9),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF1565C0).withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(12.r * 0.9),
+                                  color:
+                                      const Color(0xFF1565C0).withOpacity(0.1),
+                                  borderRadius:
+                                      BorderRadius.circular(12.r * 0.9),
                                 ),
                                 child: Icon(
                                   Icons.support_agent,
@@ -171,94 +165,101 @@ class TicketRaisingView extends StatelessWidget {
                           ),
                           SizedBox(height: 20.h * 0.9),
                           Obx(() => CustomDropdownField<String>(
-                            value: controller.selectedTicketType.value,
-                            labelText: 'Issue Category',
-                            hintText: 'Select category of issue',
-                            items: controller.ticketTypes,
-                            itemLabelBuilder: (type) => controller.getTicketTypeLabel(type),
-                            onChanged: (value) => controller.selectedTicketType.value = value,
-                            validator: controller.validateTicketType,
-                            prefixIcon: Icons.category_outlined,
-                            isRequired: true,
-                            borderColor: const Color(0xFFE5E7EB),
-                            focusedBorderColor: const Color(0xFF1565C0),
-                            fillColor: const Color(0xFFF9FAFB),
-                            borderRadius: 12.r * 0.9,
-                            labelStyle: TextStyle(
-                              fontSize: 14.sp * 0.9,
-                              fontWeight: FontWeight.w500,
-                              color: const Color(0xFF374151),
-                            ),
-                            hintStyle: TextStyle(
-                              fontSize: 14.sp * 0.9,
-                              color: const Color(0xFF9CA3AF),
-                            ),
-                            itemTextStyle: TextStyle(
-                              fontSize: 14.sp * 0.9,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          )),
+                                value: controller.selectedTicketType.value,
+                                labelText: 'Issue Category',
+                                hintText: 'Select category of issue',
+                                items: controller.ticketTypes,
+                                itemLabelBuilder: (type) =>
+                                    controller.getTicketTypeLabel(type),
+                                onChanged: (value) =>
+                                    controller.selectedTicketType.value = value,
+                                validator: controller.validateTicketType,
+                                prefixIcon: Icons.category_outlined,
+                                isRequired: true,
+                                borderColor: const Color(0xFFE5E7EB),
+                                focusedBorderColor: const Color(0xFF1565C0),
+                                fillColor: const Color(0xFFF9FAFB),
+                                borderRadius: 12.r * 0.9,
+                                labelStyle: TextStyle(
+                                  fontSize: 14.sp * 0.9,
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color(0xFF374151),
+                                ),
+                                hintStyle: TextStyle(
+                                  fontSize: 14.sp * 0.9,
+                                  color: const Color(0xFF9CA3AF),
+                                ),
+                                itemTextStyle: TextStyle(
+                                  fontSize: 14.sp * 0.9,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              )),
                           SizedBox(height: 20.h * 0.9),
                           Obx(() => CustomDropdownField<String>(
-                            value: controller.selectedDepartment.value,
-                            labelText: 'Department',
-                            hintText: 'Select department',
-                            items: controller.departments,
-                            itemLabelBuilder: (department) => controller.getDepartmentLabel(department),
-                            onChanged: (value) => controller.selectedDepartment.value = value,
-                            validator: controller.validateDepartment,
-                            prefixIcon: Icons.business,
-                            isRequired: true,
-                            borderColor: const Color(0xFFE5E7EB),
-                            focusedBorderColor: const Color(0xFF1565C0),
-                            fillColor: const Color(0xFFF9FAFB),
-                            borderRadius: 12.r * 0.9,
-                            labelStyle: TextStyle(
-                              fontSize: 14.sp * 0.9,
-                              fontWeight: FontWeight.w500,
-                              color: const Color(0xFF374151),
-                            ),
-                            hintStyle: TextStyle(
-                              fontSize: 14.sp * 0.9,
-                              color: const Color(0xFF9CA3AF),
-                            ),
-                            itemTextStyle: TextStyle(
-                              fontSize: 14.sp * 0.9,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          )),
+                                value: controller.selectedDepartment.value,
+                                labelText: 'Department',
+                                hintText: 'Select department',
+                                items: controller.departments,
+                                itemLabelBuilder: (department) =>
+                                    controller.getDepartmentLabel(department),
+                                onChanged: (value) =>
+                                    controller.selectedDepartment.value = value,
+                                validator: controller.validateDepartment,
+                                prefixIcon: Icons.business,
+                                isRequired: true,
+                                borderColor: const Color(0xFFE5E7EB),
+                                focusedBorderColor: const Color(0xFF1565C0),
+                                fillColor: const Color(0xFFF9FAFB),
+                                borderRadius: 12.r * 0.9,
+                                labelStyle: TextStyle(
+                                  fontSize: 14.sp * 0.9,
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color(0xFF374151),
+                                ),
+                                hintStyle: TextStyle(
+                                  fontSize: 14.sp * 0.9,
+                                  color: const Color(0xFF9CA3AF),
+                                ),
+                                itemTextStyle: TextStyle(
+                                  fontSize: 14.sp * 0.9,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              )),
                           SizedBox(height: 20.h * 0.9),
                           Obx(() => CustomDropdownField<String>(
-                            value: controller.selectedPriority.value,
-                            labelText: 'Priority Level',
-                            hintText: 'Select priority level',
-                            items: controller.priorities,
-                            itemLabelBuilder: (priority) => controller.getPriorityLabel(priority),
-                            onChanged: (value) => controller.selectedPriority.value = value,
-                            validator: controller.validatePriority,
-                            prefixIcon: Icons.priority_high,
-                            isRequired: true,
-                            borderColor: const Color(0xFFE5E7EB),
-                            focusedBorderColor: const Color(0xFF1565C0),
-                            fillColor: const Color(0xFFF9FAFB),
-                            borderRadius: 12.r * 0.9,
-                            labelStyle: TextStyle(
-                              fontSize: 14.sp * 0.9,
-                              fontWeight: FontWeight.w500,
-                              color: const Color(0xFF374151),
-                            ),
-                            hintStyle: TextStyle(
-                              fontSize: 14.sp * 0.9,
-                              color: const Color(0xFF9CA3AF),
-                            ),
-                            itemTextStyle: TextStyle(
-                              fontSize: 14.sp * 0.9,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          )),
+                                value: controller.selectedPriority.value,
+                                labelText: 'Priority Level',
+                                hintText: 'Select priority level',
+                                items: controller.priorities,
+                                itemLabelBuilder: (priority) =>
+                                    controller.getPriorityLabel(priority),
+                                onChanged: (value) =>
+                                    controller.selectedPriority.value = value,
+                                validator: controller.validatePriority,
+                                prefixIcon: Icons.priority_high,
+                                isRequired: true,
+                                borderColor: const Color(0xFFE5E7EB),
+                                focusedBorderColor: const Color(0xFF1565C0),
+                                fillColor: const Color(0xFFF9FAFB),
+                                borderRadius: 12.r * 0.9,
+                                labelStyle: TextStyle(
+                                  fontSize: 14.sp * 0.9,
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color(0xFF374151),
+                                ),
+                                hintStyle: TextStyle(
+                                  fontSize: 14.sp * 0.9,
+                                  color: const Color(0xFF9CA3AF),
+                                ),
+                                itemTextStyle: TextStyle(
+                                  fontSize: 14.sp * 0.9,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              )),
                           SizedBox(height: 8.h * 0.9),
                           Obx(() => controller.selectedPriority.value != null
-                              ? PriorityIndicator(priority: controller.selectedPriority.value!)
+                              ? PriorityIndicator(
+                                  priority: controller.selectedPriority.value!)
                               : const SizedBox.shrink()),
                           SizedBox(height: 20.h * 0.9),
                           CustomTextFormField(
@@ -267,7 +268,8 @@ class TicketRaisingView extends StatelessWidget {
                             maxLines: 6,
                             minLines: 4,
                             labelText: 'Description *',
-                            hintText: 'Provide detailed description of the issue, steps to reproduce, and any relevant information...',
+                            hintText:
+                                'Provide detailed description of the issue, steps to reproduce, and any relevant information...',
                             alignLabelWithHint: true,
                             borderRadius: 12.r,
                             errorBorderColor: theme.colorScheme.error,
@@ -300,7 +302,8 @@ class TicketRaisingView extends StatelessWidget {
                           SizedBox(height: 8.h * 0.9),
                           Obx(() {
                             final imagePaths = controller.uploadedImagePaths;
-                            final isUploading = controller.isUploadingImage.value;
+                            final isUploading =
+                                controller.isUploadingImage.value;
 
                             if (imagePaths.isEmpty && !isUploading) {
                               return GestureDetector(
@@ -310,8 +313,10 @@ class TicketRaisingView extends StatelessWidget {
                                   height: 120.h * 0.9,
                                   decoration: BoxDecoration(
                                     color: Colors.grey[200],
-                                    borderRadius: BorderRadius.circular(12.r * 0.9),
-                                    border: Border.all(color: Colors.grey[300]!),
+                                    borderRadius:
+                                        BorderRadius.circular(12.r * 0.9),
+                                    border:
+                                        Border.all(color: Colors.grey[300]!),
                                   ),
                                   child: Center(
                                     child: Column(
@@ -321,7 +326,8 @@ class TicketRaisingView extends StatelessWidget {
                                           padding: EdgeInsets.all(12.r * 0.9),
                                           decoration: BoxDecoration(
                                             color: Colors.blue.withOpacity(0.1),
-                                            borderRadius: BorderRadius.circular(12.r * 0.9),
+                                            borderRadius: BorderRadius.circular(
+                                                12.r * 0.9),
                                           ),
                                           child: Icon(
                                             Icons.add_a_photo,
@@ -357,7 +363,8 @@ class TicketRaisingView extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       '${imagePaths.length} Photo${imagePaths.length == 1 ? '' : 's'} Added',
@@ -368,7 +375,9 @@ class TicketRaisingView extends StatelessWidget {
                                       ),
                                     ),
                                     GestureDetector(
-                                      onTap: isUploading ? null : controller.uploadImage,
+                                      onTap: isUploading
+                                          ? null
+                                          : controller.uploadImage,
                                       child: Container(
                                         padding: EdgeInsets.symmetric(
                                           horizontal: 12.w * 0.9,
@@ -376,7 +385,8 @@ class TicketRaisingView extends StatelessWidget {
                                         ),
                                         decoration: BoxDecoration(
                                           color: Colors.blue,
-                                          borderRadius: BorderRadius.circular(20.r * 0.9),
+                                          borderRadius:
+                                              BorderRadius.circular(20.r * 0.9),
                                         ),
                                         child: Row(
                                           mainAxisSize: MainAxisSize.min,
@@ -405,25 +415,32 @@ class TicketRaisingView extends StatelessWidget {
                                 GridView.builder(
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
-                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                  gridDelegate:
+                                      SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 3,
                                     crossAxisSpacing: 8.w * 0.9,
                                     mainAxisSpacing: 8.h * 0.9,
                                     childAspectRatio: 1,
                                   ),
-                                  itemCount: imagePaths.length + (isUploading ? 1 : 0),
+                                  itemCount:
+                                      imagePaths.length + (isUploading ? 1 : 0),
                                   itemBuilder: (context, index) {
-                                    if (isUploading && index == imagePaths.length) {
+                                    if (isUploading &&
+                                        index == imagePaths.length) {
                                       return Container(
                                         decoration: BoxDecoration(
                                           color: Colors.grey[200],
-                                          borderRadius: BorderRadius.circular(12.r * 0.9),
-                                          border: Border.all(color: Colors.grey[300]!),
+                                          borderRadius:
+                                              BorderRadius.circular(12.r * 0.9),
+                                          border: Border.all(
+                                              color: Colors.grey[300]!),
                                         ),
                                         child: const Center(
                                           child: CircularProgressIndicator(
                                             strokeWidth: 2,
-                                            valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                    Colors.blue),
                                           ),
                                         ),
                                       );
@@ -431,16 +448,21 @@ class TicketRaisingView extends StatelessWidget {
 
                                     final imagePath = imagePaths[index];
                                     return GestureDetector(
-                                      onTap: () => controller.viewImageFullScreen(imagePath),
+                                      onTap: () => controller
+                                          .viewImageFullScreen(imagePath),
                                       child: Container(
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(12.r * 0.9),
-                                          border: Border.all(color: Colors.grey[300]!),
+                                          borderRadius:
+                                              BorderRadius.circular(12.r * 0.9),
+                                          border: Border.all(
+                                              color: Colors.grey[300]!),
                                         ),
                                         child: Stack(
                                           children: [
                                             ClipRRect(
-                                              borderRadius: BorderRadius.circular(12.r * 0.9),
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      12.r * 0.9),
                                               child: Image.file(
                                                 File(imagePath),
                                                 fit: BoxFit.cover,
@@ -452,12 +474,17 @@ class TicketRaisingView extends StatelessWidget {
                                               top: 4.h * 0.9,
                                               right: 4.w * 0.9,
                                               child: GestureDetector(
-                                                onTap: () => controller.removeImage(index),
+                                                onTap: () => controller
+                                                    .removeImage(index),
                                                 child: Container(
-                                                  padding: EdgeInsets.all(4.r * 0.9),
+                                                  padding:
+                                                      EdgeInsets.all(4.r * 0.9),
                                                   decoration: BoxDecoration(
-                                                    color: Colors.red.withOpacity(0.8),
-                                                    borderRadius: BorderRadius.circular(12.r * 0.9),
+                                                    color: Colors.red
+                                                        .withOpacity(0.8),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12.r * 0.9),
                                                   ),
                                                   child: Icon(
                                                     Icons.close,
@@ -471,10 +498,14 @@ class TicketRaisingView extends StatelessWidget {
                                               bottom: 4.h * 0.9,
                                               right: 4.w * 0.9,
                                               child: Container(
-                                                padding: EdgeInsets.all(4.r * 0.9),
+                                                padding:
+                                                    EdgeInsets.all(4.r * 0.9),
                                                 decoration: BoxDecoration(
-                                                  color: Colors.black.withOpacity(0.6),
-                                                  borderRadius: BorderRadius.circular(12.r * 0.9),
+                                                  color: Colors.black
+                                                      .withOpacity(0.6),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          12.r * 0.9),
                                                 ),
                                                 child: Icon(
                                                   Icons.zoom_in,
@@ -496,65 +527,130 @@ class TicketRaisingView extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 32.h * 0.9),
+                    // Obx(() => SizedBox(
+                    //       width: double.infinity,
+                    //       height: 56.h * 0.9,
+                    //       child: ElevatedButton(
+                    //         onPressed: controller.isLoading.value
+                    //             ? null
+                    //             : controller.submitTicket,
+                    //         style: ElevatedButton.styleFrom(
+                    //           backgroundColor: const Color(0xFF1565C0),
+                    //           foregroundColor: Colors.white,
+                    //           elevation: 0,
+                    //           shadowColor: Colors.transparent,
+                    //           shape: RoundedRectangleBorder(
+                    //             borderRadius: BorderRadius.circular(12.r * 0.9),
+                    //           ),
+                    //           disabledBackgroundColor: const Color(0xFF9CA3AF),
+                    //         ),
+                    //         child: controller.isLoading.value
+                    //             ? Row(
+                    //                 mainAxisAlignment: MainAxisAlignment.center,
+                    //                 children: [
+                    //                   SizedBox(
+                    //                     width: 20.w * 0.9,
+                    //                     height: 20.h * 0.9,
+                    //                     child: const CircularProgressIndicator(
+                    //                       strokeWidth: 2,
+                    //                       valueColor:
+                    //                           AlwaysStoppedAnimation<Color>(
+                    //                         Colors.white,
+                    //                       ),
+                    //                     ),
+                    //                   ),
+                    //                   SizedBox(width: 12.w * 0.9),
+                    //                   Text(
+                    //                     'Creating Ticket...',
+                    //                     style: TextStyle(
+                    //                       fontSize: 16.sp * 0.9,
+                    //                       fontWeight: FontWeight.w600,
+                    //                     ),
+                    //                   ),
+                    //                 ],
+                    //               )
+                    //             : Row(
+                    //                 mainAxisAlignment: MainAxisAlignment.center,
+                    //                 children: [
+                    //                   Icon(
+                    //                     Icons.send_outlined,
+                    //                     size: 20.sp * 0.9,
+                    //                     color: Colors.white,
+                    //                   ),
+                    //                   SizedBox(width: 8.w * 0.9),
+                    //                   Text(
+                    //                     'Submit Ticket',
+                    //                     style: TextStyle(
+                    //                       fontSize: 16.sp * 0.9,
+                    //                       fontWeight: FontWeight.w600,
+                    //                     ),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //       ),
+                    //     )),
                     Obx(() => SizedBox(
-                      width: double.infinity,
-                      height: 56.h * 0.9,
-                      child: ElevatedButton(
-                        onPressed: controller.isLoading.value ? null : controller.submitTicket,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF1565C0),
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shadowColor: Colors.transparent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.r * 0.9),
+                          width: double.infinity,
+                          height: 56.h * 0.9,
+                          child: ElevatedButton(
+                            onPressed: controller.isLoading.value
+                                ? null
+                                : () => controller
+                                    .submitTicket(context), // Pass context here
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF1565C0),
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shadowColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.r * 0.9),
+                              ),
+                              disabledBackgroundColor: const Color(0xFF9CA3AF),
+                            ),
+                            child: controller.isLoading.value
+                                ? Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SizedBox(
+                                        width: 20.w * 0.9,
+                                        height: 20.h * 0.9,
+                                        child: const CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Colors.white),
+                                        ),
+                                      ),
+                                      SizedBox(width: 12.w * 0.9),
+                                      Text(
+                                        'Creating Ticket...',
+                                        style: TextStyle(
+                                          fontSize: 16.sp * 0.9,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.send_outlined,
+                                        size: 20.sp * 0.9,
+                                        color: Colors.white,
+                                      ),
+                                      SizedBox(width: 8.w * 0.9),
+                                      Text(
+                                        'Submit Ticket',
+                                        style: TextStyle(
+                                          fontSize: 16.sp * 0.9,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                           ),
-                          disabledBackgroundColor: const Color(0xFF9CA3AF),
-                        ),
-                        child: controller.isLoading.value
-                            ? Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 20.w * 0.9,
-                              height: 20.h * 0.9,
-                              child: const CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.white,
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 12.w * 0.9),
-                            Text(
-                              'Creating Ticket...',
-                              style: TextStyle(
-                                fontSize: 16.sp * 0.9,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        )
-                            : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.send_outlined,
-                              size: 20.sp * 0.9,
-                              color: Colors.white,
-                            ),
-                            SizedBox(width: 8.w * 0.9),
-                            Text(
-                              'Submit Ticket',
-                              style: TextStyle(
-                                fontSize: 16.sp * 0.9,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )),
+                        )),
                     SizedBox(height: 16.h * 0.9),
                     SizedBox(
                       width: double.infinity,

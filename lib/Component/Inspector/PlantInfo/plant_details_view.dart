@@ -1116,18 +1116,22 @@ class InfoPlantDetailsView extends StatelessWidget {
         textColor = const Color(0xFF1F2937);
         break;
       case null:
-      // TODO: Handle this case.
-        throw UnimplementedError();
+      // Handle no data case
+        containerColor =
+            const Color(0xFF6B7280).withOpacity(0.1); // Gray background
+        borderColor = const Color(0xFF6B7280).withOpacity(0.2);
+        iconColor = const Color(0xFF6B7280);
+        textColor = const Color(0xFF6B7280);
+        break;
     }
 
     return Container(
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
         color: containerColor,
-        // Use status-based color instead of original color
         borderRadius: BorderRadius.circular(8.r),
         border: Border.all(
-          color: borderColor, // Use status-based border color
+          color: borderColor,
           width: 1,
         ),
       ),
@@ -1139,7 +1143,7 @@ class InfoPlantDetailsView extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                color: iconColor, // Use status-based icon color
+                color: iconColor,
                 size: 20.sp,
               ),
             ],
@@ -1153,9 +1157,18 @@ class InfoPlantDetailsView extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          // Only show value if showValue is true and value is provided
-          if (showValue && value != null) ...[
-            SizedBox(height: 4.h),
+          SizedBox(height: 4.h),
+          // Show appropriate content based on status and showValue
+          if (status == null)
+            Text(
+              'No Data',
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.bold,
+                color: textColor,
+              ),
+            )
+          else if (showValue && value != null)
             Text(
               value,
               style: TextStyle(
@@ -1164,10 +1177,12 @@ class InfoPlantDetailsView extends StatelessWidget {
                 color: textColor,
               ),
             ),
-          ],
         ],
       ),
     );
   }
+
+
+
 }
 

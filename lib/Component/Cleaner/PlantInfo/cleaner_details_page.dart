@@ -614,7 +614,8 @@ class CleanerDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final Map<String, dynamic>? plantData = Get.arguments;
 
-    final InfoPlantCleanerDetailController controller = Get.put(InfoPlantCleanerDetailController());
+    final InfoPlantCleanerDetailController controller =
+        Get.put(InfoPlantCleanerDetailController());
 
     if (plantData == null) {
       return Scaffold(
@@ -651,7 +652,7 @@ class CleanerDetailsPage extends StatelessWidget {
       backgroundColor: const Color(0xFFF8FAFC),
       body: CustomScrollView(
         slivers: [
-          _buildSliverAppBar(plantData,context),
+          _buildSliverAppBar(plantData, context),
           SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.all(20.w),
@@ -711,7 +712,7 @@ class CleanerDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSliverAppBar(Map<String, dynamic> plantData,context) {
+  Widget _buildSliverAppBar(Map<String, dynamic> plantData, context) {
     final isActive = plantData['isActive'] == 1;
     final underMaintenance = plantData['under_maintenance'] == 1;
     Color statusColor = Colors.grey.shade400;
@@ -748,7 +749,7 @@ class CleanerDetailsPage extends StatelessWidget {
             ),
           ],
         ),
-        child:IconButton(
+        child: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black, size: 20.sp),
           onPressed: () => Navigator.of(context).pop(),
         ),
@@ -1692,18 +1693,22 @@ class CleanerDetailsPage extends StatelessWidget {
         textColor = const Color(0xFF1F2937);
         break;
       case null:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        // Handle no data case
+        containerColor =
+            const Color(0xFF6B7280).withOpacity(0.1); // Gray background
+        borderColor = const Color(0xFF6B7280).withOpacity(0.2);
+        iconColor = const Color(0xFF6B7280);
+        textColor = const Color(0xFF6B7280);
+        break;
     }
 
     return Container(
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
         color: containerColor,
-        // Use status-based color instead of original color
         borderRadius: BorderRadius.circular(8.r),
         border: Border.all(
-          color: borderColor, // Use status-based border color
+          color: borderColor,
           width: 1,
         ),
       ),
@@ -1715,7 +1720,7 @@ class CleanerDetailsPage extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                color: iconColor, // Use status-based icon color
+                color: iconColor,
                 size: 20.sp,
               ),
             ],
@@ -1729,9 +1734,18 @@ class CleanerDetailsPage extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          // Only show value if showValue is true and value is provided
-          if (showValue && value != null) ...[
-            SizedBox(height: 4.h),
+          SizedBox(height: 4.h),
+          // Show appropriate content based on status and showValue
+          if (status == null)
+            Text(
+              'No Data',
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.bold,
+                color: textColor,
+              ),
+            )
+          else if (showValue && value != null)
             Text(
               value,
               style: TextStyle(
@@ -1740,7 +1754,6 @@ class CleanerDetailsPage extends StatelessWidget {
                 color: textColor,
               ),
             ),
-          ],
         ],
       ),
     );

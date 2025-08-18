@@ -171,7 +171,7 @@ class ScheduleCardWidget extends StatelessWidget {
           child: _buildDetailItem(
             Icons.access_time_outlined,
             'Time',
-            _formatTime(schedule.time),
+            _formatTime(schedule.inspection_time),
           ),
         ),
       ],

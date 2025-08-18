@@ -304,12 +304,82 @@ class TicketController extends GetxController {
     }
   }
 
-  Future<void> updateTicketDetails(
-      Map<String, dynamic> ticketData, context) async {
+  // Future<void> updateTicketDetails(Map<String, dynamic> ticketData, context) async {
+  //   try {
+  //     isLoading.value = true;
+  //
+  //     final ticketId = ticketData['id']; // Extract the id from ticketData
+  //
+  //     final response = await ApiService.put<Map<String, dynamic>>(
+  //       endpoint: '/api/tickets/update/inspector/$ticketId',
+  //       body: {
+  //         'status': selectedStatus.value,
+  //         'priority': selectedPriority.value,
+  //         'department': selectedDepartment.value,
+  //       },
+  //       fromJson: (json) => json as Map<String, dynamic>,
+  //     );
+  //
+  //     if (response.success && response.data != null) {
+  //       final updatedTicket = response.data!;
+  //       final allIndex = allTickets.indexWhere((t) => t['id'] == ticketId);
+  //       if (allIndex != -1) {
+  //         allTickets[allIndex] = updatedTicket;
+  //       }
+  //
+  //       final myIndex = myTickets.indexWhere((t) => t['id'] == ticketId);
+  //       if (myIndex != -1) {
+  //         myTickets[myIndex] = updatedTicket;
+  //       }
+  //
+  //       currentTicket.value = updatedTicket;
+  //       applyFilters();
+  //       await refreshAllTickets();
+  //       Get.back(); // Close the dialog or screen after update
+  //
+  //
+  //       Get.snackbar(
+  //         'Success',
+  //         'Ticket updated successfully.',
+  //         snackPosition: SnackPosition.TOP,
+  //         backgroundColor: Colors.green, // Changed to green for success
+  //         colorText: Colors.white,
+  //         icon: const Icon(Icons.check_circle_outline, color: Colors.white),
+  //         margin: const EdgeInsets.all(16),
+  //         borderRadius: 8,
+  //       );
+  //       await Future.delayed(const Duration(milliseconds: 1000));
+  //
+  //
+  //     } else {
+  //       errorMessage.value = response.errorMessage ?? 'Failed to update ticket';
+  //       Get.snackbar(
+  //         'Error',
+  //         errorMessage.value!,
+  //         snackPosition: SnackPosition.BOTTOM,
+  //         backgroundColor: Colors.red,
+  //         colorText: Colors.white,
+  //       );
+  //     }
+  //   } catch (e) {
+  //     errorMessage.value = 'Failed to update ticket: ${e.toString()}';
+  //     Get.snackbar(
+  //       'Error',
+  //       errorMessage.value!,
+  //       snackPosition: SnackPosition.BOTTOM,
+  //       backgroundColor: Colors.red,
+  //       colorText: Colors.white,
+  //     );
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
+
+  Future<void> updateTicketDetails(Map<String, dynamic> ticketData, context) async {
     try {
       isLoading.value = true;
 
-      final ticketId = ticketData['id']; // Extract the id from ticketData
+      final ticketId = ticketData['id'];
 
       final response = await ApiService.put<Map<String, dynamic>>(
         endpoint: '/api/tickets/update/inspector/$ticketId',
@@ -336,20 +406,27 @@ class TicketController extends GetxController {
         currentTicket.value = updatedTicket;
         applyFilters();
         await refreshAllTickets();
-        // await Future.delayed(const Duration(milliseconds: 1000));
-        Get.back(); // Close the dialog or screen after update
 
-
+        // Show snackbar FIRST
         Get.snackbar(
           'Success',
           'Ticket updated successfully.',
           snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.green, // Changed to green for success
+          backgroundColor: Colors.green,
           colorText: Colors.white,
           icon: const Icon(Icons.check_circle_outline, color: Colors.white),
           margin: const EdgeInsets.all(16),
           borderRadius: 8,
+          duration: const Duration(seconds: 3), // Add duration
         );
+
+        // Small delay to let snackbar appear
+        await Future.delayed(const Duration(milliseconds: 1000));
+
+        // THEN close the dialog/screen
+        Navigator.of(context).pop();
+
+        // Get.back();
 
       } else {
         errorMessage.value = response.errorMessage ?? 'Failed to update ticket';
@@ -359,6 +436,7 @@ class TicketController extends GetxController {
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red,
           colorText: Colors.white,
+          duration: const Duration(seconds: 3),
         );
       }
     } catch (e) {
@@ -369,11 +447,14 @@ class TicketController extends GetxController {
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
+        duration: const Duration(seconds: 3),
       );
     } finally {
       isLoading.value = false;
     }
   }
+
+
 
   Future<void> sendMessage() async {
     if (messageController.text.trim().isEmpty) {

@@ -10,6 +10,7 @@ class Schedule {
   final int assignedBy;
   final String scheduleDate;
   final String status;
+  final String inspection_time;
   final String? notes;
 
   Schedule({
@@ -22,6 +23,7 @@ class Schedule {
     required this.isActive,
     required this.assignedBy,
     required this.scheduleDate,
+    required this.inspection_time,
     required this.status,
     this.notes,
   });
@@ -38,6 +40,7 @@ class Schedule {
       assignedBy: json['assignedBy'] ?? 0,
       scheduleDate: json['schedule_date']?.toString() ?? '',
       status: json['status']?.toString() ?? '',
+      inspection_time: json['inspection_time']?.toString() ?? '',
       notes: json['notes']?.toString(),
     );
   }
@@ -54,6 +57,7 @@ class Schedule {
       'assignedBy': assignedBy,
       'schedule_date': scheduleDate,
       'status': status,
+      'inspection_time': inspection_time,
       'notes': notes,
     };
   }

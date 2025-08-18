@@ -556,8 +556,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
               onCallPressed: controller.callContact,
               onNavigatePressed: controller.navigateToLocation,
               onTap: (ticket) {
-                Get.toNamed(AppRoutes.inspectorTicketDetailView,
-                    arguments: ticket);
+                Get.toNamed(AppRoutes.inspectorTicketDetailView, arguments: ticket);
               },
             );
           },

@@ -61,6 +61,35 @@ class InfoPlantCleanerDetailController extends GetxController {
     print("========================");
   }
 
+  void clearData() {
+    print('🧹 Clearing InfoPlantDetailController data for UI reset...');
+
+    // Reset maintenance mode and loading states
+    isMaintenanceModeEnabled.value = false;
+    isLoading.value = false;
+    errorMessage.value = '';
+
+    // Clear IMEI and topic information
+    currentImei.value = '';
+    currentTopic.value = '';
+
+    // Reset number of boxes
+    numberOfBoxes.value = 0;
+
+    // Clear all parameter values (boxes data)
+    for (var entry in parameterValues.entries) {
+      entry.value.value = 0; // Reset each RxInt to 0
+    }
+
+    // Reset additional parameters
+    rtcTime.value = 0;
+    floot.value = 0;
+    pressure.value = 0;
+
+    print('✅ InfoPlantDetailController data cleared - UI will show clean state');
+    print('📊 Reset: Boxes=0, RTC=00:00, Floot=0, Pressure=0, All parameters=0');
+  }
+
   // // Convert seconds to HH:MM:SS format
   // String get formattedRtcTime {
   //   int totalSeconds = rtcTime.value;

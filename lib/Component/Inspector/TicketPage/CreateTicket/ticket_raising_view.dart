@@ -595,8 +595,7 @@ class TicketRaisingView extends StatelessWidget {
                           child: ElevatedButton(
                             onPressed: controller.isLoading.value
                                 ? null
-                                : () => controller
-                                    .submitTicket(context), // Pass context here
+                                : () => controller.submitTicket(context), // Pass context here
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF1565C0),
                               foregroundColor: Colors.white,

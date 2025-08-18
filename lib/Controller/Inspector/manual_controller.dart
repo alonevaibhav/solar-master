@@ -69,6 +69,50 @@ class ManualController extends GetxController {
     // Clean up resources
   }
 
+  /// Clear all data when switching UUID or disconnecting MQTT
+  void clearData() {
+    try {
+      print('🧹 Clearing ManualController data...');
+
+      // Reset UUID
+      uuid = null;
+
+      // Reset reactive state variables
+      isLoading.value = false;
+      errorMessage.value = '';
+      parametersData.value = null;
+
+      // Clear IMEI and topic information
+      currentImei.value = '';
+      currentTopic.value = '';
+
+      // Reset number of boxes
+      numberOfBoxes.value = 0;
+
+      // Reset all parameter values (450-499) to 0
+      for (int i = 450; i < 500; i++) {
+        if (parameterValues.containsKey(i)) {
+          parameterValues[i]!.value = 0;
+        }
+      }
+
+      // Reset all slot timing parameters (550-557) to 0
+      for (int i = 550; i <= 557; i++) {
+        if (parameterValues.containsKey(i)) {
+          parameterValues[i]!.value = 0;
+        }
+      }
+
+      // Clear modified parameters tracking
+      modifiedParameters.clear();
+
+      print('✅ ManualController data cleared successfully');
+
+    } catch (e) {
+      print('⚠️ Error clearing ManualController data: $e');
+    }
+  }
+
   /// Load initial data (ready to receive real MQTT messages)
   Future<void> loadInitialData() async {
     try {

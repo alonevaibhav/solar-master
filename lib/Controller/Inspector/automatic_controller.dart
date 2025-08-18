@@ -77,6 +77,40 @@ class ModbusParametersController extends GetxController {
     return 0; // Always return 0 for dummy data
   }
 
+
+
+
+  // Add this method to your ModbusParametersController class
+
+  void clearData() {
+    print('🧹 Clearing ModbusParametersController data for UI reset...');
+
+    // Reset loading and error states
+    isLoading.value = false;
+    errorMessage.value = '';
+
+    // Clear IMEI and topic information
+    currentImei.value = '';
+    currentTopic.value = '';
+
+    // Reset number of boxes to 0
+    numberOfBoxes.value = 0;
+
+    // Clear all parameter values (reset all boxes to 0)
+    for (var entry in parameterValues.entries) {
+      entry.value.value = 0; // Reset each RxInt to 0
+    }
+
+    // Clear modified parameters tracking
+    modifiedParameters.clear();
+
+    // Reset main parameters data
+    parametersData.value = null;
+
+    print('✅ ModbusParametersController data cleared - UI will show clean state');
+    print('📊 Reset: Boxes=0, All parameters=0, No modified parameters');
+  }
+
 // 3. Update parseModbusMessage to handle live vs dummy data
   void parseModbusMessage(String topic, Uint8List payloadBytes) {
     try {

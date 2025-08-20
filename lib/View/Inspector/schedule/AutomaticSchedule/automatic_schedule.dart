@@ -80,8 +80,8 @@ class ModbusParametersView extends StatelessWidget {
           PopupMenuButton<String>(
             onSelected: (value) {
               switch (value) {
-                case 'setall':
-                  _showSetAllDialog(controller);
+                case 'Setall':
+                  _showSetAllDialog(controller,context);
                   break;
               }
             },
@@ -196,7 +196,7 @@ class ModbusParametersView extends StatelessWidget {
             // Info header with better design
             // Wrap the existing container with GestureDetector or InkWell
             GestureDetector(
-              onTap: () => _showAddValvesDialog(controller),
+              onTap: () => _showAddValvesDialog(controller,context),
               child: Container(
                 width: double.infinity,
                 margin: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
@@ -618,7 +618,7 @@ class ModbusParametersView extends StatelessWidget {
     );
   }
 
-  void _showSetAllDialog(ModbusParametersController controller) {
+  void _showSetAllDialog(ModbusParametersController controller,context) {
     final textController = TextEditingController();
 
     Get.dialog(
@@ -694,12 +694,12 @@ class ModbusParametersView extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Get.back(),
+            onPressed: () =>  Navigator.of(context).pop(),
             child: Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
-              Get.back();
+              Navigator.of(context).pop();
               final value = int.tryParse(textController.text);
               if (value != null && value >= 0 && value <= 65535) {
                 controller.setAllParametersTo(value);
@@ -838,7 +838,7 @@ class ModbusParametersView extends StatelessWidget {
   }
 
   // Replace your _showAddValvesDialog method with this version that has an 8-second custom loader
-  void _showAddValvesDialog(ModbusParametersController controller) {
+  void _showAddValvesDialog(ModbusParametersController controller,context) {
     final textController = TextEditingController(text: controller.numberOfBoxes.value.toString());
 
     Get.dialog(
@@ -962,7 +962,7 @@ class ModbusParametersView extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Get.back(),
+            onPressed: () => Navigator.of(context).pop(),
             child: Text(
               'Cancel',
               style: TextStyle(color: Colors.grey[600]),
@@ -978,7 +978,7 @@ class ModbusParametersView extends StatelessWidget {
                             newValue <= 50) {
                           try {
                             // Close dialog first
-                            Get.back();
+                            Navigator.of(context).pop();
 
                             // Show loading indicator with 8-second auto-dismiss
                             Get.dialog(
@@ -998,7 +998,7 @@ class ModbusParametersView extends StatelessWidget {
                             // Auto dismiss after 8 seconds
                             Future.delayed(Duration(seconds: 12), () {
                               if (Get.isDialogOpen ?? false) {
-                                Get.back();
+                                Navigator.of(context).pop();
                               }
                             });
 

@@ -41,7 +41,7 @@ class _ImageGalleryViewState extends State<ImageGalleryView> {
         backgroundColor: Colors.black,
         leading: IconButton(
           icon: Icon(Icons.close, color: Colors.white),
-          onPressed: () => Get.back(),
+          onPressed: () =>  Navigator.of(context).pop(),
         ),
         title: Text(
           '${_currentIndex + 1} of ${widget.attachments.length}',
@@ -52,19 +52,6 @@ class _ImageGalleryViewState extends State<ImageGalleryView> {
         ),
         centerTitle: true,
         elevation: 0,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.share, color: Colors.white),
-            onPressed: () {
-              // Add share functionality if needed
-              Get.snackbar(
-                'Share',
-                'Share functionality not implemented',
-                snackPosition: SnackPosition.BOTTOM,
-              );
-            },
-          ),
-        ],
       ),
       body: Stack(
         children: [

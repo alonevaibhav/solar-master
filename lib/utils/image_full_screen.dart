@@ -44,7 +44,7 @@ class _ImageFullScreenViewState extends State<ImageFullScreenView> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.close, color: Colors.white),
-          onPressed: () => Get.back(),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           '${_currentIndex + 1} of ${widget.allImages.length}',

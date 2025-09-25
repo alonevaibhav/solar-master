@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../Controller/Inspector/info_plant_detail_controller.dart';
 import '../../../Route Manager/app_routes.dart';
+import '../../../Services/init.dart';
 import '../../../View/Cleaner/CleanupManegment/cleanup_controller.dart';
 
 class InfoPlantDetailsView extends StatelessWidget {
@@ -20,105 +21,127 @@ class InfoPlantDetailsView extends StatelessWidget {
     final String? uuid = plantData?['uuid']?.toString();
     print('UUID: $uuid');
 
+    Future<void> handleBackPress() async {
+      try {
+        await AppInitializer.disconnectMQTT();
+        print('✅ MQTT disconnected on back press');
+      } catch (e) {
+        print('❌ Error disconnecting MQTT: $e');
+      }
+    }
+
+
 
     // Set UUID after creation
     controller.setUuid(uuid);
     controller.printUuidInfo();
 
     if (plantData == null) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Plant Details'),
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          elevation: 0,
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.error_outline,
-                size: 64.sp,
-                color: Colors.grey.shade400,
-              ),
-              SizedBox(height: 16.h),
-              Text(
-                'No plant data available',
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  color: Colors.grey.shade600,
+      return WillPopScope(
+        onWillPop: () async {
+          await handleBackPress();
+          return true; // Allow the page to pop
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('Plant Details'),
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
+            elevation: 0,
+          ),
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 64.sp,
+                  color: Colors.grey.shade400,
                 ),
-              ),
-            ],
+                SizedBox(height: 16.h),
+                Text(
+                  'No plant data available',
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );
     }
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      body: CustomScrollView(
-        slivers: [
-          _buildSliverAppBar(plantData,context),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.all(20.w),
-              child: Column(
-                children: [
-                  // _buildScheduleRow(plantData),
-                  SizedBox(height: 24.h),
-                  _buildQuickStatsRow(plantData),
-                  SizedBox(height: 24.h),
-                  _buildSolarHealthSection(controller),
-                  // New solar health section
-                  SizedBox(height: 24.h),
+    return WillPopScope(
+      onWillPop: () async {
+        await handleBackPress();
+        return true; // Allow the page to pop
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF8FAFC),
+        body: CustomScrollView(
+          slivers: [
+            _buildSliverAppBar(plantData,context),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.all(20.w),
+                child: Column(
+                  children: [
+                    // _buildScheduleRow(plantData),
+                    SizedBox(height: 24.h),
+                    _buildQuickStatsRow(plantData),
+                    SizedBox(height: 24.h),
+                    _buildSolarHealthSection(controller),
+                    // New solar health section
+                    SizedBox(height: 24.h),
 
-                  _buildBasicInformation(plantData),
-                  SizedBox(height: 20.h),
-                  _buildPersonnelSection(plantData),
-                  SizedBox(height: 20.h),
-                  _buildLocationSection(plantData),
-                  SizedBox(height: 20.h),
-                  _buildSystemInformation(plantData),
-                  if (plantData['info'] != null &&
-                      plantData['info']
-                          .toString()
-                          .isNotEmpty) ...[
+                    _buildBasicInformation(plantData),
                     SizedBox(height: 20.h),
-                    _buildAdditionalInfo(plantData),
-                  ],
-                  SizedBox(height: 32.h),
-                  Obx(() =>
-                      ElevatedButton(
-                        onPressed: controller.isLoading.value
-                            ? null
-                            : controller.toggleMaintenanceMode,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                          controller.isMaintenanceModeEnabled.value
-                              ? Colors.red
-                              : Colors.green,
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 32, vertical: 16),
-                        ),
-                        child: controller.isLoading.value
-                            ? CircularProgressIndicator(color: Colors.white)
-                            : Text(
-                          controller.isMaintenanceModeEnabled.value
-                              ? 'STOP MAINTENANCE'
-                              : 'START MAINTENANCE',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                    _buildPersonnelSection(plantData),
+                    SizedBox(height: 20.h),
+                    _buildLocationSection(plantData),
+                    SizedBox(height: 20.h),
+                    _buildSystemInformation(plantData),
+                    if (plantData['info'] != null &&
+                        plantData['info']
+                            .toString()
+                            .isNotEmpty) ...[
+                      SizedBox(height: 20.h),
+                      _buildAdditionalInfo(plantData),
+                    ],
+                    SizedBox(height: 32.h),
+                    Obx(() =>
+                        ElevatedButton(
+                          onPressed: controller.isLoading.value
+                              ? null
+                              : controller.toggleMaintenanceMode,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                            controller.isMaintenanceModeEnabled.value
+                                ? Colors.red
+                                : Colors.green,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 32, vertical: 16),
                           ),
-                        ),
-                      )),
-                ],
+                          child: controller.isLoading.value
+                              ? CircularProgressIndicator(color: Colors.white)
+                              : Text(
+                            controller.isMaintenanceModeEnabled.value
+                                ? 'STOP MAINTENANCE'
+                                : 'START MAINTENANCE',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        )),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

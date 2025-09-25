@@ -31,20 +31,15 @@ class PlantInfoView extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
-          title: Text(
-            'Info Plants',
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-              fontSize: 18.sp, // Responsive font
+          title: Center(
+            child: Text(
+              'All Solar Plants',
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 18.sp, // Responsive font
+              ),
             ),
-          ),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.black, size: 24.sp),
-            onPressed: () async {
-              await _handleBackPress();
-              Navigator.of(context).pop();
-            },
           ),
         ),
         body: Obx(() {
@@ -57,7 +52,7 @@ class PlantInfoView extends StatelessWidget {
               ),
             );
           }
-      
+
           if (controller.errorMessage.value.isNotEmpty) {
             return Center(
               child: Padding(
@@ -84,7 +79,7 @@ class PlantInfoView extends StatelessWidget {
               ),
             );
           }
-      
+
           if (controller.plants.isEmpty) {
             return Center(
               child: Text(
@@ -93,7 +88,7 @@ class PlantInfoView extends StatelessWidget {
               ),
             );
           }
-      
+
           // return ListView.builder(
           //   padding: EdgeInsets.all(16.w),
           //   itemCount: controller.plants.length,
@@ -108,19 +103,22 @@ class PlantInfoView extends StatelessWidget {
           //     );
           //   },
           // );
-          return ListView.builder(
-            padding: EdgeInsets.all(16.w),
-            itemCount: controller.plants.length,
-            itemBuilder: (context, index) {
-              final plant = controller.plants[index];
-              return Obx(() => PlantInfoCard(
-                plant: plant,
-                isLoading: controller.loadingPlantId.value == plant['id'].toString(),
-                onTap: controller.isNavigating.value
-                    ? null // Disable all taps when any plant is loading
-                    : () => controller.viewPlantDetails(plant['id']),
-              ));
-            },
+          return RefreshIndicator(
+            onRefresh: controller.fetchPlants,
+            child: ListView.builder(
+              padding: EdgeInsets.all(16.w),
+              itemCount: controller.plants.length,
+              itemBuilder: (context, index) {
+                final plant = controller.plants[index];
+                return Obx(() => PlantInfoCard(
+                  plant: plant,
+                  isLoading: controller.loadingPlantId.value == plant['id'].toString(),
+                  onTap: controller.isNavigating.value
+                      ? null // Disable all taps when any plant is loading
+                      : () => controller.viewPlantDetails(plant['id']),
+                ));
+              },
+            ),
           );
         }),
       ),

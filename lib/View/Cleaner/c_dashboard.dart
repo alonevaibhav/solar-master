@@ -84,6 +84,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import '../../Component/Cleaner/PlantInfo/cleaner_info_page.dart';
 import '../../Component/Cleaner/profile_view.dart';
 import '../../Controller/Cleaner/profile_controller.dart';
 import '../../utils/exit.dart';
@@ -104,6 +105,7 @@ class _CleanerDashboardViewState extends State<CleanerDashboardView> {
   final List<Widget> _pages = [
     const CleanerHomeTab(),
     const CleanerProfileTab(),
+    const PlantTab(),
   ];
 
   @override
@@ -166,5 +168,14 @@ class CleanerProfileTab extends StatelessWidget {
     return Scaffold(
       body:ProfileView(),
     );
+  }
+}
+
+class PlantTab extends StatelessWidget {
+  const PlantTab({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CleanerInfoPage();
   }
 }

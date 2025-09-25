@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solar_app/View/Inspector/plant_inspection_view.dart';
 import 'package:solar_app/View/Inspector/user_profile.dart';
+import '../../Component/Inspector/PlantInfo/plant _info.dart';
 import '../../Component/Inspector/TicketPage/ticket_view.dart';
 import '../../Controller/Inspector/area_inspection_controller.dart';
 import '../../Controller/Inspector/plant_inspection_controller.dart';
@@ -28,6 +29,8 @@ class _InDashboardState extends State<InDashboard> {
     const InspectorHomeTab(),
     const InspectorAlertsTab(),
     const InspectorProfileTab(),
+    const InspectorPlantsTab(), // New Plants tab
+
   ];
 
   @override
@@ -48,6 +51,16 @@ class _InDashboardState extends State<InDashboard> {
         ),
       ),
     );
+  }
+}
+
+// New Plants tab widget
+class InspectorPlantsTab extends StatelessWidget {
+  const InspectorPlantsTab({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return PlantInfoView();
   }
 }
 

@@ -13,26 +13,29 @@ class CleaningManagementView extends StatelessWidget {
 
     return GetBuilder<CleaningManagementController>(
       builder: (controller) {
-        return Scaffold(
-          backgroundColor: Colors.grey.shade100,
-          body: RefreshIndicator(
-            onRefresh: controller.refreshData,
-            child: SafeArea(
-              child: Padding(
-                padding: EdgeInsets.all(12.8.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildSearchBar(),
-                    SizedBox(height: 19.2.h),
-                    _buildStatusCards(controller),
-                    SizedBox(height: 19.2.h),
-                    // _buildAreaSection(controller),
-                    // SizedBox(height: 12.8.h),
-                    Expanded(
-                      child: _buildTaskList(controller),
-                    ),
-                  ],
+        return RefreshIndicator(
+          onRefresh: controller.refreshData,
+          child: Scaffold(
+            backgroundColor: Colors.grey.shade100,
+            body: RefreshIndicator(
+              onRefresh: controller.refreshData,
+              child: SafeArea(
+                child: Padding(
+                  padding: EdgeInsets.all(12.8.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // _buildSearchBar(),
+                      SizedBox(height: 19.2.h),
+                      _buildStatusCards(controller),
+                      SizedBox(height: 19.2.h),
+                      // _buildAreaSection(controller),
+                      // SizedBox(height: 12.8.h),
+                      Expanded(
+                        child: _buildTaskList(controller),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -44,38 +47,38 @@ class CleaningManagementView extends StatelessWidget {
 }
 
 
-  Widget _buildSearchBar() {
-    return Container(
-      height: 38.4.h,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(9.6.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: Offset(0, 1.6),
-          ),
-        ],
-      ),
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: 'no search...',
-          hintStyle: TextStyle(
-            color: Colors.grey.shade500,
-            fontSize: 12.8.sp,
-          ),
-          prefixIcon: Icon(
-            Icons.search,
-            color: Colors.grey.shade500,
-            size: 16.w,
-          ),
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: 12.8.w, vertical: 9.6.h),
-        ),
-      ),
-    );
-  }
+  // Widget _buildSearchBar() {
+  //   return Container(
+  //     height: 38.4.h,
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(9.6.r),
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: Colors.black.withOpacity(0.05),
+  //           blurRadius: 8,
+  //           offset: Offset(0, 1.6),
+  //         ),
+  //       ],
+  //     ),
+  //     child: TextField(
+  //       decoration: InputDecoration(
+  //         hintText: 'no search...',
+  //         hintStyle: TextStyle(
+  //           color: Colors.grey.shade500,
+  //           fontSize: 12.8.sp,
+  //         ),
+  //         prefixIcon: Icon(
+  //           Icons.search,
+  //           color: Colors.grey.shade500,
+  //           size: 16.w,
+  //         ),
+  //         border: InputBorder.none,
+  //         contentPadding: EdgeInsets.symmetric(horizontal: 12.8.w, vertical: 9.6.h),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildStatusCards(CleaningManagementController controller) {
     return Obx(() {

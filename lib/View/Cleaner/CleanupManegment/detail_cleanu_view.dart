@@ -675,8 +675,7 @@ class DetailsViewTask extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Use Get.put to instantiate the controller if it hasn't been already
-    final CleaningManagementController controller =
-    Get.put(CleaningManagementController());
+    final CleaningManagementController controller = Get.put(CleaningManagementController());
 
     final Map<String, dynamic>? plantData = Get.arguments;
     print('Received plant data: $plantData');

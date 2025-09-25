@@ -28,29 +28,32 @@ class _ScheduleContentViewState extends State<ScheduleContentView> {
   @override
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'All Schedule',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp),
+    return RefreshIndicator(
+      onRefresh: () => scheduleController.fetchInspectorSchedules(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'All Schedule',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp),
+          ),
         ),
-      ),
-      body: SafeArea(
-        child: Obx(() {
-          if (scheduleController.isLoading) {
-            return _buildLoadingState();
-          }
+        body: SafeArea(
+          child: Obx(() {
+            if (scheduleController.isLoading) {
+              return _buildLoadingState();
+            }
 
-          if (scheduleController.errorMessage != null) {
-            return _buildErrorState(scheduleController.errorMessage!);
-          }
+            if (scheduleController.errorMessage != null) {
+              return _buildErrorState(scheduleController.errorMessage!);
+            }
 
-          if (scheduleController.allSchedules.isEmpty) {
-            return _buildEmptyState();
-          }
+            if (scheduleController.allSchedules.isEmpty) {
+              return _buildEmptyState();
+            }
 
-          return _buildWeekFilterContent();
-        }),
+            return _buildWeekFilterContent();
+          }),
+        ),
       ),
     );
   }

@@ -6,81 +6,84 @@ import '../../Controller/Cleaner/today_inspections_controller.dart';
 import '../../Model/Cleaner/inspection_model.dart';
 
 class TodayInspectionsView extends GetView<TodayInspectionsController> {
-  const TodayInspectionsView({Key? key}) : super(key: key);
+  const TodayInspectionsView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(16.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Search Bar
-              TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search Area...',
-                  hintStyle: TextStyle(fontSize: 14.sp),
-                  suffixIcon: const Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.r),
+    return RefreshIndicator(
+      onRefresh: controller.fetchInspections,
+      child: Scaffold(
+        body: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.all(16.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Search Bar
+                TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Search Area...',
+                    hintStyle: TextStyle(fontSize: 14.sp),
+                    suffixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                  ),
+                  onChanged: controller.updateSearchQuery,
+                ),
+
+                SizedBox(height: 16.h),
+
+                // Segmented Control Tabs
+                _buildSegmentedControl(),
+
+                SizedBox(height: 16.h),
+
+                // Area Label
+                Text(
+                  'Area -1',
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                onChanged: controller.updateSearchQuery,
-              ),
 
-              SizedBox(height: 16.h),
+                SizedBox(height: 16.h),
 
-              // Segmented Control Tabs
-              _buildSegmentedControl(),
+                // Inspections List
+                Expanded(
+                  child: Obx(() {
+                    final inspections = controller.selectedSegment.value == 0
+                        ? controller.getFilteredPendingInspections()
+                        : controller.getFilteredCompletedInspections();
 
-              SizedBox(height: 16.h),
+                    if (controller.isLoading.value) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
 
-              // Area Label
-              Text(
-                'Area -1',
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+                    if (inspections.isEmpty) {
+                      return Center(
+                        child: Text(
+                          controller.selectedSegment.value == 0
+                              ? 'No Pending Clean-ups'
+                              : 'No Completed Clean-ups',
+                          style: TextStyle(fontSize: 14.sp),
+                        ),
+                      );
+                    }
 
-              SizedBox(height: 16.h),
-
-              // Inspections List
-              Expanded(
-                child: Obx(() {
-                  final inspections = controller.selectedSegment.value == 0
-                      ? controller.getFilteredPendingInspections()
-                      : controller.getFilteredCompletedInspections();
-
-                  if (controller.isLoading.value) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (inspections.isEmpty) {
-                    return Center(
-                      child: Text(
-                        controller.selectedSegment.value == 0
-                            ? 'No Pending Clean-ups'
-                            : 'No Completed Clean-ups',
-                        style: TextStyle(fontSize: 14.sp),
-                      ),
+                    return ListView.separated(
+                      itemCount: inspections.length,
+                      separatorBuilder: (context, index) => SizedBox(height: 12.h),
+                      itemBuilder: (context, index) {
+                        final inspection = inspections[index];
+                        return _buildInspectionCard(inspection);
+                      },
                     );
-                  }
-
-                  return ListView.separated(
-                    itemCount: inspections.length,
-                    separatorBuilder: (context, index) => SizedBox(height: 12.h),
-                    itemBuilder: (context, index) {
-                      final inspection = inspections[index];
-                      return _buildInspectionCard(inspection);
-                    },
-                  );
-                }),
-              ),
-            ],
+                  }),
+                ),
+              ],
+            ),
           ),
         ),
       ),

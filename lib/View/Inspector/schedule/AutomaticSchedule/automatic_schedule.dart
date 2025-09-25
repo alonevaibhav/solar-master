@@ -39,7 +39,7 @@ class ModbusParametersView extends StatelessWidget {
               ),
             ),
             Obx(() => Text(
-                  'IMEI: ${controller.currentImei.value} | Boxes: ${controller.numberOfBoxes.value}',
+                  'IMEI: ${controller.currentImei.value} | valve: ${controller.numberOfBoxes.value}',
                   style: TextStyle(
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w400,
@@ -93,7 +93,7 @@ class ModbusParametersView extends StatelessWidget {
                   children: [
                     Icon(Icons.settings_applications, size: 18.w),
                     SizedBox(width: 8.w),
-                    Text('Set All Boxes'),
+                    Text('Set All Valve'),
                   ],
                 ),
               ),
@@ -159,7 +159,7 @@ class ModbusParametersView extends StatelessWidget {
           );
         }
 
-        // Check if no boxes to show
+
         if (controller.numberOfBoxes.value == 0) {
           return Center(
             child: Column(
@@ -172,7 +172,7 @@ class ModbusParametersView extends StatelessWidget {
                 ),
                 SizedBox(height: 16.h),
                 Text(
-                  'No boxes to display',
+                  'No Valve to display',
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w600,
@@ -191,6 +191,8 @@ class ModbusParametersView extends StatelessWidget {
             ),
           );
         }
+
+
 
         return Column(
           children: [

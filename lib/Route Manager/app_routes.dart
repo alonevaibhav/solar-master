@@ -238,29 +238,21 @@ class AppRoutes {
       name: automaticSchedule,
       page: () => ModbusParametersView(),
       binding: AppBindings(),
-      transition: Transition.rightToLeft,
-      transitionDuration: const Duration(milliseconds: 300),
     ),
     GetPage(
       name: manualSchedule,
       page: () => ManualSchedule(),
       binding: AppBindings(),
-      transition: Transition.rightToLeft,
-      transitionDuration: const Duration(milliseconds: 300),
     ),
     GetPage(
       name: settingPageRoute,
       page: () => SchedulePage(),
       binding: AppBindings(),
-      transition: Transition.rightToLeft,
-      transitionDuration: const Duration(milliseconds: 300),
     ),
     GetPage(
       name: historyInspector,
       page: () => HistoryInspector(),
       binding: AppBindings(),
-      transition: Transition.rightToLeft,
-      transitionDuration: const Duration(milliseconds: 300),
     ),
 
 

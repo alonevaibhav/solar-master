@@ -608,12 +608,16 @@ class PlantInspectionView extends GetView<PlantInspectionController> {
   // }
 
   Widget _buildTicketPriorityCards(TicketController ticketController) {
-    final priority = ticketController.allTicketsStats.value!['priority'] as Map<String, dynamic>;
-    final status = ticketController.allTicketsStats.value!['status'] as Map<String, dynamic>;
+    // Calculate priority counts for ONLY open tickets
+    final openTickets = ticketController.allTickets.where((ticket) => ticket['status'] == 'open').toList();
 
-    // Check if there are any open tickets
-    final openTicketsCount = int.tryParse(status['open']?.toString() ?? '0') ?? 0;
-    final hasOpenTickets = openTicketsCount > 0;
+    final openPriorityCounts = {
+      'critical': openTickets.where((t) => t['priority'] == '1').length,
+      'high': openTickets.where((t) => t['priority'] == '2').length,
+      'medium': openTickets.where((t) => t['priority'] == '3').length,
+      'low': openTickets.where((t) => t['priority'] == '4').length,
+      'veryLow': openTickets.where((t) => t['priority'] == '5').length,
+    };
 
     return Container(
       padding: EdgeInsets.all(12.0.w),
@@ -629,7 +633,7 @@ class PlantInspectionView extends GetView<PlantInspectionController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Priority Breakdown',
+            'Priority Breakdown (Open Tickets)',
             style: TextStyle(
               fontSize: 12.0.sp,
               fontWeight: FontWeight.w600,
@@ -642,7 +646,7 @@ class PlantInspectionView extends GetView<PlantInspectionController> {
               Expanded(
                 child: _buildCompactTicketItem(
                   'Critical',
-                  hasOpenTickets ? (priority['critical']?.toString() ?? '0') : '0',
+                  openPriorityCounts['critical'].toString(),
                   const Color(0xFFDC2626),
                   Icons.priority_high,
                 ),
@@ -656,7 +660,7 @@ class PlantInspectionView extends GetView<PlantInspectionController> {
               Expanded(
                 child: _buildCompactTicketItem(
                   'High',
-                  hasOpenTickets ? (priority['high']?.toString() ?? '0') : '0',
+                  openPriorityCounts['high'].toString(),
                   const Color(0xFFEA580C),
                   Icons.auto_fix_high_sharp,
                 ),
@@ -670,7 +674,7 @@ class PlantInspectionView extends GetView<PlantInspectionController> {
               Expanded(
                 child: _buildCompactTicketItem(
                   'Medium',
-                  hasOpenTickets ? (priority['medium']?.toString() ?? '0') : '0',
+                  openPriorityCounts['medium'].toString(),
                   const Color(0xFFCA8A04),
                   Icons.brightness_medium,
                 ),
@@ -684,7 +688,7 @@ class PlantInspectionView extends GetView<PlantInspectionController> {
               Expanded(
                 child: _buildCompactTicketItem(
                   'Low',
-                  hasOpenTickets ? (priority['low']?.toString() ?? '0') : '0',
+                  openPriorityCounts['low'].toString(),
                   const Color(0xFF059669),
                   Icons.backup_table_sharp,
                 ),
@@ -698,7 +702,7 @@ class PlantInspectionView extends GetView<PlantInspectionController> {
               Expanded(
                 child: _buildCompactTicketItem(
                   'V.Low',
-                  hasOpenTickets ? (priority['veryLow']?.toString() ?? '0') : '0',
+                  openPriorityCounts['veryLow'].toString(),
                   const Color(0xFF0284C7),
                   Icons.low_priority,
                 ),

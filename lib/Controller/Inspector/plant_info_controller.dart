@@ -127,7 +127,7 @@ class PlantInfoController extends GetxController {
 
   // Add these variables to your existing controller class
   final RxBool isNavigating = false.obs;
-  final RxString loadingPlantId = ''.obs; // Track which plant is loading
+  final RxString loadingPlantId = ''.obs;
 
 // Modified viewPlantDetails method
   Future<void> viewPlantDetails(int plantId) async {

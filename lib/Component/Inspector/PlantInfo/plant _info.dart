@@ -27,7 +27,7 @@ class PlantInfoView extends StatelessWidget {
         return true; // Allow the page to pop
       },
       child: Scaffold(
-        backgroundColor: Colors.grey[100],
+        // backgroundColor: Colors.grey[100],
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,

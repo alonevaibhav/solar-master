@@ -5,7 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../Controller/Inspector/info_plant_detail_controller.dart';
 import '../../../Route Manager/app_routes.dart';
 import '../../../Services/init.dart';
-import '../../../View/Cleaner/CleanupManegment/cleanup_controller.dart';
 
 class InfoPlantDetailsView extends StatelessWidget {
   const InfoPlantDetailsView({Key? key}) : super(key: key);

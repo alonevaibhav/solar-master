@@ -560,6 +560,9 @@
 //   }
 // }
 
+
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -888,7 +891,7 @@ class _PlantInfoCardState extends State<PlantInfoCard>
 
                             // Specs section with icons
                             Padding(
-                              padding: EdgeInsets.all(20.w * scale),
+                              padding: EdgeInsets.all(10.w * scale),
                               child: Column(
                                 children: [
                                   // Panels and area
@@ -925,83 +928,140 @@ class _PlantInfoCardState extends State<PlantInfoCard>
 
                             // Enhanced action button
                             Container(
+                              margin: EdgeInsets.only(top: 8.h * scale), // Add some spacing from content above
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.vertical(
                                   bottom: Radius.circular(20.r * scale),
                                 ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.05),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, -2),
+                                  ),
+                                ],
                               ),
                               child: Material(
-                                color: widget.isLoading
-                                    ? const Color(0xFF10B981).withOpacity(0.1)
-                                    : const Color(0xFFF8FAFC),
+                                color: Colors.transparent,
                                 borderRadius: BorderRadius.vertical(
                                   bottom: Radius.circular(20.r * scale),
                                 ),
-                                child: InkWell(
-                                  borderRadius: BorderRadius.vertical(
-                                    bottom: Radius.circular(20.r * scale),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  decoration: BoxDecoration(
+                                    gradient: widget.isLoading
+                                        ? LinearGradient(
+                                      colors: [
+                                        const Color(0xFF10B981).withOpacity(0.1),
+                                        const Color(0xFF10B981).withOpacity(0.05),
+                                      ],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                    )
+                                        : LinearGradient(
+                                      colors: [
+                                        const Color(0xFFF8FAFC),
+                                        const Color(0xFFF1F5F9),
+                                      ],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                    ),
+                                    borderRadius: BorderRadius.vertical(
+                                      bottom: Radius.circular(20.r * scale),
+                                    ),
+                                    border: Border(
+                                      top: BorderSide(
+                                        color: Colors.grey.shade200,
+                                        width: 0.5,
+                                      ),
+                                    ),
                                   ),
-                                  onTap: widget.isLoading ? null : widget.onTap,
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: 18.h * scale),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: widget.isLoading
-                                          ? [
-                                              SizedBox(
-                                                width: 20.w * scale,
-                                                height: 20.h * scale,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  strokeWidth: 2.5,
-                                                  valueColor:
-                                                      AlwaysStoppedAnimation<
-                                                          Color>(
-                                                    const Color(0xFF10B981),
-                                                  ),
-                                                ),
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.vertical(
+                                      bottom: Radius.circular(20.r * scale),
+                                    ),
+                                    onTap: widget.isLoading ? null : widget.onTap,
+                                    splashColor: widget.isLoading
+                                        ? const Color(0xFF10B981).withOpacity(0.2)
+                                        : const Color(0xFF3B82F6).withOpacity(0.1),
+                                    highlightColor: widget.isLoading
+                                        ? const Color(0xFF10B981).withOpacity(0.1)
+                                        : const Color(0xFF3B82F6).withOpacity(0.05),
+                                    child: AnimatedContainer(
+                                      duration: const Duration(milliseconds: 200),
+                                      padding: EdgeInsets.symmetric(vertical: 18.h * scale),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: widget.isLoading
+                                            ? [
+                                          SizedBox(
+                                            width: 20.w * scale,
+                                            height: 20.h * scale,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2.5,
+                                              valueColor: const AlwaysStoppedAnimation<Color>(
+                                                Color(0xFF10B981),
                                               ),
-                                              SizedBox(width: 12.w * scale),
-                                              Text(
-                                                'Loading Details...',
-                                                style: TextStyle(
-                                                  color:
-                                                      const Color(0xFF10B981),
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 16.sp * scale,
-                                                ),
-                                              ),
-                                            ]
-                                          : [
-                                              Icon(
-                                                Icons.visibility_outlined,
-                                                size: 20.sp * scale,
-                                                color: const Color(0xFF4B5563),
-                                              ),
-                                              SizedBox(width: 8.w * scale),
-                                              Text(
-                                                'View Details',
-                                                style: TextStyle(
-                                                  color:
-                                                      const Color(0xFF1F2937),
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 16.sp * scale,
-                                                ),
-                                              ),
-                                              SizedBox(width: 8.w * scale),
-                                              Icon(
+                                            ),
+                                          ),
+                                          SizedBox(width: 12.w * scale),
+                                          AnimatedDefaultTextStyle(
+                                            duration: const Duration(milliseconds: 200),
+                                            style: TextStyle(
+                                              color: const Color(0xFF10B981),
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 16.sp * scale,
+                                              letterSpacing: 0.5,
+                                            ),
+                                            child: const Text('Loading Details...'),
+                                          ),
+                                        ]
+                                            : [
+                                          AnimatedContainer(
+                                            duration: const Duration(milliseconds: 200),
+                                            padding: EdgeInsets.all(4.r * scale),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF3B82F6).withOpacity(0.1),
+                                              borderRadius: BorderRadius.circular(8.r * scale),
+                                            ),
+                                            child: Icon(
+                                              Icons.visibility_outlined,
+                                              size: 20.sp * scale,
+                                              color: const Color(0xFF3B82F6),
+                                            ),
+                                          ),
+                                          SizedBox(width: 12.w * scale),
+                                          AnimatedDefaultTextStyle(
+                                            duration: const Duration(milliseconds: 200),
+                                            style: TextStyle(
+                                              color: const Color(0xFF1F2937),
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20.sp * scale,
+                                              letterSpacing: 0.5,
+                                            ),
+                                            child: const Text('View Details'),
+                                          ),
+                                          SizedBox(width: 8.w * scale),
+                                          AnimatedRotation(
+                                            duration: const Duration(milliseconds: 200),
+                                            turns: 0,
+                                            child: Container(
+                                              padding: EdgeInsets.all(2.r * scale),
+                                              child: Icon(
                                                 Icons.arrow_forward_ios_rounded,
                                                 size: 14.sp * scale,
                                                 color: const Color(0xFF6B7280),
                                               ),
-                                            ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
+
                           ],
                         ),
                       ),
@@ -1029,6 +1089,29 @@ class _PlantInfoCardState extends State<PlantInfoCard>
 
   Widget _buildInfoRow(
       IconData icon, String label, String value, double scale) {
+
+    // Enhanced status logic for icon color
+    final isActive = widget.plant['isActive'] == 1;
+    final isOnline = widget.plant['isOnline'] == true;
+    final underMaintenance = widget.plant['under_maintenance'] == 1;
+
+    Color iconColor;
+    Color iconBackgroundColor;
+
+    // Set icon colors based on plant status
+    if (underMaintenance) {
+      iconColor = const Color(0xFFFF8C00); // Orange
+      iconBackgroundColor = const Color(0xFFFF8C00).withOpacity(0.1);
+    } else if (isActive && isOnline) {
+      iconColor = const Color(0xFF10B981); // Green
+      iconBackgroundColor = const Color(0xFF10B981).withOpacity(0.1);
+    } else if (isActive) {
+      iconColor = const Color(0xFF3B82F6); // Blue
+      iconBackgroundColor = const Color(0xFF3B82F6).withOpacity(0.1);
+    } else {
+      iconColor = const Color(0xFF6B7280); // Grey
+      iconBackgroundColor = const Color(0xFF6B7280).withOpacity(0.1);
+    }
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1042,7 +1125,7 @@ class _PlantInfoCardState extends State<PlantInfoCard>
           child: Icon(
             icon,
             size: 18.sp * scale,
-            color: const Color(0xFF3B82F6),
+            color: iconColor, // Dynamic icon color
           ),
         ),
         SizedBox(width: 12.w * scale),

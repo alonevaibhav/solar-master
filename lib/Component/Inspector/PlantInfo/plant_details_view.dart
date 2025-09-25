@@ -909,6 +909,8 @@ class InfoPlantDetailsView extends StatelessWidget {
       return dateTime.toString();
     }
   }
+
+
   Widget _buildSolarHealthSection(InfoPlantDetailController controller) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 2.w, vertical: 8.h),

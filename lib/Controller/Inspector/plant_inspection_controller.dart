@@ -878,12 +878,14 @@
 // }
 
 
+
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:solar_app/Controller/Inspector/ticket_controller.dart';
 import '../../API Service/Model/get_status_data.dart';
 import '../../API Service/api_service.dart';
 import '../../Route Manager/app_routes.dart';
@@ -1375,13 +1377,17 @@ class PlantInspectionController extends GetxController {
     selectedTabIndex.value = index;
   }
 
-  void navigateToInspectionDetails(Map<String, dynamic> item) {
-    Get.toNamed(AppRoutes.inspectorStartInspection, arguments: item);
-  }
-
   Future<void> refreshDashboard() async {
+
     await fetchInspectionItems();
     await allInspectionsController.fetchAllInspections();
+
+
+    final TicketController ticketController = Get.find<TicketController>();
+    await ticketController.fetchAllTickets();
+    await ticketController.fetchMyTickets();
+
+    // fetchAllTickets
     Get.snackbar('Success', 'Dashboard refreshed successfully');
   }
 
@@ -1635,8 +1641,48 @@ class PlantInspectionController extends GetxController {
   }
 
   // ✅ UPDATED CONTROLLER METHOD - Now populates form after fetching
-  Future<void> fetchInspectorData(int inspectionCardId) async {
+  // Future<void> fetchInspectorData(int inspectionCardId) async {
+  //   try {
+  //     String endpoint = getInspectorDataByID(inspectionCardId);
+  //
+  //     var response = await ApiService.get<InspectorDataResponse>(
+  //       endpoint: endpoint,
+  //       fromJson: (json) => InspectorDataResponse.fromJson(json),
+  //       includeToken: true,
+  //     );
+  //
+  //     if (response.success) {
+  //       inspectorDataResponse = response.data; // Store the response data
+  //       this.inspectionCardId = inspectorDataResponse?.data.id; // Store inspectionCardId
+  //       print('Fetched data: ${inspectorDataResponse?.data.id}');
+  //
+  //       // Populate the form with the fetched data
+  //       _populateFormWithInspectorData();
+  //     } else {
+  //       print('Error fetching data: ${response.errorMessage}');
+  //       Get.snackbar('Error', 'Failed to load inspection data');
+  //     }
+  //   } catch (e) {
+  //     print('An error occurred: $e');
+  //     Get.snackbar('Error', 'An error occurred while loading data');
+  //   }
+  // }
+
+
+  // void navigateToInspectionDetails(Map<String, dynamic> item) {
+  //   Get.toNamed(AppRoutes.inspectorStartInspection, arguments: item);
+  // }
+
+  // Add these to your controller
+  final RxBool isLoadingInspection = false.obs;
+  final RxString loadingInspectionId = ''.obs;
+
+// RECOMMENDED: Single responsibility - only fetch data
+  Future<bool> fetchInspectorData(int inspectionCardId) async {
     try {
+      isLoadingInspection.value = true;
+      loadingInspectionId.value = inspectionCardId.toString();
+
       String endpoint = getInspectorDataByID(inspectionCardId);
 
       var response = await ApiService.get<InspectorDataResponse>(
@@ -1646,22 +1692,48 @@ class PlantInspectionController extends GetxController {
       );
 
       if (response.success) {
-        inspectorDataResponse = response.data; // Store the response data
-        this.inspectionCardId =
-            inspectorDataResponse?.data.id; // Store inspectionCardId
+        inspectorDataResponse = response.data;
+        this.inspectionCardId = inspectorDataResponse?.data.id;
         print('Fetched data: ${inspectorDataResponse?.data.id}');
-
-        // Populate the form with the fetched data
         _populateFormWithInspectorData();
+        return true; // Success
       } else {
         print('Error fetching data: ${response.errorMessage}');
         Get.snackbar('Error', 'Failed to load inspection data');
+        return false; // Failure
       }
     } catch (e) {
       print('An error occurred: $e');
       Get.snackbar('Error', 'An error occurred while loading data');
+      return false; // Failure
+    } finally {
+      isLoadingInspection.value = false;
+      loadingInspectionId.value = '';
     }
   }
+
+// RECOMMENDED: Combined operation with proper error handling
+  Future<void> fetchInspectorDataAndNavigate(int inspectionCardId, Map<String, dynamic> item) async {
+    try {
+      bool success = await fetchInspectorData(inspectionCardId);
+
+      if (success) {
+        navigateToInspectionDetails(item);
+      }
+      // Error handling is already done in fetchInspectorData
+    } catch (error) {
+      print('Error in fetchInspectorDataAndNavigate: $error');
+      Get.snackbar('Error', 'Failed to complete operation');
+    }
+  }
+
+// Simple navigation method
+  void navigateToInspectionDetails(Map<String, dynamic> item) {
+    Get.toNamed(AppRoutes.inspectorStartInspection, arguments: item);
+  }
+
+
+
   Future<void> updateInspectionReport() async {
     if (formKey.currentState!.validate()) {
       // Check if inspectionCardId is available

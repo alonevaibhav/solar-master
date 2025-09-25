@@ -96,8 +96,49 @@ class PlantInfoController extends GetxController {
   //   Get.toNamed(AppRoutes.inspectorDetailsSection, arguments: plant);
   // }
 
+  // Future<void> viewPlantDetails(int plantId) async {
+  //   try {
+  //     final plant = plants.firstWhere((plant) => plant['id'] == plantId);
+  //     selectedPlant.value = plant;
+  //
+  //     // Get UUID from the selected plant
+  //     final uuid = plant['uuid']?.toString();
+  //
+  //     if (uuid != null) {
+  //       print('Initializing MQTT for plant UUID: $uuid');
+  //       // Initialize/reinitialize MQTT with the selected plant's UUID
+  //       await AppInitializer.reinitializeWithUUID(uuid);
+  //       print('✅ MQTT successfully initialized for UUID: $uuid');
+  //     } else {
+  //       print('⚠️ No UUID found for selected plant');
+  //     }
+  //
+  //     // Navigate to plant details with plant data
+  //     Get.toNamed(AppRoutes.inspectorDetailsSection, arguments: plant);
+  //
+  //   } catch (e) {
+  //     print('❌ Error in viewPlantDetails: $e');
+  //     // Still navigate even if MQTT initialization fails
+  //     final plant = plants.firstWhere((plant) => plant['id'] == plantId);
+  //     selectedPlant.value = plant;
+  //     Get.toNamed(AppRoutes.inspectorDetailsSection, arguments: plant);
+  //   }
+  // }
+
+  // Add these variables to your existing controller class
+  final RxBool isNavigating = false.obs;
+  final RxString loadingPlantId = ''.obs; // Track which plant is loading
+
+// Modified viewPlantDetails method
   Future<void> viewPlantDetails(int plantId) async {
+    // Prevent multiple navigation attempts
+    if (isNavigating.value) return;
+
     try {
+      // Set loading state
+      isNavigating.value = true;
+      loadingPlantId.value = plantId.toString();
+
       final plant = plants.firstWhere((plant) => plant['id'] == plantId);
       selectedPlant.value = plant;
 
@@ -122,6 +163,10 @@ class PlantInfoController extends GetxController {
       final plant = plants.firstWhere((plant) => plant['id'] == plantId);
       selectedPlant.value = plant;
       Get.toNamed(AppRoutes.inspectorDetailsSection, arguments: plant);
+    } finally {
+      // Reset loading state
+      isNavigating.value = false;
+      loadingPlantId.value = '';
     }
   }
 

@@ -3,12 +3,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class InspectionItem extends StatefulWidget {
   final Map<String, dynamic> inspectionData;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
+  final bool isLoading; // Added this
 
   const InspectionItem({
     Key? key,
     required this.inspectionData,
-    required this.onTap,
+     this.onTap,
+    this.isLoading = false, // Added this
+
   }) : super(key: key);
 
   @override
@@ -40,6 +43,8 @@ class _InspectionItemState extends State<InspectionItem> with SingleTickerProvid
   }
 
   void _toggleExpansion() {
+    if (widget.isLoading) return; // Add this line
+
     setState(() {
       isExpanded = !isExpanded;
       if (isExpanded) {
@@ -319,12 +324,47 @@ class _InspectionItemState extends State<InspectionItem> with SingleTickerProvid
                     SizedBox(height: 20.h),
 
                     // Start Inspection Button inside expandable section
+                    // SizedBox(
+                    //   width: double.infinity,
+                    //   child: ElevatedButton(
+                    //     onPressed: widget.onTap,
+                    //     style: ElevatedButton.styleFrom(
+                    //       backgroundColor: _getStatusColor(),
+                    //       foregroundColor: Colors.white,
+                    //       elevation: 2,
+                    //       shadowColor: _getStatusColor().withOpacity(0.3),
+                    //       shape: RoundedRectangleBorder(
+                    //         borderRadius: BorderRadius.circular(12.r),
+                    //       ),
+                    //       padding: EdgeInsets.symmetric(vertical: 14.h),
+                    //     ),
+                    //     child: Row(
+                    //       mainAxisAlignment: MainAxisAlignment.center,
+                    //       children: [
+                    //         Icon(
+                    //           Icons.play_circle_filled,
+                    //           size: 20.sp,
+                    //           color: Colors.white,
+                    //         ),
+                    //         SizedBox(width: 8.w),
+                    //         Text(
+                    //           'Start Inspection',
+                    //           style: TextStyle(
+                    //             fontSize: 14.sp,
+                    //             fontWeight: FontWeight.w600,
+                    //           ),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
+
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: widget.onTap,
+                        onPressed: widget.isLoading ? null : widget.onTap, // Add loading check
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _getStatusColor(),
+                          backgroundColor: widget.isLoading ? Colors.grey : _getStatusColor(),
                           foregroundColor: Colors.white,
                           elevation: 2,
                           shadowColor: _getStatusColor().withOpacity(0.3),
@@ -336,19 +376,38 @@ class _InspectionItemState extends State<InspectionItem> with SingleTickerProvid
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              Icons.play_circle_filled,
-                              size: 20.sp,
-                              color: Colors.white,
-                            ),
-                            SizedBox(width: 8.w),
-                            Text(
-                              'Start Inspection',
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w600,
+                            if (widget.isLoading) ...[
+                              SizedBox(
+                                width: 20.w,
+                                height: 20.h,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                ),
                               ),
-                            ),
+                              SizedBox(width: 8.w),
+                              Text(
+                                'Loading...',
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ] else ...[
+                              Icon(
+                                Icons.play_circle_filled,
+                                size: 20.sp,
+                                color: Colors.white,
+                              ),
+                              SizedBox(width: 8.w),
+                              Text(
+                                'Start Inspection',
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ),

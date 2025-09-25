@@ -1,6 +1,3 @@
-
-
-
 import 'dart:typed_data';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -10,6 +7,7 @@ import '../Controller/Inspector/info_plant_detail_controller.dart';
 import '../Controller/Inspector/manual_controller.dart';
 import '../View/Cleaner/CleanupManegment/cleanup_controller.dart';
 import 'mqtt-service.dart';
+
 class AppInitializer {
   static SolarMQTTService? mqttService;
   static late ModbusParametersController modbusController;
@@ -28,7 +26,8 @@ class AppInitializer {
     manualController = Get.put(ManualController());
     cleaningManagementController = Get.put(CleaningManagementController());
     infoPlantDetailController = Get.put(InfoPlantDetailController());
-    infoPlantCleanerDetailController = Get.put(InfoPlantCleanerDetailController());
+    infoPlantCleanerDetailController =
+        Get.put(InfoPlantCleanerDetailController());
 
     _isInitialized = true;
   }
@@ -39,7 +38,9 @@ class AppInitializer {
       return;
     }
 
-    if (_currentUUID == uuid && mqttService != null && mqttService!.isConnected) {
+    if (_currentUUID == uuid &&
+        mqttService != null &&
+        mqttService!.isConnected) {
       print('✅ Already connected to UUID: $uuid');
       return;
     }
@@ -88,7 +89,6 @@ class AppInitializer {
       _currentUUID = uuid;
 
       print('✅ MQTT successfully initialized and connected for UUID: $uuid');
-
     } catch (e) {
       print('❌ Error reinitializing MQTT for UUID $uuid: $e');
       await _cleanupMQTTConnection();

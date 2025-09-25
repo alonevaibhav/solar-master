@@ -500,8 +500,120 @@ class PlantInspectionView extends GetView<PlantInspectionController> {
     );
   }
 
+  // Widget _buildTicketPriorityCards(TicketController ticketController) {
+  //   final priority = ticketController.allTicketsStats.value!['priority'] as Map<String, dynamic>;
+  //   final status = ticketController.allTicketsStats.value!['status'] as Map<String, dynamic>;
+  //
+  //   // Check if there are any open tickets
+  //   final openTicketsCount = int.tryParse(status['open']?.toString() ?? '0') ?? 0;
+  //
+  //   // Don't show priority breakdown if no open tickets
+  //   if (openTicketsCount == 0) {
+  //     return const SizedBox.shrink(); // Returns empty widget
+  //   }
+  //
+  //   return Container(
+  //     padding: EdgeInsets.all(12.0.w),
+  //     decoration: BoxDecoration(
+  //       color: const Color(0xFFFAFBFC),
+  //       borderRadius: BorderRadius.circular(12.0.r),
+  //       border: Border.all(
+  //         color: const Color(0xFFEDF2F7),
+  //         width: 1.0,
+  //       ),
+  //     ),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Text(
+  //           'Priority Breakdown',
+  //           style: TextStyle(
+  //             fontSize: 12.0.sp,
+  //             fontWeight: FontWeight.w600,
+  //             color: const Color(0xFF4A5568),
+  //           ),
+  //         ),
+  //         SizedBox(height: 8.0.h),
+  //         Row(
+  //           children: [
+  //             Expanded(
+  //               child: _buildCompactTicketItem(
+  //                 'Critical',
+  //                 priority['critical']?.toString() ?? '0',
+  //                 const Color(0xFFDC2626),
+  //                 Icons.priority_high,
+  //               ),
+  //             ),
+  //             Container(
+  //               width: 1,
+  //               height: 30.h,
+  //               color: const Color(0xFFE2E8F0),
+  //               margin: EdgeInsets.symmetric(horizontal: 6.0.w),
+  //             ),
+  //             Expanded(
+  //               child: _buildCompactTicketItem(
+  //                 'High',
+  //                 priority['high']?.toString() ?? '0',
+  //                 const Color(0xFFEA580C),
+  //                 Icons.auto_fix_high_sharp,
+  //               ),
+  //             ),
+  //             Container(
+  //               width: 1,
+  //               height: 30.h,
+  //               color: const Color(0xFFE2E8F0),
+  //               margin: EdgeInsets.symmetric(horizontal: 6.0.w),
+  //             ),
+  //             Expanded(
+  //               child: _buildCompactTicketItem(
+  //                 'Medium',
+  //                 priority['medium']?.toString() ?? '0',
+  //                 const Color(0xFFCA8A04),
+  //                 Icons.brightness_medium,
+  //               ),
+  //             ),
+  //             Container(
+  //               width: 1,
+  //               height: 30.h,
+  //               color: const Color(0xFFE2E8F0),
+  //               margin: EdgeInsets.symmetric(horizontal: 6.0.w),
+  //             ),
+  //             Expanded(
+  //               child: _buildCompactTicketItem(
+  //                 'Low',
+  //                 priority['low']?.toString() ?? '0',
+  //                 const Color(0xFF059669),
+  //                 Icons.backup_table_sharp,
+  //               ),
+  //             ),
+  //             Container(
+  //               width: 1,
+  //               height: 30.h,
+  //               color: const Color(0xFFE2E8F0),
+  //               margin: EdgeInsets.symmetric(horizontal: 6.0.w),
+  //             ),
+  //             Expanded(
+  //               child: _buildCompactTicketItem(
+  //                 'V.Low',
+  //                 priority['veryLow']?.toString() ?? '0',
+  //                 const Color(0xFF0284C7),
+  //                 Icons.low_priority,
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
   Widget _buildTicketPriorityCards(TicketController ticketController) {
     final priority = ticketController.allTicketsStats.value!['priority'] as Map<String, dynamic>;
+    final status = ticketController.allTicketsStats.value!['status'] as Map<String, dynamic>;
+
+    // Check if there are any open tickets
+    final openTicketsCount = int.tryParse(status['open']?.toString() ?? '0') ?? 0;
+    final hasOpenTickets = openTicketsCount > 0;
 
     return Container(
       padding: EdgeInsets.all(12.0.w),
@@ -530,7 +642,7 @@ class PlantInspectionView extends GetView<PlantInspectionController> {
               Expanded(
                 child: _buildCompactTicketItem(
                   'Critical',
-                  priority['critical']?.toString() ?? '0',
+                  hasOpenTickets ? (priority['critical']?.toString() ?? '0') : '0',
                   const Color(0xFFDC2626),
                   Icons.priority_high,
                 ),
@@ -544,7 +656,7 @@ class PlantInspectionView extends GetView<PlantInspectionController> {
               Expanded(
                 child: _buildCompactTicketItem(
                   'High',
-                  priority['high']?.toString() ?? '0',
+                  hasOpenTickets ? (priority['high']?.toString() ?? '0') : '0',
                   const Color(0xFFEA580C),
                   Icons.auto_fix_high_sharp,
                 ),
@@ -558,7 +670,7 @@ class PlantInspectionView extends GetView<PlantInspectionController> {
               Expanded(
                 child: _buildCompactTicketItem(
                   'Medium',
-                  priority['medium']?.toString() ?? '0',
+                  hasOpenTickets ? (priority['medium']?.toString() ?? '0') : '0',
                   const Color(0xFFCA8A04),
                   Icons.brightness_medium,
                 ),
@@ -572,7 +684,7 @@ class PlantInspectionView extends GetView<PlantInspectionController> {
               Expanded(
                 child: _buildCompactTicketItem(
                   'Low',
-                  priority['low']?.toString() ?? '0',
+                  hasOpenTickets ? (priority['low']?.toString() ?? '0') : '0',
                   const Color(0xFF059669),
                   Icons.backup_table_sharp,
                 ),
@@ -586,7 +698,7 @@ class PlantInspectionView extends GetView<PlantInspectionController> {
               Expanded(
                 child: _buildCompactTicketItem(
                   'V.Low',
-                  priority['veryLow']?.toString() ?? '0',
+                  hasOpenTickets ? (priority['veryLow']?.toString() ?? '0') : '0',
                   const Color(0xFF0284C7),
                   Icons.low_priority,
                 ),
@@ -597,6 +709,7 @@ class PlantInspectionView extends GetView<PlantInspectionController> {
       ),
     );
   }
+
 
   Widget _buildTicketStatusCards(TicketController ticketController) {
     final status = ticketController.allTicketsStats.value!['status'] as Map<String, dynamic>;
@@ -741,19 +854,37 @@ class PlantInspectionView extends GetView<PlantInspectionController> {
       );
     }
 
+    // return Column(
+    //   children: [
+    //     for (int i = 0; i < controller.inspectionItems.length; i++)
+    //       InspectionItem(
+    //         inspectionData: controller.inspectionItems[i],
+    //         onTap: () async {
+    //           int specificItemId = controller.inspectionItems[i]['id'];
+    //           await controller.fetchInspectorData(specificItemId);
+    //           controller.navigateToInspectionDetails(controller.inspectionItems[i]);
+    //         },
+    //       ),
+    //   ],
+    // );
+
     return Column(
       children: [
         for (int i = 0; i < controller.inspectionItems.length; i++)
-          InspectionItem(
+          Obx(() => InspectionItem(
             inspectionData: controller.inspectionItems[i],
-            onTap: () async {
+            isLoading: controller.loadingInspectionId.value == controller.inspectionItems[i]['id'].toString(),
+            onTap: controller.isLoadingInspection.value
+                ? null // Disable all taps when loading
+                : () { // Remove async here
               int specificItemId = controller.inspectionItems[i]['id'];
-              await controller.fetchInspectorData(specificItemId);
-              controller.navigateToInspectionDetails(controller.inspectionItems[i]);
+              // Call the method without await to make it VoidCallback compatible
+              controller.fetchInspectorDataAndNavigate(specificItemId, controller.inspectionItems[i]);
             },
-          ),
+          )),
       ],
     );
+
   }
 
 

@@ -94,18 +94,32 @@ class PlantInfoView extends StatelessWidget {
             );
           }
       
+          // return ListView.builder(
+          //   padding: EdgeInsets.all(16.w),
+          //   itemCount: controller.plants.length,
+          //   itemBuilder: (context, index) {
+          //     final plant = controller.plants[index];
+          //     return Padding(
+          //       padding: EdgeInsets.only(bottom: 12.h),
+          //       child: PlantInfoCard(
+          //         plant: plant,
+          //         onTap: () => controller.viewPlantDetails(plant['id']),
+          //       ),
+          //     );
+          //   },
+          // );
           return ListView.builder(
             padding: EdgeInsets.all(16.w),
             itemCount: controller.plants.length,
             itemBuilder: (context, index) {
               final plant = controller.plants[index];
-              return Padding(
-                padding: EdgeInsets.only(bottom: 12.h),
-                child: PlantInfoCard(
-                  plant: plant,
-                  onTap: () => controller.viewPlantDetails(plant['id']),
-                ),
-              );
+              return Obx(() => PlantInfoCard(
+                plant: plant,
+                isLoading: controller.loadingPlantId.value == plant['id'].toString(),
+                onTap: controller.isNavigating.value
+                    ? null // Disable all taps when any plant is loading
+                    : () => controller.viewPlantDetails(plant['id']),
+              ));
             },
           );
         }),

@@ -877,8 +877,6 @@
 //   }
 // }
 
-
-
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -893,7 +891,8 @@ import '../../utils/constants.dart';
 import 'all_inspection_controller.dart';
 
 class PlantInspectionController extends GetxController {
-  final AllInspectionsController allInspectionsController = Get.put(AllInspectionsController());
+  final AllInspectionsController allInspectionsController =
+      Get.put(AllInspectionsController());
 
   final isLoadingDashboard = false.obs;
   final errorMessageDashboard = Rxn<String>();
@@ -997,7 +996,7 @@ class PlantInspectionController extends GetxController {
       } else {
         print('Error: Context is null');
         timeController.text =
-        DateTime.now().toString().split(' ')[1].split('.')[0];
+            DateTime.now().toString().split(' ')[1].split('.')[0];
       }
 
       // Populate status
@@ -1129,7 +1128,6 @@ class PlantInspectionController extends GetxController {
   //   }
   // }
 
-
   ///--------------Delete this method if not needed----------------
   String? inspectionId;
 
@@ -1155,7 +1153,8 @@ class PlantInspectionController extends GetxController {
       String key = 'checklist_${inspectionId}';
       String jsonString = jsonEncode(checklistItems.toList());
       await prefs.setString(key, jsonString);
-      print('Checklist saved for inspection: $inspectionId (${checklistItems.length} items)');
+      print(
+          'Checklist saved for inspection: $inspectionId (${checklistItems.length} items)');
     } catch (e) {
       print('Error saving checklist to prefs: $e');
     }
@@ -1175,8 +1174,10 @@ class PlantInspectionController extends GetxController {
 
       if (jsonString != null && jsonString.isNotEmpty) {
         List<dynamic> decoded = jsonDecode(jsonString);
-        checklistItems.value = decoded.map((item) => Map<String, dynamic>.from(item)).toList();
-        print('Checklist loaded from prefs for inspection: $inspectionId (${checklistItems.length} items)');
+        checklistItems.value =
+            decoded.map((item) => Map<String, dynamic>.from(item)).toList();
+        print(
+            'Checklist loaded from prefs for inspection: $inspectionId (${checklistItems.length} items)');
       } else {
         print('No saved checklist found for inspection: $inspectionId');
       }
@@ -1231,8 +1232,10 @@ class PlantInspectionController extends GetxController {
                 'distributor_admin_id': itemMap['distributor_admin_id'],
                 'assigned_at': itemMap['assigned_at'],
                 'completed_at': itemMap['completed_at'],
-                'completed': itemMap['completed'] ?? 0, // This is your completion status
-                'checked': itemMap['checked'] ?? 0,     // This seems to be another status field
+                'completed':
+                    itemMap['completed'] ?? 0, // This is your completion status
+                'checked': itemMap['checked'] ??
+                    0, // This seems to be another status field
                 'inspector_name': itemMap['inspector_name'],
                 'distributor_admin_name': itemMap['distributor_admin_name'],
               };
@@ -1247,14 +1250,16 @@ class PlantInspectionController extends GetxController {
             print('API response success is false or data is null');
           }
         } else {
-          errorMessageDashboard.value = response.errorMessage ?? 'Failed to fetch checklist';
+          errorMessageDashboard.value =
+              response.errorMessage ?? 'Failed to fetch checklist';
           print('Failed to fetch checklist: ${response.errorMessage}');
         }
       } else {
         print('Using cached checklist data: ${checklistItems.length} items');
       }
     } catch (e) {
-      errorMessageDashboard.value = 'An error occurred while fetching the checklist';
+      errorMessageDashboard.value =
+          'An error occurred while fetching the checklist';
       print('An error occurred while fetching the checklist: $e');
     } finally {
       isLoadingChecklist.value = false;
@@ -1265,14 +1270,16 @@ class PlantInspectionController extends GetxController {
   void toggleChecklistItem(int index) {
     if (index >= 0 && index < checklistItems.length) {
       // Toggle the checked status
-      checklistItems[index]['checked'] = checklistItems[index]['checked'] == 1 ? 0 : 1;
+      checklistItems[index]['checked'] =
+          checklistItems[index]['checked'] == 1 ? 0 : 1;
 
       // Optionally, you can also update the completed status if needed
       // checklistItems[index]['completed'] = checklistItems[index]['completed'] == 1 ? 0 : 1;
 
       // Update completed_at timestamp when marking as checked
       if (checklistItems[index]['checked'] == 1) {
-        checklistItems[index]['completed_at'] = DateTime.now().toIso8601String();
+        checklistItems[index]['completed_at'] =
+            DateTime.now().toIso8601String();
       } else {
         checklistItems[index]['completed_at'] = null;
       }
@@ -1285,7 +1292,6 @@ class PlantInspectionController extends GetxController {
       print('Toggled item $index: checked=${checklistItems[index]['checked']}');
     }
   }
-
 
   // Clear checklist data from SharedPreferences (optional - for cleanup)
   Future<void> clearChecklistPrefs() async {
@@ -1378,10 +1384,8 @@ class PlantInspectionController extends GetxController {
   }
 
   Future<void> refreshDashboard() async {
-
     await fetchInspectionItems();
     await allInspectionsController.fetchAllInspections();
-
 
     final TicketController ticketController = Get.find<TicketController>();
     await ticketController.fetchAllTickets();
@@ -1668,7 +1672,6 @@ class PlantInspectionController extends GetxController {
   //   }
   // }
 
-
   // void navigateToInspectionDetails(Map<String, dynamic> item) {
   //   Get.toNamed(AppRoutes.inspectorStartInspection, arguments: item);
   // }
@@ -1676,9 +1679,10 @@ class PlantInspectionController extends GetxController {
   // Add these to your controller
   final RxBool isLoadingInspection = false.obs;
   final RxString loadingInspectionId = ''.obs;
+  final RxString errorMessage = ''.obs;
 
 // RECOMMENDED: Single responsibility - only fetch data
-  Future<bool> fetchInspectorData(int inspectionCardId) async {
+  Future<bool> fetchInspectorData(int inspectionCardId, context) async {
     try {
       isLoadingInspection.value = true;
       loadingInspectionId.value = inspectionCardId.toString();
@@ -1698,14 +1702,25 @@ class PlantInspectionController extends GetxController {
         _populateFormWithInspectorData();
         return true; // Success
       } else {
-        print('Error fetching data: ${response.errorMessage}');
-        Get.snackbar('Error', 'Failed to load inspection data');
-        return false; // Failure
+        print('Error fetching dataaa: ${response.errorMessage}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Center(child: Text('Report Not Available')),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        );
+
+        print('Snackbar called'); // Add this line
+        return false;
       }
     } catch (e) {
       print('An error occurred: $e');
-      Get.snackbar('Error', 'An error occurred while loading data');
-      return false; // Failure
+      return true; // Failure
     } finally {
       isLoadingInspection.value = false;
       loadingInspectionId.value = '';
@@ -1713,9 +1728,10 @@ class PlantInspectionController extends GetxController {
   }
 
 // RECOMMENDED: Combined operation with proper error handling
-  Future<void> fetchInspectorDataAndNavigate(int inspectionCardId, Map<String, dynamic> item) async {
+  Future<void> fetchInspectorDataAndNavigate(
+      int inspectionCardId, Map<String, dynamic> item, context) async {
     try {
-      bool success = await fetchInspectorData(inspectionCardId);
+      bool success = await fetchInspectorData(inspectionCardId, context);
 
       if (success) {
         navigateToInspectionDetails(item);
@@ -1731,8 +1747,6 @@ class PlantInspectionController extends GetxController {
   void navigateToInspectionDetails(Map<String, dynamic> item) {
     Get.toNamed(AppRoutes.inspectorStartInspection, arguments: item);
   }
-
-
 
   Future<void> updateInspectionReport() async {
     if (formKey.currentState!.validate()) {
@@ -1759,11 +1773,13 @@ class PlantInspectionController extends GetxController {
             "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}"; // HH:MM format
 
         // Prepare checklist data - only the 3 required fields
-        List<Map<String, dynamic>> checklistResult = checklistItems.map((item) => {
-          'id': item['id'],
-          'checked': item['checked'] ?? 0,
-          'item_name': item['item_name'],
-        }).toList();
+        List<Map<String, dynamic>> checklistResult = checklistItems
+            .map((item) => {
+                  'id': item['id'],
+                  'checked': item['checked'] ?? 0,
+                  'item_name': item['item_name'],
+                })
+            .toList();
 
         // Convert to JSON string
         String checklistJsonString = jsonEncode(checklistResult);
@@ -1782,14 +1798,16 @@ class PlantInspectionController extends GetxController {
           'ratings': '4', // Default rating as requested
           'date': currentDate, // Current date
           'time': currentTime, // Current time
-          'inspector_checklist_result': checklistJsonString, // Send as JSON string
+          'inspector_checklist_result':
+              checklistJsonString, // Send as JSON string
         };
 
         // Prepare files for upload
         List<MultipartFiles> files = [];
         for (int i = 0; i < uploadedImagePaths.length; i++) {
           files.add(MultipartFiles(
-            field: 'attachments', // Use 'attachments' as field name for all images
+            field:
+                'attachments', // Use 'attachments' as field name for all images
             filePath: uploadedImagePaths[i],
           ));
         }
@@ -1805,7 +1823,8 @@ class PlantInspectionController extends GetxController {
 
         if (response.success == true) {
           // Calculate completion stats for success message
-          int completedItems = checklistItems.where((item) => item['checked'] == 1).length;
+          int completedItems =
+              checklistItems.where((item) => item['checked'] == 1).length;
           int totalItems = checklistItems.length;
 
           Get.snackbar(
@@ -1848,5 +1867,4 @@ class PlantInspectionController extends GetxController {
       }
     }
   }
-
 }

@@ -20,7 +20,7 @@ class PlantInspectionView extends GetView<PlantInspectionController> {
         } else if (controller.errorMessageDashboard.value != null) {
           return _buildErrorState();
         } else {
-          return _buildMainContent();
+          return _buildMainContent(context);
         }
       }),
     );
@@ -112,7 +112,7 @@ class PlantInspectionView extends GetView<PlantInspectionController> {
     );
   }
 
-  Widget _buildMainContent() {
+  Widget _buildMainContent(context) {
     return RefreshIndicator(
       onRefresh: controller.refreshDashboard,
       color: const Color(0xFF718096),
@@ -153,7 +153,7 @@ class PlantInspectionView extends GetView<PlantInspectionController> {
                 SizedBox(height: 15.6.h),
                 _buildAllTicketsSection(),
                 SizedBox(height: 15.6.h),
-                _buildInspectionTabs(),
+                _buildInspectionTabs(context),
               ]),
             ),
           ),
@@ -805,7 +805,7 @@ class PlantInspectionView extends GetView<PlantInspectionController> {
     );
   }
 
-  Widget _buildInspectionTabs() {
+  Widget _buildInspectionTabs(context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -818,12 +818,12 @@ class PlantInspectionView extends GetView<PlantInspectionController> {
           ),
         ),
         SizedBox(height: 14.4.h),
-        _buildInspectionItems(),
+        _buildInspectionItems(context),
       ],
     );
   }
 
-  Widget _buildInspectionItems() {
+  Widget _buildInspectionItems(context) {
     if (controller.inspectionItems.isEmpty) {
       return Center(
         child: Container(
@@ -883,7 +883,7 @@ class PlantInspectionView extends GetView<PlantInspectionController> {
                 : () { // Remove async here
               int specificItemId = controller.inspectionItems[i]['id'];
               // Call the method without await to make it VoidCallback compatible
-              controller.fetchInspectorDataAndNavigate(specificItemId, controller.inspectionItems[i]);
+              controller.fetchInspectorDataAndNavigate(specificItemId, controller.inspectionItems[i],context);
             },
           )),
       ],

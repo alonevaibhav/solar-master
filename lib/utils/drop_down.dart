@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -19,6 +17,7 @@ class CustomDropdownField<T> extends StatelessWidget {
   final Color? borderColor;
   final Color? focusedBorderColor;
   final Color? fillColor;
+  final Color? iconcolor;
   final double? borderRadius;
   final double? maxHeight;
   final EdgeInsetsGeometry? contentPadding;
@@ -52,6 +51,7 @@ class CustomDropdownField<T> extends StatelessWidget {
     this.itemTextStyle,
     this.dropdownBackgroundColor,
     this.dropdownShadow,
+    this.iconcolor,
   }) : super(key: key);
 
   @override
@@ -67,10 +67,15 @@ class CustomDropdownField<T> extends StatelessWidget {
           fontWeight: FontWeight.w500,
         ),
         prefixIcon: prefixIcon != null
-            ? Icon(prefixIcon, size: 20.sp)
+            ? Icon(
+          prefixIcon,
+          size: 20.sp,
+          color: iconcolor,  // Apply iconcolor to prefixIcon as well
+        )
             : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadius ?? 12.r),
+
           borderSide: BorderSide(
             color: borderColor ?? theme.dividerColor,
           ),
@@ -138,7 +143,9 @@ class CustomDropdownField<T> extends StatelessWidget {
       iconStyleData: IconStyleData(
         icon: Icon(
           suffixIcon ?? Icons.keyboard_arrow_down_rounded,
-          color: enabled ? theme.hintColor : theme.disabledColor,
+          color: !enabled
+              ? theme.disabledColor
+              : iconcolor ?? theme.hintColor,  // Use iconcolor if provided, otherwise fallback to theme.hintColor
         ),
         iconSize: 24.sp,
       ),

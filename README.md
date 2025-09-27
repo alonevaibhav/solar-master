@@ -15,40 +15,42 @@
 
 ## 📲 Get the App
 
-<table align="center">
-  <tr>
-    <td align="center">
-      <a href="[YOUR_DRIVE_LINK_HERE]">
-        <img src="https://img.shields.io/badge/Download%20Inspector%20App-FF6B6B?style=for-the-badge&logo=android&logoColor=white" width="250"/>
-      </a>
-      <br/><sub><b>Inspector Version</b></sub>
-    </td>
-    <td align="center">
-      <img src="https://img.shields.io/badge/Coming%20Soon-Cleaner%20App-lightgrey?style=for-the-badge&logo=android&logoColor=white" width="250"/>
-      <br/><sub><b>Field Worker Version</b></sub>
-    </td>
-  </tr>
-</table>
+<div align="center">
+  <a href="[YOUR_DRIVE_LINK_HERE]">
+    <img src="https://img.shields.io/badge/📱_Download_Solar_Manager_App-4285F4?style=for-the-badge&logo=googledrive&logoColor=white" width="300"/>
+  </a>
+  <br/>
+  <sub><b>Single App with Role-Based Access (Inspector & Cleaner)</b></sub>
+</div>
 
 ---
 
 ## 🎯 Project Overview
 
-**Vidani Solar Panel Manager** is a comprehensive field operations management ecosystem designed for solar panel maintenance teams. The system provides role-specific applications with real-time hardware integration and efficient task management.
+**Vidani Solar Panel Manager** is a comprehensive field operations management system designed for solar panel maintenance teams. The application features role-based authentication routing that provides different interfaces and functionalities for Inspectors and Cleaners within a single unified app.
 
-### 🏗️ **System Architecture**
+### 🏗️ **Dual Communication Architecture**
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│  Inspector App  │    │   Backend API   │    │  Hardware/IoT   │
-│   (Flutter)     │◄──►│  (TypeScript)   │◄──►│ (MQTT Protocol) │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         ▲                       ▲                       ▲
-         │                       │                       │
-         ▼                       ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Cleaner App   │    │ MySQL Database  │    │ Real-time Data  │
-│ (Coming Soon)   │    │   (Persistent)  │    │   Monitoring    │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
+┌─────────────────────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│     Solar Panel Manager         │    │   Backend API   │    │  Hardware/IoT   │
+│  (Single Flutter App)           │◄──►│  (TypeScript)   │◄──►│ (MQTT Broker)   │
+│                                 │    └─────────────────┘    └─────────────────┘
+│ ┌─────────────┐ ┌─────────────┐ │              ▲                       ▲
+│ │  Inspector  │ │   Cleaner   │ │              │                       │
+│ │ Interface   │ │ Interface   │ │              ▼                       ▼
+│ │             │ │             │ │    ┌─────────────────┐    ┌─────────────────┐
+│ └─────────────┘ └─────────────┘ │    │ MySQL Database  │    │ Real-time Data  │
+│      Auth-Based Routing         │    │   (Persistent)  │    │   Monitoring    │
+└─────────────────────────────────┘    └─────────────────┘    └─────────────────┘
+         ▲                                                               ▲
+         │              🚀 Direct MQTT Communication                      │
+         │                (Real-time Hardware Control)                   │
+         └───────────────────────────────────────────────────────────────┘
+
+Communication Flow:
+• Flutter ↔ Backend: REST APIs, WebSocket (Data & Auth)
+• Flutter ↔ MQTT: Direct connection (Real-time control)
+• Backend ↔ MQTT: Server-side automation & logging
 ```
 
 ---
@@ -56,9 +58,9 @@
 ## 🛠️ Core Features
 
 ### 🔐 **Authentication & Role Management**
-- **Multi-role Login System** with secure credential validation
-- **Inspector Dashboard** with comprehensive navigation
-- **Profile Management** with role-specific access controls
+- **Role-Based Authentication Routing** with secure credential validation
+- **Dynamic Interface Loading** - Inspector and Cleaner interfaces within single app
+- **Profile Management** with role-specific access controls and permissions
 
 ### 🎫 **Ticket Management System**
 - **Real-time Ticket Tracking** with status updates
@@ -82,22 +84,23 @@
 - **Manual Override** - On-demand cleaning operations
 - **Time Slot Configuration** - Customizable maintenance windows
 - **Activity History** - Complete operational logs
+- **Direct Hardware Control** - Flutter app communicates directly with MQTT for real-time operations
 
 ---
 
-## 📱 Inspector App Interface
+## 📱 Application Interface
 
 <div align="center">
 
-| Authentication | Dashboard | Plant Details |
+| Authentication | Inspector Dashboard | Plant Monitoring |
 |:---:|:---:|:---:|
 | ![Login](screenshots/login.png) | ![Dashboard](screenshots/dashboard.png) | ![Plant Details](screenshots/plant_details.png) |
-| **Secure Role-based Login** | **Inspection Overview** | **Real-time Monitoring** |
+| **Role-Based Login** | **Inspector Overview** | **Real-time Monitoring** |
 
-| Ticket System | Scheduling | Automation |
+| Ticket Management | Scheduling System | Automation Controls |
 |:---:|:---:|:---:|
 | ![Tickets](screenshots/tickets.png) | ![Schedule](screenshots/schedule.png) | ![Automation](screenshots/automation.png) |
-| **Advanced Ticket Management** | **Weekly Planning** | **Smart Control System** |
+| **Advanced Ticket System** | **Weekly Planning** | **Smart Control System** |
 
 </div>
 
@@ -133,11 +136,11 @@
 
 ### **IoT Integration**
 ![MQTT](https://img.shields.io/badge/MQTT-660066?style=for-the-badge&logo=mqtt&logoColor=white)<br/>
-**Hardware Communication**
-- Real-time Messaging
-- Device Control
-- Status Monitoring
-- Automated Triggers
+**Dual Communication Layer**
+- Direct Flutter-MQTT Connection
+- Real-time Device Control
+- Instant Status Updates
+- Hardware Command Execution
 
 </td>
 </tr>
@@ -169,34 +172,40 @@
 
 ---
 
-## 🔄 Inspector Application Flow
+## 🔄 Application Flow (Role-Based Routing)
 
 ```mermaid
 flowchart TD
-    A[🔐 Inspector Login] --> B[📊 Dashboard]
-    B --> C[🎫 Ticket Management]
-    B --> D[📅 Schedule View]
-    B --> E[🏭 Plant Information]
-    B --> F[👤 Profile]
+    A[🔐 User Login] --> B{👤 Role Authentication}
     
-    C --> C1[📋 View All Tickets]
-    C --> C2[💬 Ticket Chat]
-    C --> C3[🔄 Status Updates]
+    B -->|Inspector Role| C[📊 Inspector Dashboard]
+    B -->|Cleaner Role| D[🧹 Cleaner Dashboard]
     
-    D --> D1[📆 Two-week Schedule]
-    D --> D2[⏰ Time Slots]
-    D --> D3[📝 Schedule Notes]
+    C --> C1[🎫 Ticket Management]
+    C --> C2[📅 Schedule Management]
+    C --> C3[🏭 Plant Information]
+    C --> C4[👤 Profile & Settings]
     
-    E --> E1[🚨 Raise Ticket]
-    E --> E2[⚙️ Plant Controls]
+    D --> D1[📋 Task Assignment]
+    D --> D2[🧽 Cleaning Operations]
+    D --> D3[📊 Progress Tracking]
+    D --> D4[👤 Profile & Settings]
     
-    E2 --> E2A[🤖 Automatic Schedule]
-    E2 --> E2B[👨‍💼 Manual Schedule]
-    E2 --> E2C[⏰ Time Slot Config]
-    E2 --> E2D[📜 Operation Logs]
+    C1 --> C1A[📋 View All Tickets]
+    C1 --> C1B[💬 Ticket Communication]
+    C1 --> C1C[🔄 Status Updates]
     
-    F --> F1[ℹ️ Profile Details]
-    F --> F2[🚪 Logout]
+    C3 --> C3A[🚨 Raise Tickets]
+    C3 --> C3B[⚙️ System Controls]
+    
+    C3B --> C3B1[🤖 Automatic Schedule]
+    C3B --> C3B2[👨‍💼 Manual Operations]
+    C3B --> C3B3[⏰ Time Slot Config]
+    C3B --> C3B4[📜 Activity Logs]
+    
+    D2 --> D2A[🎯 Assigned Tasks]
+    D2 --> D2B[⚙️ Equipment Control]
+    D2 --> D2C[📸 Progress Reports]
 ```
 
 ---
@@ -214,12 +223,35 @@ MQTT Broker (Mosquitto recommended)
 ### Quick Start
 ```bash
 # Clone the repository
-git clonehttps://github.com/alonevaibhav/solar-master
+git clone https://github.com/[username]/vidani-solar-manager.git
 
 # Frontend setup
 cd vidani-solar-manager/inspector-app
 flutter pub get
 flutter run
+
+# Backend setup  
+cd ../backend
+npm install
+npm run dev
+```
+
+### Environment Configuration
+```env
+# Database
+DATABASE_URL=mysql://user:password@localhost:3306/solar_db
+
+# MQTT Configuration
+MQTT_BROKER_URL=mqtt://localhost:1883
+MQTT_USERNAME=your_username
+MQTT_PASSWORD=your_password
+
+# API Configuration
+API_PORT=3000
+JWT_SECRET=your_jwt_secret
+```
+
+---
 
 ## 📈 System Performance
 
@@ -230,6 +262,28 @@ flutter run
 | **MQTT Message Delivery** | < 500ms | ✅ Achieved |
 | **Mobile App Launch** | < 3 seconds | ✅ Achieved |
 | **Database Query Speed** | < 100ms | ✅ Achieved |
+
+---
+
+## 🔮 Roadmap
+
+### **Phase 1 - Current** ✅
+- ✅ Inspector Mobile Application
+- ✅ Ticket Management System
+- ✅ Basic Plant Monitoring
+- ✅ MQTT Integration
+
+### **Phase 2 - In Development** 🚧
+- 🚧 Cleaner Mobile Application
+- 🚧 Advanced Analytics Dashboard
+- 🚧 Predictive Maintenance
+- 🚧 Mobile App Optimization
+
+### **Phase 3 - Planned** 📋
+- 📋 Web Dashboard for Management
+- 📋 AI-powered Scheduling
+- 📋 Advanced Reporting
+- 📋 Integration APIs
 
 ---
 

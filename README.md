@@ -223,33 +223,15 @@ MQTT Broker (Mosquitto recommended)
 ### Quick Start
 ```bash
 # Clone the repository
-git clone https://github.com/[username]/vidani-solar-manager.git
+git clone https://github.com/alonevaibhav/solar-master
 
 # Frontend setup
 cd vidani-solar-manager/inspector-app
 flutter pub get
 flutter run
-
-# Backend setup  
-cd ../backend
-npm install
-npm run dev
 ```
 
-### Environment Configuration
-```env
-# Database
-DATABASE_URL=mysql://user:password@localhost:3306/solar_db
 
-# MQTT Configuration
-MQTT_BROKER_URL=mqtt://localhost:1883
-MQTT_USERNAME=your_username
-MQTT_PASSWORD=your_password
-
-# API Configuration
-API_PORT=3000
-JWT_SECRET=your_jwt_secret
-```
 
 ---
 

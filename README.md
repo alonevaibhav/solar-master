@@ -16,12 +16,13 @@
 ## 📲 Get the App
 
 <div align="center">
-  <a href="[YOUR_DRIVE_LINK_HERE]">
+  <a href="https://drive.google.com/file/d/1phtR6Hk9NqFYzqqic0vsoOgeH4xkzc5Z/view?usp=drivesdk">
     <img src="https://img.shields.io/badge/📱_Download_Solar_Manager_App-4285F4?style=for-the-badge&logo=googledrive&logoColor=white" width="300"/>
   </a>
   <br/>
   <sub><b>Single App with Role-Based Access (Inspector & Cleaner)</b></sub>
 </div>
+
 
 ---
 

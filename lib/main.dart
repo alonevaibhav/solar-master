@@ -16,7 +16,7 @@ void main() async {
   await ApiService.init();
   await AppInitializer.initialize();
   // Initialize notification service
-  await Get.putAsync(() => NotificationService().init());
+  // await Get.putAsync(() => NotificationService().init());
 
 
 

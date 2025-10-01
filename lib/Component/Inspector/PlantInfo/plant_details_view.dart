@@ -36,37 +36,31 @@ class InfoPlantDetailsView extends StatelessWidget {
     controller.printUuidInfo();
 
     if (plantData == null) {
-      return WillPopScope(
-        onWillPop: () async {
-          await handleBackPress();
-          return true; // Allow the page to pop
-        },
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text('Plant Details'),
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
-            elevation: 0,
-          ),
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 64.sp,
-                  color: Colors.grey.shade400,
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Plant Details'),
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          elevation: 0,
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 64.sp,
+                color: Colors.grey.shade400,
+              ),
+              SizedBox(height: 16.h),
+              Text(
+                'No plant data available',
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  color: Colors.grey.shade600,
                 ),
-                SizedBox(height: 16.h),
-                Text(
-                  'No plant data available',
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       );
@@ -88,12 +82,12 @@ class InfoPlantDetailsView extends StatelessWidget {
                 child: Column(
                   children: [
                     // _buildScheduleRow(plantData),
-                    SizedBox(height: 24.h),
+                    SizedBox(height: 30.h),
                     _buildQuickStatsRow(plantData),
-                    SizedBox(height: 24.h),
+                    SizedBox(height: 35.h),
                     _buildSolarHealthSection(controller),
                     // New solar health section
-                    SizedBox(height: 24.h),
+                    SizedBox(height: 35.h),
 
                     _buildBasicInformation(plantData),
                     SizedBox(height: 20.h),
@@ -250,7 +244,7 @@ class InfoPlantDetailsView extends StatelessWidget {
                   Text(
                     plantData['name'] ?? 'Unnamed Plant',
                     style: TextStyle(
-                      fontSize: 28.sp,
+                      fontSize: 25.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                       height: 1.2,
@@ -266,7 +260,7 @@ class InfoPlantDetailsView extends StatelessWidget {
                         child: Text(
                           plantData['address'] ?? 'No address available',
                           style: TextStyle(
-                            fontSize: 14.sp,
+                            fontSize: 10.sp,
                             color: Colors.white70,
                             height: 1.3,
                           ),
@@ -284,141 +278,6 @@ class InfoPlantDetailsView extends StatelessWidget {
   }
 
 
-  Widget _buildNavigatableStatCard(String label, String value, IconData icon,
-      Color color,
-      {required VoidCallback onTap}) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            color.withOpacity(0.1),
-            color.withOpacity(0.05),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(16.r), // Adjusted from 20.r
-        border: Border.all(
-          color: color.withOpacity(0.3),
-          width: 1.2, // Adjusted from 1.5
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.15),
-            blurRadius: 12, // Adjusted from 15
-            offset: const Offset(0, 4.8), // Adjusted from 6
-            spreadRadius: 0.8, // Adjusted from 1
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(16.r),
-          // Adjusted from 20.r
-          splashColor: color.withOpacity(0.2),
-          highlightColor: color.withOpacity(0.1),
-          child: Container(
-            padding: EdgeInsets.all(14.4.w), // Adjusted from 18.w
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: EdgeInsets.all(11.2.w), // Adjusted from 14.w
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        color,
-                        color.withOpacity(0.8),
-                      ],
-                    ),
-                    borderRadius:
-                    BorderRadius.circular(12.8.r), // Adjusted from 16.r
-                    boxShadow: [
-                      BoxShadow(
-                        color: color.withOpacity(0.3),
-                        blurRadius: 6.4, // Adjusted from 8
-                        offset: const Offset(0, 3.2), // Adjusted from 4
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    icon,
-                    color: Colors.white,
-                    size: 20.8.sp, // Adjusted from 26.sp
-                  ),
-                ),
-                SizedBox(height: 11.2.h), // Adjusted from 14.h
-
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 10.4.sp, // Adjusted from 13.sp
-                    fontWeight: FontWeight.w700,
-                    color: color,
-                    letterSpacing: 0.4, // Adjusted from 0.5
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-
-                SizedBox(height: 6.4.h), // Adjusted from 8.h
-
-                Container(
-                  width: double.infinity,
-                  padding:
-                  EdgeInsets.symmetric(vertical: 8.h), // Adjusted from 10.h
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [
-                        color,
-                        color.withOpacity(0.8),
-                      ],
-                    ),
-                    borderRadius:
-                    BorderRadius.circular(20.r), // Adjusted from 25.r
-                    boxShadow: [
-                      BoxShadow(
-                        color: color.withOpacity(0.3),
-                        blurRadius: 4.8, // Adjusted from 6
-                        offset: const Offset(0, 2.4), // Adjusted from 3
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Open',
-                        style: TextStyle(
-                          fontSize: 9.6.sp, // Adjusted from 12.sp
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.64, // Adjusted from 0.8
-                        ),
-                      ),
-                      SizedBox(width: 4.8.w), // Adjusted from 6.w
-                      Icon(
-                        Icons.arrow_forward_rounded,
-                        size: 11.2.sp, // Adjusted from 14.sp
-                        color: Colors.white,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildQuickStatsRow(Map<String, dynamic> plantData) {
     return Row(
@@ -476,15 +335,15 @@ class InfoPlantDetailsView extends StatelessWidget {
               color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12.r),
             ),
-            child: Icon(icon, color: color, size: 24.sp),
+            child: Icon(icon, color: color, size: 22.sp),
           ),
           SizedBox(height: 12.h),
           Text(
             value,
             style: TextStyle(
-              fontSize: 14.sp,
+              fontSize: 11.sp,
               fontWeight: FontWeight.bold,
-              color: Colors.grey.shade800,
+              color: Colors.black,
             ),
           ),
           SizedBox(height: 4.h),
@@ -687,7 +546,7 @@ class InfoPlantDetailsView extends StatelessWidget {
             child: Text(
               value,
               style: TextStyle(
-                fontSize: 14.sp,
+                fontSize: 13.sp,
                 color: Colors.grey.shade800,
                 fontWeight: FontWeight.w600,
               ),

@@ -934,7 +934,6 @@
 //   }
 // }
 
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -960,7 +959,7 @@ class _StartInspectionState extends State<StartInspection> {
   void initState() {
     super.initState();
     controllerTag =
-    "inspection_${inspectionData['id'] ?? DateTime.now().millisecondsSinceEpoch}";
+        "inspection_${inspectionData['id'] ?? DateTime.now().millisecondsSinceEpoch}";
     controller = Get.put(PlantInspectionController(),
         tag: controllerTag!, permanent: true);
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -969,7 +968,7 @@ class _StartInspectionState extends State<StartInspection> {
           DateTime.now().millisecondsSinceEpoch.toString();
       controller!.setInspectionId(inspectionId);
       if (inspectionData['id'] != null) {
-        controller!.fetchInspectorData(inspectionData['id'],context);
+        controller!.fetchInspectorData(inspectionData['id'], context);
       }
       controller!.getCheckList();
     });
@@ -996,7 +995,6 @@ class _StartInspectionState extends State<StartInspection> {
   Widget build(BuildContext context) {
     if (controller == null) {
       return Scaffold(
-        // backgroundColor: const Color(0xFFF8FAFF),
         body: Center(
           child: CircularProgressIndicator(
             valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
@@ -1005,7 +1003,6 @@ class _StartInspectionState extends State<StartInspection> {
       );
     }
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFF),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -1057,7 +1054,8 @@ class _StartInspectionState extends State<StartInspection> {
         }
         return SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: (20.w) * _sizeScaleFactor),
+            padding:
+                EdgeInsets.symmetric(horizontal: (20.w) * _sizeScaleFactor),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -1068,14 +1066,8 @@ class _StartInspectionState extends State<StartInspection> {
                       vertical: (8.h) * _sizeScaleFactor),
                   decoration: BoxDecoration(
                     color: Colors.blue,
-                    borderRadius: BorderRadius.circular((25.r) * _sizeScaleFactor),
-                    // boxShadow: [
-                    //   BoxShadow(
-                    //     color: Colors.blue.shade200,
-                    //     blurRadius: (8.r) * _sizeScaleFactor,
-                    //     offset: const Offset(0, 4),
-                    //   ),
-                    // ],
+                    borderRadius:
+                        BorderRadius.circular((25.r) * _sizeScaleFactor),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -1105,7 +1097,8 @@ class _StartInspectionState extends State<StartInspection> {
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular((20.r) * _sizeScaleFactor),
+                    borderRadius:
+                        BorderRadius.circular((20.r) * _sizeScaleFactor),
                     border: Border.all(color: Colors.black26),
                   ),
                   child: Stack(
@@ -1130,10 +1123,12 @@ class _StartInspectionState extends State<StartInspection> {
                             Row(
                               children: [
                                 Container(
-                                  padding: EdgeInsets.all((12.r) * _sizeScaleFactor),
+                                  padding:
+                                      EdgeInsets.all((12.r) * _sizeScaleFactor),
                                   decoration: BoxDecoration(
                                     color: Colors.blue,
-                                    borderRadius: BorderRadius.circular((12.r) * _sizeScaleFactor),
+                                    borderRadius: BorderRadius.circular(
+                                        (12.r) * _sizeScaleFactor),
                                   ),
                                   child: Icon(
                                     Icons.solar_power,
@@ -1144,7 +1139,8 @@ class _StartInspectionState extends State<StartInspection> {
                                 SizedBox(width: (16.w) * _sizeScaleFactor),
                                 Expanded(
                                   child: Text(
-                                    inspectionData['plant_name'] ?? 'Unknown Plant',
+                                    inspectionData['plant_name'] ??
+                                        'Unknown Plant',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: (20.sp) * _sizeScaleFactor,
@@ -1156,17 +1152,21 @@ class _StartInspectionState extends State<StartInspection> {
                             ),
                             SizedBox(height: (16.h) * _sizeScaleFactor),
                             Container(
-                              padding: EdgeInsets.all((12.r) * _sizeScaleFactor),
+                              padding:
+                                  EdgeInsets.all((12.r) * _sizeScaleFactor),
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                borderRadius: BorderRadius.circular((12.r) * _sizeScaleFactor),
+                                borderRadius: BorderRadius.circular(
+                                    (12.r) * _sizeScaleFactor),
                                 border: Border.all(color: Colors.black26),
                               ),
                               child: Column(
                                 children: [
                                   Row(
                                     children: [
-                                      Icon(Icons.schedule, color: Colors.blue, size: (18.r) * _sizeScaleFactor),
+                                      Icon(Icons.schedule,
+                                          color: Colors.blue,
+                                          size: (18.r) * _sizeScaleFactor),
                                       SizedBox(width: (8.w) * _sizeScaleFactor),
                                       Text(
                                         'Scheduled: ',
@@ -1190,7 +1190,8 @@ class _StartInspectionState extends State<StartInspection> {
                                   Row(
                                     children: [
                                       Icon(Icons.person,
-                                          color: Colors.blue, size: (18.r) * _sizeScaleFactor),
+                                          color: Colors.blue,
+                                          size: (18.r) * _sizeScaleFactor),
                                       SizedBox(width: (8.w) * _sizeScaleFactor),
                                       Text(
                                         'Inspector: ',
@@ -1201,7 +1202,8 @@ class _StartInspectionState extends State<StartInspection> {
                                         ),
                                       ),
                                       Text(
-                                        inspectionData['inspector_name'] ?? 'Not assigned',
+                                        inspectionData['inspector_name'] ??
+                                            'Not assigned',
                                         style: TextStyle(
                                           color: Colors.black,
                                           fontSize: (14.sp) * _sizeScaleFactor,
@@ -1209,7 +1211,8 @@ class _StartInspectionState extends State<StartInspection> {
                                         ),
                                       ),
                                     ],
-                                  ),   SizedBox(height: (8.h) * _sizeScaleFactor),
+                                  ),
+                                  SizedBox(height: (8.h) * _sizeScaleFactor),
                                   Row(
                                     children: [
                                       Icon(
@@ -1227,7 +1230,8 @@ class _StartInspectionState extends State<StartInspection> {
                                         ),
                                       ),
                                       Text(
-                                        inspectionData['plant_address'] ?? 'Unknown Location',
+                                        inspectionData['plant_address'] ??
+                                            'Unknown Location',
                                         style: TextStyle(
                                           color: Colors.black,
                                           fontSize: (14.sp) * _sizeScaleFactor,
@@ -1267,34 +1271,39 @@ class _StartInspectionState extends State<StartInspection> {
                         padding: EdgeInsets.all((10.r) * _sizeScaleFactor),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular((16.r) * _sizeScaleFactor),
+                          borderRadius:
+                              BorderRadius.circular((16.r) * _sizeScaleFactor),
                           border: Border.all(color: Colors.blue),
                         ),
                         child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Container(
-                              padding: EdgeInsets.all((16.r) * _sizeScaleFactor),
+                              padding:
+                                  EdgeInsets.all((16.r) * _sizeScaleFactor),
                               decoration: BoxDecoration(
                                 color: Colors.blue,
-                                borderRadius: BorderRadius.circular((16.r) * _sizeScaleFactor),
+                                borderRadius: BorderRadius.circular(
+                                    (16.r) * _sizeScaleFactor),
                               ),
                               child: Icon(
                                 Icons.cleaning_services,
                                 color: Colors.white,
-                                size: (28.r) * _sizeScaleFactor,
+                                size: (20.r) * _sizeScaleFactor,
                               ),
                             ),
                             SizedBox(width: (16.w) * _sizeScaleFactor),
                             Expanded(
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    inspectionData['cleaner_name'] ?? 'Cleaner Name',
+                                    inspectionData['cleaner_name'] ??
+                                        'Cleaner Name',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: (18.sp) * _sizeScaleFactor,
+                                      fontSize: (17.sp) * _sizeScaleFactor,
                                       color: Colors.grey.shade800,
                                     ),
                                   ),
@@ -1305,13 +1314,14 @@ class _StartInspectionState extends State<StartInspection> {
                                         vertical: (4.h) * _sizeScaleFactor),
                                     decoration: BoxDecoration(
                                       color: Colors.green.shade100,
-                                      borderRadius: BorderRadius.circular((12.r) * _sizeScaleFactor),
+                                      borderRadius: BorderRadius.circular(
+                                          (12.r) * _sizeScaleFactor),
                                     ),
                                     child: Text(
                                       'Active',
                                       style: TextStyle(
                                         color: Colors.green.shade700,
-                                        fontSize: (12.sp) * _sizeScaleFactor,
+                                        fontSize: (10.sp) * _sizeScaleFactor,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -1333,7 +1343,9 @@ class _StartInspectionState extends State<StartInspection> {
                               readOnly: true,
                             ),
                           ),
-                          SizedBox(width: (12.w) * _sizeScaleFactor), // Space between fields
+                          SizedBox(
+                              width: (12.w) *
+                                  _sizeScaleFactor), // Space between fields
                           Expanded(
                             child: _buildTextField(
                               controller: controller!.timeController,
@@ -1344,34 +1356,33 @@ class _StartInspectionState extends State<StartInspection> {
                           ),
                         ],
                       ),
-
-
                       SizedBox(height: (20.h) * _sizeScaleFactor),
                       Container(
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular((16.r) * _sizeScaleFactor),
+                          borderRadius:
+                              BorderRadius.circular((16.r) * _sizeScaleFactor),
                         ),
                         child: Obx(() => CustomDropdownField<String>(
-                          value: controller!.selectedStatus.value.isEmpty
-                              ? null
-                              : controller!.selectedStatus.value,
-                          labelText: 'Status',
-                          prefixIcon: Icons.flag,
-                          items: controller!.statusOptions,
-                          itemLabelBuilder: (status) => status,
-                          isRequired: true,
-                          onChanged: (value) {
-                            if (value != null) {
-                              controller!.selectedStatus.value = value;
-                            }
-                          },
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please select status';
-                            }
-                            return null;
-                          },
-                        )),
+                              value: controller!.selectedStatus.value.isEmpty
+                                  ? null
+                                  : controller!.selectedStatus.value,
+                              labelText: 'Status',
+                              prefixIcon: Icons.flag,
+                              items: controller!.statusOptions,
+                              itemLabelBuilder: (status) => status,
+                              isRequired: true,
+                              onChanged: (value) {
+                                if (value != null) {
+                                  controller!.selectedStatus.value = value;
+                                }
+                              },
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please select status';
+                                }
+                                return null;
+                              },
+                            )),
                       ),
                       SizedBox(height: (32.h) * _sizeScaleFactor),
                       buildChecklistSection(controller!),
@@ -1468,7 +1479,8 @@ class _StartInspectionState extends State<StartInspection> {
             borderSide: BorderSide(color: Colors.blue, width: 2),
           ),
           contentPadding: EdgeInsets.symmetric(
-              horizontal: (16.w) * _sizeScaleFactor, vertical: (16.h) * _sizeScaleFactor),
+              horizontal: (16.w) * _sizeScaleFactor,
+              vertical: (16.h) * _sizeScaleFactor),
         ),
       ),
     );
@@ -1485,13 +1497,6 @@ class _StartInspectionState extends State<StartInspection> {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular((16.r) * _sizeScaleFactor),
-        // boxShadow: [
-        //   BoxShadow(
-        //     color: Colors.blue.shade100.withOpacity(0.3),
-        //     blurRadius: (8.r) * _sizeScaleFactor,
-        //     offset: const Offset(0, 2),
-        //   ),
-        // ],
       ),
       child: TextFormField(
         controller: controller,
@@ -1542,7 +1547,8 @@ class _StartInspectionState extends State<StartInspection> {
           ),
           alignLabelWithHint: true,
           contentPadding: EdgeInsets.symmetric(
-              horizontal: (16.w) * _sizeScaleFactor, vertical: (16.h) * _sizeScaleFactor),
+              horizontal: (16.w) * _sizeScaleFactor,
+              vertical: (16.h) * _sizeScaleFactor),
         ),
         validator: (value) {
           if (isRequired && (value == null || value.isEmpty)) {
@@ -1583,7 +1589,8 @@ class _StartInspectionState extends State<StartInspection> {
                           width: 0.5,
                           style: BorderStyle.solid,
                         ),
-                        borderRadius: BorderRadius.circular((16.r) * _sizeScaleFactor),
+                        borderRadius:
+                            BorderRadius.circular((16.r) * _sizeScaleFactor),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -1592,7 +1599,8 @@ class _StartInspectionState extends State<StartInspection> {
                             padding: EdgeInsets.all((20.r) * _sizeScaleFactor),
                             decoration: BoxDecoration(
                               color: Colors.blue,
-                              borderRadius: BorderRadius.circular((20.r) * _sizeScaleFactor),
+                              borderRadius: BorderRadius.circular(
+                                  (20.r) * _sizeScaleFactor),
                             ),
                             child: Icon(
                               Icons.add_a_photo,
@@ -1638,7 +1646,8 @@ class _StartInspectionState extends State<StartInspection> {
                               ),
                             ),
                             GestureDetector(
-                              onTap: isUploading ? null : controller!.uploadImage,
+                              onTap:
+                                  isUploading ? null : controller!.uploadImage,
                               child: Container(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: (16.w) * _sizeScaleFactor,
@@ -1646,7 +1655,8 @@ class _StartInspectionState extends State<StartInspection> {
                                 ),
                                 decoration: BoxDecoration(
                                   color: Colors.blue,
-                                  borderRadius: BorderRadius.circular((20.r) * _sizeScaleFactor),
+                                  borderRadius: BorderRadius.circular(
+                                      (20.r) * _sizeScaleFactor),
                                   // boxShadow: [
                                   //   BoxShadow(
                                   //     color: Colors.blue.shade300,
@@ -1682,7 +1692,8 @@ class _StartInspectionState extends State<StartInspection> {
                         GridView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 3,
                             crossAxisSpacing: (12.w) * _sizeScaleFactor,
                             mainAxisSpacing: (12.h) * _sizeScaleFactor,
@@ -1694,34 +1705,32 @@ class _StartInspectionState extends State<StartInspection> {
                               return Container(
                                 decoration: BoxDecoration(
                                   color: Colors.blue.shade100,
-                                  borderRadius: BorderRadius.circular((16.r) * _sizeScaleFactor),
+                                  borderRadius: BorderRadius.circular(
+                                      (16.r) * _sizeScaleFactor),
                                 ),
                                 child: Center(
                                   child: CircularProgressIndicator(
                                     strokeWidth: 3,
-                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.blue),
                                   ),
                                 ),
                               );
                             }
                             final imagePath = imagePaths[index];
                             return GestureDetector(
-                              onTap: () => controller!.viewImageFullScreen(imagePath),
+                              onTap: () =>
+                                  controller!.viewImageFullScreen(imagePath),
                               child: Container(
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular((16.r) * _sizeScaleFactor),
-                                  // boxShadow: [
-                                  //   BoxShadow(
-                                  //     color: Colors.blue.shade200.withOpacity(0.4),
-                                  //     blurRadius: (8.r) * _sizeScaleFactor,
-                                  //     offset: const Offset(0, 2),
-                                  //   ),
-                                  // ],
+                                  borderRadius: BorderRadius.circular(
+                                      (16.r) * _sizeScaleFactor),
                                 ),
                                 child: Stack(
                                   children: [
                                     ClipRRect(
-                                      borderRadius: BorderRadius.circular((16.r) * _sizeScaleFactor),
+                                      borderRadius: BorderRadius.circular(
+                                          (16.r) * _sizeScaleFactor),
                                       child: Image.file(
                                         File(imagePath),
                                         fit: BoxFit.cover,
@@ -1733,19 +1742,15 @@ class _StartInspectionState extends State<StartInspection> {
                                       top: (6.h) * _sizeScaleFactor,
                                       right: (6.w) * _sizeScaleFactor,
                                       child: GestureDetector(
-                                        onTap: () => controller!.removeImage(index),
+                                        onTap: () =>
+                                            controller!.removeImage(index),
                                         child: Container(
-                                          padding: EdgeInsets.all((6.r) * _sizeScaleFactor),
+                                          padding: EdgeInsets.all(
+                                              (6.r) * _sizeScaleFactor),
                                           decoration: BoxDecoration(
                                             color: Colors.red.shade600,
-                                            borderRadius: BorderRadius.circular((20.r) * _sizeScaleFactor),
-                                            // boxShadow: [
-                                            //   BoxShadow(
-                                            //     color: Colors.red.shade300,
-                                            //     blurRadius: (4.r) * _sizeScaleFactor,
-                                            //     offset: const Offset(0, 2),
-                                            //   ),
-                                            // ],
+                                            borderRadius: BorderRadius.circular(
+                                                (20.r) * _sizeScaleFactor),
                                           ),
                                           child: Icon(
                                             Icons.close,
@@ -1759,17 +1764,12 @@ class _StartInspectionState extends State<StartInspection> {
                                       bottom: (6.h) * _sizeScaleFactor,
                                       right: (6.w) * _sizeScaleFactor,
                                       child: Container(
-                                        padding: EdgeInsets.all((6.r) * _sizeScaleFactor),
+                                        padding: EdgeInsets.all(
+                                            (6.r) * _sizeScaleFactor),
                                         decoration: BoxDecoration(
                                           color: Colors.blue,
-                                          borderRadius: BorderRadius.circular((20.r) * _sizeScaleFactor),
-                                          // boxShadow: [
-                                          //   BoxShadow(
-                                          //     color: Colors.blue.shade300,
-                                          //     blurRadius: (4.r) * _sizeScaleFactor,
-                                          //     offset: const Offset(0, 2),
-                                          //   ),
-                                          // ],
+                                          borderRadius: BorderRadius.circular(
+                                              (20.r) * _sizeScaleFactor),
                                         ),
                                         child: Icon(
                                           Icons.zoom_in,
@@ -1802,84 +1802,81 @@ class _StartInspectionState extends State<StartInspection> {
       height: (56.h) * _sizeScaleFactor,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular((16.r) * _sizeScaleFactor),
-        // boxShadow: [
-        //   BoxShadow(
-        //     color: Colors.blue.shade300.withOpacity(0.4),
-        //     blurRadius: (12.r) * _sizeScaleFactor,
-        //     offset: const Offset(0, 6),
-        //   ),
-        // ],
       ),
       child: Obx(() => ElevatedButton(
-        onPressed: controller!.isSubmitting.value
-            ? null
-            : () => controller!.updateInspectionReport(),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
-          shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular((16.r) * _sizeScaleFactor),
-          ),
-          padding: EdgeInsets.zero,
-        ),
-        child: Ink(
-          decoration: BoxDecoration(
-            color: controller!.isSubmitting.value ? Colors.grey : Colors.blue,
-            borderRadius: BorderRadius.circular((16.r) * _sizeScaleFactor),
-          ),
-          child: Container(
-            width: double.infinity,
-            height: double.infinity,
-            alignment: Alignment.center,
-            child: controller!.isSubmitting.value
-                ? Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: (20.w) * _sizeScaleFactor,
-                  height: (20.h) * _sizeScaleFactor,
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 2,
-                  ),
-                ),
-                SizedBox(width: (12.w) * _sizeScaleFactor),
-                Text(
-                  'Submitting...',
-                  style: TextStyle(
-                    fontSize: (16.sp) * _sizeScaleFactor,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            )
-                : Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.send_rounded,
-                  color: Colors.white,
-                  size: (20.r) * _sizeScaleFactor,
-                ),
-                SizedBox(width: (8.w) * _sizeScaleFactor),
-                Text(
-                  'Submit Inspection Report',
-                  style: TextStyle(
-                    fontSize: (16.sp) * _sizeScaleFactor,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
+            onPressed: controller!.isSubmitting.value
+                ? null
+                : () => controller!.updateInspectionReport(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              shadowColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular((16.r) * _sizeScaleFactor),
+              ),
+              padding: EdgeInsets.zero,
             ),
-          ),
-        ),
-      )),
+            child: Ink(
+              decoration: BoxDecoration(
+                color:
+                    controller!.isSubmitting.value ? Colors.grey : Colors.blue,
+                borderRadius: BorderRadius.circular((16.r) * _sizeScaleFactor),
+              ),
+              child: Container(
+                width: double.infinity,
+                height: double.infinity,
+                alignment: Alignment.center,
+                child: controller!.isSubmitting.value
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: (20.w) * _sizeScaleFactor,
+                            height: (20.h) * _sizeScaleFactor,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          ),
+                          SizedBox(width: (12.w) * _sizeScaleFactor),
+                          Text(
+                            'Submitting...',
+                            style: TextStyle(
+                              fontSize: (16.sp) * _sizeScaleFactor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.send_rounded,
+                            color: Colors.white,
+                            size: (20.r) * _sizeScaleFactor,
+                          ),
+                          SizedBox(width: (8.w) * _sizeScaleFactor),
+                          Text(
+                            'Submit Inspection Report',
+                            style: TextStyle(
+                              fontSize: (16.sp) * _sizeScaleFactor,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
+            ),
+          )),
     );
   }
 
-  Widget buildChecklistSection(PlantInspectionController plantInspectionController) {
+  Widget buildChecklistSection(
+      PlantInspectionController plantInspectionController) {
+    final double _sizeScaleFactor = 0.6; // 20% smaller
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1933,11 +1930,12 @@ class _StartInspectionState extends State<StartInspection> {
                     padding: EdgeInsets.all((16.r) * _sizeScaleFactor),
                     decoration: BoxDecoration(
                       color: Colors.blue,
-                      borderRadius: BorderRadius.circular((16.r) * _sizeScaleFactor),
+                      borderRadius:
+                          BorderRadius.circular((16.r) * _sizeScaleFactor),
                     ),
                     child: Icon(
                       Icons.checklist_outlined,
-                      size: (32.r) * _sizeScaleFactor,
+                      size: (35.r) * _sizeScaleFactor,
                       color: Colors.white,
                     ),
                   ),
@@ -1945,7 +1943,7 @@ class _StartInspectionState extends State<StartInspection> {
                   Text(
                     'No Checklist Items',
                     style: TextStyle(
-                      fontSize: (18.sp) * _sizeScaleFactor,
+                      fontSize: (20.sp) * _sizeScaleFactor,
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
                     ),
@@ -1954,7 +1952,7 @@ class _StartInspectionState extends State<StartInspection> {
                   Text(
                     'Checklist items will appear here when available',
                     style: TextStyle(
-                      fontSize: (14.sp) * _sizeScaleFactor,
+                      fontSize: (17.sp) * _sizeScaleFactor,
                       color: Colors.black,
                     ),
                     textAlign: TextAlign.center,
@@ -1968,13 +1966,6 @@ class _StartInspectionState extends State<StartInspection> {
               color: Colors.white,
               borderRadius: BorderRadius.circular((20.r) * _sizeScaleFactor),
               border: Border.all(color: Colors.blue),
-              // boxShadow: [
-              //   BoxShadow(
-              //     color: Colors.blue.shade100.withOpacity(0.4),
-              //     blurRadius: (12.r) * _sizeScaleFactor,
-              //     offset: const Offset(0, 4),
-              //   ),
-              // ],
             ),
             child: Column(
               children: [
@@ -1995,18 +1986,20 @@ class _StartInspectionState extends State<StartInspection> {
                           Text(
                             'Progress Overview',
                             style: TextStyle(
-                              fontSize: (16.sp) * _sizeScaleFactor,
+                              fontSize: (20.sp) * _sizeScaleFactor,
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Container(
                             padding: EdgeInsets.symmetric(
-                                horizontal: (12.w) * _sizeScaleFactor,
-                                vertical: (6.h) * _sizeScaleFactor),
+                              horizontal: (12.w) * _sizeScaleFactor,
+                              vertical: (6.h) * _sizeScaleFactor,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular((20.r) * _sizeScaleFactor),
+                              borderRadius: BorderRadius.circular(
+                                  (20.r) * _sizeScaleFactor),
                             ),
                             child: Text(
                               '${plantInspectionController.checklistItems.where((item) => item['checked'] == 1).length}/${plantInspectionController.checklistItems.length}',
@@ -2021,14 +2014,16 @@ class _StartInspectionState extends State<StartInspection> {
                       ),
                       SizedBox(height: (12.h) * _sizeScaleFactor),
                       ClipRRect(
-                        borderRadius: BorderRadius.circular((10.r) * _sizeScaleFactor),
+                        borderRadius:
+                            BorderRadius.circular((10.r) * _sizeScaleFactor),
                         child: LinearProgressIndicator(
                           value: plantInspectionController.checklistItems
-                              .where((item) => item['checked'] == 1)
-                              .length /
+                                  .where((item) => item['checked'] == 1)
+                                  .length /
                               plantInspectionController.checklistItems.length,
                           backgroundColor: Colors.white.withOpacity(0.3),
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
                           minHeight: (8.h) * _sizeScaleFactor,
                         ),
                       ),
@@ -2055,11 +2050,14 @@ class _StartInspectionState extends State<StartInspection> {
                     endIndent: (20.w) * _sizeScaleFactor,
                   ),
                   itemBuilder: (context, index) {
-                    final item = plantInspectionController.checklistItems[index];
+                    final item =
+                        plantInspectionController.checklistItems[index];
                     final isChecked = item['checked'] == 1;
                     return InkWell(
-                      onTap: () => plantInspectionController.toggleChecklistItem(index),
-                      borderRadius: BorderRadius.circular((12.r) * _sizeScaleFactor),
+                      onTap: () =>
+                          plantInspectionController.toggleChecklistItem(index),
+                      borderRadius:
+                          BorderRadius.circular((12.r) * _sizeScaleFactor),
                       child: Container(
                         padding: EdgeInsets.symmetric(
                           horizontal: (20.w) * _sizeScaleFactor,
@@ -2072,19 +2070,22 @@ class _StartInspectionState extends State<StartInspection> {
                               width: (28.w) * _sizeScaleFactor,
                               height: (28.h) * _sizeScaleFactor,
                               decoration: BoxDecoration(
-                                color: isChecked ? Colors.blue : Colors.transparent,
+                                color: isChecked
+                                    ? Colors.blue
+                                    : Colors.transparent,
                                 border: Border.all(
                                   color: isChecked ? Colors.blue : Colors.blue,
                                   width: 2,
                                 ),
-                                borderRadius: BorderRadius.circular((8.r) * _sizeScaleFactor),
+                                borderRadius: BorderRadius.circular(
+                                    (8.r) * _sizeScaleFactor),
                               ),
                               child: isChecked
                                   ? Icon(
-                                Icons.check_rounded,
-                                size: (18.r) * _sizeScaleFactor,
-                                color: Colors.white,
-                              )
+                                      Icons.check_rounded,
+                                      size: (18.r) * _sizeScaleFactor,
+                                      color: Colors.white,
+                                    )
                                   : null,
                             ),
                             SizedBox(width: (16.w) * _sizeScaleFactor),
@@ -2095,10 +2096,12 @@ class _StartInspectionState extends State<StartInspection> {
                                   Text(
                                     item['item_name'] ?? 'Unknown Item',
                                     style: TextStyle(
-                                      fontSize: (16.sp) * _sizeScaleFactor,
+                                      fontSize: (17.sp) * _sizeScaleFactor,
                                       fontWeight: FontWeight.w600,
-                                      color: isChecked ? Colors.grey.shade600 : Colors.grey.shade800,
-                                      decoration: isChecked ? TextDecoration.lineThrough : null,
+                                      color: isChecked
+                                          ? Colors.grey.shade600
+                                          : Colors.grey.shade800,
+                                      // decoration: isChecked ? TextDecoration.lineThrough : null,
                                     ),
                                   ),
                                   if (item['info'] != null) ...[
@@ -2110,7 +2113,8 @@ class _StartInspectionState extends State<StartInspection> {
                                       ),
                                       decoration: BoxDecoration(
                                         color: Colors.blue.shade50,
-                                        borderRadius: BorderRadius.circular((12.r) * _sizeScaleFactor),
+                                        borderRadius: BorderRadius.circular(
+                                            (12.r) * _sizeScaleFactor),
                                         border: Border.all(
                                           color: Colors.blue,
                                           width: 1,
@@ -2135,7 +2139,9 @@ class _StartInspectionState extends State<StartInspection> {
                               height: (10.h) * _sizeScaleFactor,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: isChecked ? Colors.green : Colors.grey.shade300,
+                                color: isChecked
+                                    ? Colors.green
+                                    : Colors.grey.shade300,
                               ),
                             ),
                           ],
@@ -2153,20 +2159,4 @@ class _StartInspectionState extends State<StartInspection> {
       ],
     );
   }
-
-  Color _getTypeColor(String type) {
-    switch (type.toLowerCase()) {
-      case ' a':
-        return Colors.blue;
-      case ' b':
-        return Colors.green;
-      case ' c':
-        return Colors.orange;
-      case ' d':
-        return Colors.red;
-      default:
-        return Colors.blue;
-    }
-  }
 }
-

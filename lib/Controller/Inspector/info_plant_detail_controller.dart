@@ -1,6 +1,8 @@
 
 
 
+import 'dart:developer' as Developer;
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -227,8 +229,7 @@ class InfoPlantDetailController extends GetxController {
       if (559 < allParameters.length) {
         rtcTime.value = allParameters[559];
         hasRtcData.value = true; // Mark that we have received RTC data
-        print(
-            '🕒 RTC Time (560): ${rtcTime.value} - Formatted: $formattedRtcTime');
+        Developer.log('🕒 RTC Time (560): ${rtcTime.value} - Formatted: $formattedRtcTime');
       }
 
       // Update parameter 561 (number of boxes)
@@ -240,15 +241,16 @@ class InfoPlantDetailController extends GetxController {
       if (595 < allParameters.length) {
         floot.value = allParameters[595];
         hasFlootData.value = true; // Mark that we have received floot data
-        print(
-            '🌊 Floot (595): ${floot.value} - Status: ${flootStatus == HealthStatus.good ? "GOOD" : "CRITICAL"}');
+        Developer.log('🌊 Floot (595): ${floot.value} - Status: ${flootStatus == HealthStatus.good ? "GOOD" : "CRITICAL"}');
       }
 
       // Update parameter 596 (Pressure) with validation
       if (596 < allParameters.length) {
         pressure.value = allParameters[596];
         hasPressureData.value = true; // Mark that we have received pressure data
-        print(
+
+
+      Developer.log(
             '🔘 Pressure (596): ${pressure.value} - Status: ${pressureStatus == HealthStatus.good ? "GOOD" : "CRITICAL"}');
       }
 
@@ -266,10 +268,8 @@ class InfoPlantDetailController extends GetxController {
         }
       }
 
-      print(
-          '📊 Live data for ${numberOfBoxes.value} boxes, dummy (0) for remaining ${50 - numberOfBoxes.value} boxes');
-      print(
-          '📊 Additional Parameters - RTC: $formattedRtcTime, Floot: ${floot.value} (${flootStatus == HealthStatus.good ? "✅" : "❌"}), Pressure: ${pressure.value} (${pressureStatus == HealthStatus.good ? "✅" : "❌"})');
+      Developer.log('✅ Parsed ${allParameters.length} parameters from payload', name: 'ModbusParser');
+
     } catch (e) {
       errorMessage.value = 'Error parsing MQTT message: $e';
     }

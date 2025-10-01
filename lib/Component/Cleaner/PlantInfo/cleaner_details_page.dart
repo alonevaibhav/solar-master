@@ -818,7 +818,7 @@ class CleanerDetailsPage extends StatelessWidget {
                         child: Text(
                           plantData['address'] ?? 'No address available',
                           style: TextStyle(
-                            fontSize: 14.sp,
+                            fontSize: 10.sp,
                             color: Colors.white70,
                             height: 1.3,
                           ),

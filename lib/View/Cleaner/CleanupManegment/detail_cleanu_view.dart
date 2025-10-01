@@ -766,7 +766,7 @@ class DetailsViewTask extends StatelessWidget {
               _buildPanelValvesList(controller),
               SizedBox(height: 21.6.h),
               // Maintenance Button
-              _buildMaintenanceButton(controller),
+              _buildMaintenanceButton(controller,context),
               SizedBox(height: 14.4.h),
             ],
           ),
@@ -1216,7 +1216,7 @@ class DetailsViewTask extends StatelessWidget {
   }
 
   // / Updated maintenance button method - Fixed version
-  Widget _buildMaintenanceButton(CleaningManagementController controller) {
+  Widget _buildMaintenanceButton(CleaningManagementController controller,context) {
     return Obx(() {
       if (!controller.shouldShowMaintenanceButton) {
         return SizedBox.shrink();
@@ -1232,10 +1232,10 @@ class DetailsViewTask extends StatelessWidget {
             // Check task status before deciding what to do
             if (controller.taskStatus.value == 'pending') {
               // Show confirmation dialog only for starting cleaning
-              _showCleaningConfirmationDialog(controller);
+              _showCleaningConfirmationDialog(controller,context);
             } else if (controller.taskStatus.value == 'cleaning') {
               // Directly call updateCleaningStatus for completing cleaning
-              controller.updateCleaningStatus();
+              controller.updateCleaningStatus(context);
             }
           },
           style: ElevatedButton.styleFrom(
@@ -1271,7 +1271,7 @@ class DetailsViewTask extends StatelessWidget {
 
 // Updated confirmation dialog - only for starting cleaning
   void _showCleaningConfirmationDialog(
-      CleaningManagementController controller) {
+      CleaningManagementController controller,context) {
     Get.dialog(
       AlertDialog(
         shape: RoundedRectangleBorder(
@@ -1294,7 +1294,7 @@ class DetailsViewTask extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Get.back(), // Close dialog
+            onPressed: () =>  Navigator.of(context).pop(),
             child: Text(
               'Cancel',
               style: TextStyle(
@@ -1305,8 +1305,8 @@ class DetailsViewTask extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              Get.back(); // Close dialog
-              controller.updateCleaningStatus(); // Start cleaning
+              Navigator.of(context).pop();
+              controller.updateCleaningStatus(context); // Start cleaning
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue.shade500,

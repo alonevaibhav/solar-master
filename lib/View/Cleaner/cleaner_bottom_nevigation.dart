@@ -161,6 +161,14 @@ class CleanerBottomNavigation extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
+
+          _buildNavItem(
+            icon: Icons.local_florist_outlined,
+            selectedIcon: Icons.local_florist,
+            index: 2,
+            label: 'plant',
+            color: const Color(0xFFA7C8DA),
+          ),
           _buildNavItem(
             icon: Icons.home_outlined,
             selectedIcon: Icons.home,
@@ -168,13 +176,6 @@ class CleanerBottomNavigation extends StatelessWidget {
             label: 'Home',
             color: Colors.blueAccent,
 
-          ),
-          _buildNavItem(
-            icon: Icons.local_florist_outlined,
-            selectedIcon: Icons.local_florist,
-            index: 2,
-            label: 'plant',
-            color: const Color(0xFFA7C8DA),
           ),
           _buildNavItem(
             icon: Icons.person_outline,

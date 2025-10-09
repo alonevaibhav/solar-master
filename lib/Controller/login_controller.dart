@@ -107,10 +107,6 @@ class LoginController extends GetxController {
       return 'Password is required';
     }
 
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters';
-    }
-
     return null;
   }
 
@@ -126,7 +122,6 @@ class LoginController extends GetxController {
   Future<void> login() async {
     try {
       errorMessage.value = '';
-      print("djfhdjf");
 
       if (!formKey.currentState!.validate()) {
         return;

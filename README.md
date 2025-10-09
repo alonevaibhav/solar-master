@@ -1,4 +1,4 @@
-# ☀️ Vidani Solar Panel Manager
+# ☀️ Solar Panel Manager
 ### *Clean Energy Solutions - Field Operations Management System*
 
 <br/>
@@ -246,29 +246,7 @@ flutter run
 | **Mobile App Launch** | < 3 seconds | ✅ Achieved |
 | **Database Query Speed** | < 100ms | ✅ Achieved |
 
----
 
-## 🔮 Roadmap
-
-### **Phase 1 - Current** ✅
-- ✅ Inspector Mobile Application
-- ✅ Ticket Management System
-- ✅ Basic Plant Monitoring
-- ✅ MQTT Integration
-
-### **Phase 2 - In Development** 🚧
-- 🚧 Cleaner Mobile Application
-- 🚧 Advanced Analytics Dashboard
-- 🚧 Predictive Maintenance
-- 🚧 Mobile App Optimization
-
-### **Phase 3 - Planned** 📋
-- 📋 Web Dashboard for Management
-- 📋 AI-powered Scheduling
-- 📋 Advanced Reporting
-- 📋 Integration APIs
-
----
 
 ## 🤝 Contributing
 

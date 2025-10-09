@@ -379,23 +379,8 @@ class ProfileView extends GetView<ProfileController> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Quick Actions',
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF1E293B),
-                          ),
-                        ),
-                        SizedBox(height: 12.h),
-                        _buildCompactMenuOption(
-                          icon: Icons.eco,
-                          title: 'Plants Information',
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF4CAF50), Color(0xFF8BC34A)],
-                          ),
-                          onTap: controller.goToPlantInfo,
-                        ),
+                        // Te
+
                       ],
                     ),
 

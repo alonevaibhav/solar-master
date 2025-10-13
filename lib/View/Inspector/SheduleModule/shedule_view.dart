@@ -26,8 +26,8 @@ class _ScheduleContentViewState extends State<ScheduleContentView> {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
+    
     return RefreshIndicator(
       onRefresh: () => scheduleController.fetchInspectorSchedules(),
       child: Scaffold(

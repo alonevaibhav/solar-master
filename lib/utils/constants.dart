@@ -58,7 +58,7 @@ String mqttCleanerPost(String uuid) => "/api/mqtt/cleaner/publish/$uuid";
 
 String mqttHistoryGet(String id) => "/api/mqtt/inspector/device-logs/$id";
 
-String deviceLogAsPerMonth(int yrdt, int id) => "/api/mqtt/inspector/device-logs/$id?month=/$yrdt";
+String deviceLogAsPerMonth(int yrmn, String id) => "/api/mqtt/inspector/device-logs/$id?month=$yrmn";
 
 String raiseTicket = "/api/tickets/create/inspector";
 

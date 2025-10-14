@@ -576,14 +576,13 @@
 //     );
 //   }
 // }
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:solar_app/Component/Inspector/History/widget/filter.dart';
 import 'cycle_view.dart';
 import 'history_controller.dart';
-
 
 class HistoryInspector extends StatelessWidget {
   HistoryInspector({super.key});
@@ -601,7 +600,7 @@ class HistoryInspector extends StatelessWidget {
     controller.printUuidInfo();
 
     if (plantID != null && plantID.isNotEmpty) {
-      controller.loadMqttHistory();
+      controller.loadMqttHistoryByYearMonth();
     }
 
     return Scaffold(
@@ -616,7 +615,7 @@ class HistoryInspector extends StatelessWidget {
             icon: Icon(Icons.refresh),
             onPressed: () {
               if (plantID != null && plantID.isNotEmpty) {
-                controller.refreshMqttHistory();
+                controller.loadMqttHistoryByYearMonth();
               } else {
                 Get.snackbar(
                   'Error',
@@ -652,110 +651,129 @@ class HistoryInspector extends StatelessWidget {
         }
 
         if (controller.hasError.value) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline, size: 64, color: Colors.red[400]),
-                  SizedBox(height: 16),
-                  Text(
-                    'Something went wrong',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red[700],
-                    ),
+          return SingleChildScrollView(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              children: [
+                MqttHistoryDateFilter(controller: controller),
+                SizedBox(height: 24),
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.error_outline, size: 64, color: Colors.red[400]),
+                      SizedBox(height: 16),
+                      Text(
+                        'Something went wrong',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red[700],
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        controller.errorMessage.value,
+                        style: TextStyle(color: Colors.red[600]),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          if (plantID != null && plantID.isNotEmpty) {
+                            controller.loadMqttHistoryByYearMonth();
+                          }
+                        },
+                        icon: Icon(Icons.refresh),
+                        label: Text('Retry'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue[700],
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 8),
-                  Text(
-                    controller.errorMessage.value,
-                    style: TextStyle(color: Colors.red[600]),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      if (plantID != null && plantID.isNotEmpty) {
-                        controller.loadMqttHistory();
-                      }
-                    },
-                    icon: Icon(Icons.refresh),
-                    label: Text('Retry'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[700],
-                      foregroundColor: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           );
         }
 
         if (controller.cycles.isEmpty) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.history, size: 64, color: Colors.grey[400]),
-                  SizedBox(height: 16),
-                  Text(
-                    'No Cleaning Cycles',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[600],
-                    ),
+          return SingleChildScrollView(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              children: [
+                MqttHistoryDateFilter(controller: controller),
+                SizedBox(height: 24),
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.history, size: 64, color: Colors.grey[400]),
+                      SizedBox(height: 16),
+                      Text(
+                        'No Cleaning Cycles',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'No cleaning cycles found for the selected month',
+                        style: TextStyle(color: Colors.grey[500]),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          if (plantID != null && plantID.isNotEmpty) {
+                            controller.loadMqttHistoryByYearMonth();
+                          }
+                        },
+                        icon: Icon(Icons.refresh),
+                        label: Text('Load Data'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue[700],
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 8),
-                  Text(
-                    'No cleaning cycles found for this device',
-                    style: TextStyle(color: Colors.grey[500]),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      if (plantID != null && plantID.isNotEmpty) {
-                        controller.loadMqttHistory();
-                      }
-                    },
-                    icon: Icon(Icons.refresh),
-                    label: Text('Load Data'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[700],
-                      foregroundColor: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           );
         }
 
-        return RefreshIndicator(
-          onRefresh: () async {
-            if (plantID != null && plantID.isNotEmpty) {
-              await controller.refreshMqttHistory();
-            }
-          },
-          child: ListView.builder(
-            padding: EdgeInsets.all(16),
-            itemCount: controller.cycles.length,
-            itemBuilder: (context, index) {
-              final cycle = controller.cycles[index];
-              final isLastCycle = index == controller.cycles.length - 1;
+        // Success state - Show filter and cycles
+        return Column(
+          children: [
+            // Date Filter at the top
+            Container(
+              padding: EdgeInsets.all(16),
+              child: MqttHistoryDateFilter(controller: controller),
+            ),
+            // Cycles List
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.all(16),
+                itemCount: controller.cycles.length,
+                itemBuilder: (context, index) {
+                  final cycle = controller.cycles[index];
+                  final isLastCycle = index == controller.cycles.length - 1;
 
-              return CycleGroupWidget(
-                cycle: cycle,
-                isLastGroup: isLastCycle,
-              );
-            },
-          ),
+                  return CycleGroupWidget(
+                    controller: controller,
+                    cycle: cycle,
+                    isLastGroup: isLastCycle,
+                  );
+                },
+              ),
+            ),
+          ],
         );
       }),
     );

@@ -198,19 +198,23 @@
 //   }
 // }
 
-import 'package:get/get_state_manager/src/simple/get_controllers.dart';
-import 'package:get/get.dart';
+
+
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../../API Service/api_service.dart';
 import '../../../Model/Inspector/history_model.dart';
 import '../../../utils/constants.dart';
 
 class InspectorHistoryController extends GetxController {
-  // Observable variables for state management
   var isLoading = false.obs;
   var cycles = <CycleData>[].obs;
   var errorMessage = ''.obs;
   var hasError = false.obs;
+
+  var selectedYear = DateTime.now().year.obs;
+  var selectedMonth = DateTime.now().month.obs;
 
   String? plantID;
 
@@ -228,10 +232,17 @@ class InspectorHistoryController extends GetxController {
     super.onInit();
   }
 
-  /// Fetches MQTT history data for a given UUID
-  Future<void> loadMqttHistory() async {
+  /// Formats year and month to YYYYMM format (e.g., 2025 & 09 = 2509)
+  String _formatYearMonth(int year, int month) {
+    String yearStr = year.toString().substring(2); // Get last 2 digits (25 from 2025)
+    String monthStr = month.toString().padLeft(2, '0'); // Pad month with 0 if needed
+    return '$yearStr$monthStr'; // Returns 2509
+  }
+
+  /// Fetches MQTT history data for selected year and month
+  Future<void> loadMqttHistoryByYearMonth() async {
     if (plantID == null || plantID!.isEmpty) {
-      _setError('ID cannot be empty');
+      _setError('Plant ID cannot be empty');
       return;
     }
 
@@ -239,9 +250,16 @@ class InspectorHistoryController extends GetxController {
       _setLoading(true);
       _clearError();
 
-      // Make the GET API call using ApiService
+      // Format year and month (e.g., 2025, 09 -> 2509)
+      String yrmn = _formatYearMonth(selectedYear.value, selectedMonth.value);
+
+      if (kDebugMode) {
+        print('Fetching MQTT history for Plant: $plantID, YearMonth: $yrmn');
+      }
+
+      // Make the GET API call using the formatted year-month
       final response = await ApiService.get<Map<String, dynamic>>(
-        endpoint: mqttHistoryGet(plantID!),
+        endpoint: deviceLogAsPerMonth(int.parse(yrmn), plantID! as String),
         fromJson: (data) => data as Map<String, dynamic>,
         includeToken: true,
       );
@@ -254,32 +272,34 @@ class InspectorHistoryController extends GetxController {
     } catch (e) {
       _setError('An unexpected error occurred: ${e.toString()}');
       if (kDebugMode) {
-        print('Error in loadMqttHistory: $e');
+        print('Error in loadMqttHistoryByYearMonth: $e');
       }
     } finally {
       _setLoading(false);
     }
   }
 
-  /// Refreshes the MQTT history data
-  Future<void> refreshMqttHistory() async {
-    await loadMqttHistory();
+  /// Updates selected year
+  void updateYear(int year) {
+    selectedYear.value = year;
   }
 
-  /// Handles successful API response with new JSON structure
+  /// Updates selected month
+  void updateMonth(int month) {
+    selectedMonth.value = month;
+  }
+
   void _handleSuccessResponse(Map<String, dynamic> responseData) {
     try {
       List<CycleData> processedCycles = [];
 
-      // Extract cycles array from response
       List<dynamic>? cyclesData = responseData['cycles'] as List<dynamic>?;
 
       if (cyclesData == null || cyclesData.isEmpty) {
-        _setError('No cycle data available');
+        _setError('No cycle data available for selected month');
         return;
       }
 
-      // Process each cycle
       for (var cycleJson in cyclesData) {
         if (cycleJson is Map<String, dynamic>) {
           CycleData cycle = CycleData.fromJson(cycleJson);
@@ -287,9 +307,7 @@ class InspectorHistoryController extends GetxController {
         }
       }
 
-      // Sort cycles by cycle number (newest first)
       processedCycles.sort((a, b) => b.cycleNumber.compareTo(a.cycleNumber));
-
       cycles.value = processedCycles;
 
       if (kDebugMode) {
@@ -303,12 +321,12 @@ class InspectorHistoryController extends GetxController {
     }
   }
 
-  /// Sets loading state
+
+
   void _setLoading(bool loading) {
     isLoading.value = loading;
   }
 
-  /// Sets error state and message
   void _setError(String message) {
     hasError.value = true;
     errorMessage.value = message;
@@ -318,13 +336,11 @@ class InspectorHistoryController extends GetxController {
     }
   }
 
-  /// Clears error state
   void _clearError() {
     hasError.value = false;
     errorMessage.value = '';
   }
 
-  /// Clears all data and resets state
   void clearData() {
     cycles.clear();
     _clearError();
@@ -337,4 +353,3 @@ class InspectorHistoryController extends GetxController {
     super.onClose();
   }
 }
-

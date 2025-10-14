@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:intl/intl.dart';
+import 'package:solar_app/Component/Inspector/History/widget/filter.dart';
 import '../../../Model/Inspector/history_model.dart';
+import 'history_controller.dart';
 
 class CycleGroupWidget extends StatelessWidget {
   final CycleData cycle;
   final bool isLastGroup;
+  InspectorHistoryController controller;
 
-  const CycleGroupWidget({
+  CycleGroupWidget({
     super.key,
     required this.cycle,
     required this.isLastGroup,
+    required this.controller,
   });
 
   @override
@@ -21,20 +26,22 @@ class CycleGroupWidget extends StatelessWidget {
     Color headerColor = isCompleted
         ? Colors.green[700]!
         : hasFault
-        ? Colors.red[700]!
-        : Colors.blue[700]!;
+            ? Colors.red[700]!
+            : Colors.blue[700]!;
 
     Color headerBgColor = isCompleted
         ? Colors.green[50]!
         : hasFault
-        ? Colors.red[50]!
-        : Colors.blue[50]!;
+            ? Colors.red[50]!
+            : Colors.blue[50]!;
 
     return Container(
       margin: EdgeInsets.only(bottom: isLastGroup ? 0 : 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+
+
           // Cycle Header
           Container(
             width: double.infinity,
@@ -56,8 +63,8 @@ class CycleGroupWidget extends StatelessWidget {
                     isCompleted
                         ? Icons.check_circle
                         : hasFault
-                        ? Icons.error
-                        : Icons.refresh,
+                            ? Icons.error
+                            : Icons.refresh,
                     color: Colors.white,
                     size: 20,
                   ),
@@ -80,8 +87,8 @@ class CycleGroupWidget extends StatelessWidget {
                         isCompleted
                             ? 'Completed Successfully'
                             : hasFault
-                            ? 'Completed with ${summary.faultCount} Fault(s)'
-                            : 'In Progress/Stopped',
+                                ? 'Completed with ${summary.faultCount} Fault(s)'
+                                : 'In Progress/Stopped',
                         style: TextStyle(
                           fontSize: 14,
                           color: headerColor.withOpacity(0.8),
@@ -124,15 +131,19 @@ class CycleGroupWidget extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildSummaryItem('Started', summary.startedAt, Icons.play_arrow),
+                _buildSummaryItem(
+                    'Started', summary.startedAt, Icons.play_arrow),
                 if (summary.completedAt != null) ...[
                   SizedBox(height: 8),
-                  _buildSummaryItem('Completed', summary.completedAt!, Icons.check),
+                  _buildSummaryItem(
+                      'Completed', summary.completedAt!, Icons.check),
                 ],
                 SizedBox(height: 8),
-                _buildSummaryItem('Start Method', summary.startMethod, Icons.touch_app),
+                _buildSummaryItem(
+                    'Start Method', summary.startMethod, Icons.touch_app),
                 SizedBox(height: 8),
-                _buildSummaryItem('Stop Method', summary.stopMethod, Icons.stop_circle),
+                _buildSummaryItem(
+                    'Stop Method', summary.stopMethod, Icons.stop_circle),
                 SizedBox(height: 8),
                 _buildSummaryItem(
                   'Solenoid Range',
@@ -210,7 +221,8 @@ class CycleGroupWidget extends StatelessWidget {
           timeAgo = '${difference.inDays}d ago';
         }
 
-        fullDate = DateFormat('MMM dd, yyyy - hh:mm a').format(dateTime.toLocal());
+        fullDate =
+            DateFormat('MMM dd, yyyy - hh:mm a').format(dateTime.toLocal());
       } catch (e) {
         timeAgo = 'Unknown';
         fullDate = event.timestamp;
@@ -222,7 +234,8 @@ class CycleGroupWidget extends StatelessWidget {
     IconData statusIcon = Icons.circle;
     String statusText = event.status;
 
-    if (event.complete == 1 || event.status.toLowerCase().contains('cycle complete')) {
+    if (event.complete == 1 ||
+        event.status.toLowerCase().contains('cycle complete')) {
       circleColor = Colors.green[500]!;
       textColor = Colors.green[700]!;
       statusIcon = Icons.check_circle;
@@ -304,7 +317,8 @@ class CycleGroupWidget extends StatelessWidget {
                       ),
                       if (event.solenoid != 0)
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: Colors.purple[50],
                             borderRadius: BorderRadius.circular(8),
@@ -321,9 +335,7 @@ class CycleGroupWidget extends StatelessWidget {
                         ),
                     ],
                   ),
-
                   SizedBox(height: 4),
-
                   Text(
                     statusText,
                     style: TextStyle(
@@ -332,9 +344,7 @@ class CycleGroupWidget extends StatelessWidget {
                       color: textColor,
                     ),
                   ),
-
                   SizedBox(height: 6),
-
                   Container(
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(

@@ -1068,6 +1068,15 @@ class DetailsViewTask extends StatelessWidget {
             iconColor: Colors.purple.shade400,
           ),
 
+          SizedBox(height: 10.h),
+
+          _buildInfoRow(
+            icon: Icons.play_circle_outline_rounded,
+            label: 'UUID',
+            value: controller.plantuuid ?? 'N/A',
+            iconColor: Colors.blueAccent,
+          ),
+
           SizedBox(height: 14.h),
 
           // Plant Specifications

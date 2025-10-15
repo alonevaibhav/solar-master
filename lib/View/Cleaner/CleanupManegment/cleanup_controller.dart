@@ -170,6 +170,11 @@ class CleaningManagementController extends GetxController {
     return value is int ? value.toDouble() : (value as num).toDouble();
   }
 
+
+  String get plantuuid {
+    return taskDetails.value?['plant_uuid'] ?? 0;
+  }
+
   @override
   void onInit() {
     super.onInit();

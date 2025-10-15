@@ -576,6 +576,8 @@
 //     );
 //   }
 // }
+
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -591,6 +593,7 @@ class HistoryInspector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     final Map<String, dynamic>? plantData = Get.arguments;
     print('Received plant data: $plantData');
     final String? plantID = plantData?['id']?.toString();

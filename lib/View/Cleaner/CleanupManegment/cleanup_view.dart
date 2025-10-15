@@ -565,6 +565,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:solar_app/View/Cleaner/CleanupManegment/task_card.dart';
 import 'cleanup_controller.dart';
 
 
@@ -758,173 +759,190 @@ class CleaningManagementView extends StatelessWidget {
   }
 
 
-  Widget _buildTaskCard(
-      CleaningManagementController controller, Map<String, dynamic> task) {
+  // Widget _buildTaskCard(CleaningManagementController controller, Map<String, dynamic> task) {
+  //   return Obx(() {
+  //     final taskId = task['id'];
+  //
+  //     final matchingTask = controller.todaysSchedules.value
+  //         ?.firstWhere((item) => item['id'] == taskId, orElse: () => {});
+  //
+  //     final status = matchingTask?['status'] ?? 'pending';
+  //
+  //     Color cardBackgroundColor;
+  //     Color statusBadgeColor;
+  //     Color borderColor;
+  //
+  //     switch (status.toLowerCase()) {
+  //       case 'pending':
+  //         cardBackgroundColor = Colors.orange.shade50;
+  //         statusBadgeColor = Colors.orange.shade100;
+  //         borderColor = Colors.orange.shade200;
+  //         break;
+  //       case 'cleaning':
+  //         cardBackgroundColor = Colors.blue.shade50;
+  //         statusBadgeColor = Colors.blue.shade100;
+  //         borderColor = Colors.blue.shade200;
+  //         break;
+  //       case 'done':
+  //         cardBackgroundColor = Colors.green.shade50;
+  //         statusBadgeColor = Colors.green.shade100;
+  //         borderColor = Colors.green.shade200;
+  //         break;
+  //       default:
+  //         cardBackgroundColor = Colors.white;
+  //         statusBadgeColor = Colors.grey.shade200;
+  //         borderColor = Colors.grey.shade300;
+  //     }
+  //
+  //     return Container(
+  //       margin: EdgeInsets.only(bottom: 12.8.h),
+  //       decoration: BoxDecoration(
+  //         color: cardBackgroundColor,
+  //         borderRadius: BorderRadius.circular(12.8.r),
+  //         border: Border.all(color: borderColor, width: 1),
+  //         boxShadow: [
+  //           BoxShadow(
+  //             color: Colors.black.withOpacity(0.08),
+  //             blurRadius: 6.4,
+  //             offset: const Offset(0, 3.2),
+  //           ),
+  //         ],
+  //       ),
+  //       child: Material(
+  //         color: Colors.transparent,
+  //         child: InkWell(
+  //           onTap: () {
+  //             controller.fetchReportData(task['id']);
+  //             controller.navigateToTaskDetails(task);
+  //           },
+  //           borderRadius: BorderRadius.circular(12.8.r),
+  //           child: Padding(
+  //             padding: EdgeInsets.all(16.w),
+  //             child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Row(
+  //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                   children: [
+  //                     Row(
+  //                       children: [
+  //                         Icon(
+  //                           Icons.access_time,
+  //                           color: controller.getStatusColor(status),
+  //                           size: 16.w,
+  //                         ),
+  //                         SizedBox(width: 6.4.w),
+  //                         Text(
+  //                           controller.formatTime(
+  //                               task['cleaning_start_time'] ?? '08:00:00'),
+  //                           style: TextStyle(
+  //                             color: controller.getStatusColor(status),
+  //                             fontSize: 12.8.sp,
+  //                             fontWeight: FontWeight.w500,
+  //                           ),
+  //                         ),
+  //                       ],
+  //                     ),
+  //                     Container(
+  //                       padding: EdgeInsets.symmetric(
+  //                           horizontal: 9.6.w, vertical: 3.2.h),
+  //                       decoration: BoxDecoration(
+  //                         color: statusBadgeColor,
+  //                         borderRadius: BorderRadius.circular(9.6.r),
+  //                         border: Border.all(
+  //                             color: controller.getStatusColor(status),
+  //                             width: 0.5),
+  //                       ),
+  //                       child: Text(
+  //                         status == 'pending'
+  //                             ? 'Cleaning Pending'
+  //                             : status == 'ongoing'
+  //                             ? 'In Progress'
+  //                             : status == 'done'
+  //                             ? 'Completed'
+  //                             : status.toUpperCase(),
+  //                         style: TextStyle(
+  //                           color: controller.getStatusColor(status),
+  //                           fontSize: 9.6.sp,
+  //                           fontWeight: FontWeight.w600,
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //                 SizedBox(height: 12.8.h),
+  //                 Text(
+  //                   task['plant_location'] ?? 'Unknown Location',
+  //                   style: TextStyle(
+  //                     color: Colors.black87,
+  //                     fontSize: 16.sp,
+  //                     fontWeight: FontWeight.w600,
+  //                   ),
+  //                 ),
+  //                 SizedBox(height: 6.4.h),
+  //                 Row(
+  //                   children: [
+  //                     Icon(
+  //                       Icons.location_on_outlined,
+  //                       color: Colors.grey.shade600,
+  //                       size: 12.w,
+  //                     ),
+  //                     SizedBox(width: 4.w),
+  //                     Expanded(
+  //                       child: Text(
+  //                         '${task['area_name'] ?? 'Unknown Area'}, ${task['taluka_name'] ?? 'Unknown Taluka'}',
+  //                         style: TextStyle(
+  //                           color: Colors.grey.shade600,
+  //                           fontSize: 11.2.sp,
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //                 SizedBox(height: 3.2.h),
+  //                 Row(
+  //                   children: [
+  //                     Icon(
+  //                       Icons.solar_power_outlined,
+  //                       color: Colors.grey.shade600,
+  //                       size: 12.w,
+  //                     ),
+  //                     SizedBox(width: 4.w),
+  //                     Text(
+  //                       'Panels: ${task['plant_total_panels'] ?? 0} | ${task['plant_capacity_w'] ?? 0}kW',
+  //                       style: TextStyle(
+  //                         color: Colors.grey.shade600,
+  //                         fontSize: 11.2.sp,
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //     );
+  //   });
+  // }
+
+
+
+  Widget _buildTaskCard(CleaningManagementController controller, Map<String, dynamic> task) {
     return Obx(() {
       final taskId = task['id'];
-
       final matchingTask = controller.todaysSchedules.value
           ?.firstWhere((item) => item['id'] == taskId, orElse: () => {});
-
       final status = matchingTask?['status'] ?? 'pending';
 
-      Color cardBackgroundColor;
-      Color statusBadgeColor;
-      Color borderColor;
-
-      switch (status.toLowerCase()) {
-        case 'pending':
-          cardBackgroundColor = Colors.orange.shade50;
-          statusBadgeColor = Colors.orange.shade100;
-          borderColor = Colors.orange.shade200;
-          break;
-        case 'cleaning':
-          cardBackgroundColor = Colors.blue.shade50;
-          statusBadgeColor = Colors.blue.shade100;
-          borderColor = Colors.blue.shade200;
-          break;
-        case 'done':
-          cardBackgroundColor = Colors.green.shade50;
-          statusBadgeColor = Colors.green.shade100;
-          borderColor = Colors.green.shade200;
-          break;
-        default:
-          cardBackgroundColor = Colors.white;
-          statusBadgeColor = Colors.grey.shade200;
-          borderColor = Colors.grey.shade300;
-      }
-
-      return Container(
-        margin: EdgeInsets.only(bottom: 12.8.h),
-        decoration: BoxDecoration(
-          color: cardBackgroundColor,
-          borderRadius: BorderRadius.circular(12.8.r),
-          border: Border.all(color: borderColor, width: 1),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 6.4,
-              offset: const Offset(0, 3.2),
-            ),
-          ],
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () {
-              controller.fetchReportData(task['id']);
-              controller.navigateToTaskDetails(task);
-            },
-            borderRadius: BorderRadius.circular(12.8.r),
-            child: Padding(
-              padding: EdgeInsets.all(16.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.access_time,
-                            color: controller.getStatusColor(status),
-                            size: 16.w,
-                          ),
-                          SizedBox(width: 6.4.w),
-                          Text(
-                            controller.formatTime(
-                                task['cleaning_start_time'] ?? '08:00:00'),
-                            style: TextStyle(
-                              color: controller.getStatusColor(status),
-                              fontSize: 12.8.sp,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 9.6.w, vertical: 3.2.h),
-                        decoration: BoxDecoration(
-                          color: statusBadgeColor,
-                          borderRadius: BorderRadius.circular(9.6.r),
-                          border: Border.all(
-                              color: controller.getStatusColor(status),
-                              width: 0.5),
-                        ),
-                        child: Text(
-                          status == 'pending'
-                              ? 'Cleaning Pending'
-                              : status == 'ongoing'
-                              ? 'In Progress'
-                              : status == 'done'
-                              ? 'Completed'
-                              : status.toUpperCase(),
-                          style: TextStyle(
-                            color: controller.getStatusColor(status),
-                            fontSize: 9.6.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 12.8.h),
-                  Text(
-                    task['plant_location'] ?? 'Unknown Location',
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 6.4.h),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.location_on_outlined,
-                        color: Colors.grey.shade600,
-                        size: 12.w,
-                      ),
-                      SizedBox(width: 4.w),
-                      Expanded(
-                        child: Text(
-                          '${task['area_name'] ?? 'Unknown Area'}, ${task['taluka_name'] ?? 'Unknown Taluka'}',
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 11.2.sp,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 3.2.h),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.solar_power_outlined,
-                        color: Colors.grey.shade600,
-                        size: 12.w,
-                      ),
-                      SizedBox(width: 4.w),
-                      Text(
-                        'Panels: ${task['plant_total_panels'] ?? 0} | ${task['plant_capacity_w'] ?? 0}kW',
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 11.2.sp,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+      return TaskCard(
+        controller: controller,
+        task: task,
+        status: status,
       );
     });
   }
+
 
   void _showPendingCleanups(CleaningManagementController controller,context) {
     Get.bottomSheet(

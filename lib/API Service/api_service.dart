@@ -22,7 +22,8 @@ class ApiResponse<T> {
 }
 
 class ApiService {
-  static const String baseUrl = "https://qb2267h4-3000.inc1.devtunnels.ms";
+  static const String baseUrl = "https://qb2267h4-8080.inc1.devtunnels.ms";
+
   // static const String baseUrl = "https://smartsolarcleaner.com/api";
 
 

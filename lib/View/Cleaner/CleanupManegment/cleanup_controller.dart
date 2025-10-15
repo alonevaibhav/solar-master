@@ -1,1107 +1,7 @@
-//
-// import 'dart:typed_data';
-// import 'package:get/get.dart';
-// import 'package:flutter/material.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
-// import 'dart:async';
-// import '../../../API Service/api_service.dart';
-// import '../../../Route Manager/app_routes.dart';
-// import '../../../Services/data_parser.dart';
-// import '../../../Services/init.dart';
-// import '../../../utils/constants.dart';
-// import 'dart:developer' as developer;
-//
-//
-// class CleaningManagementController extends GetxController {
-//   final todaysSchedules = Rxn<List<Map<String, dynamic>>>();
-//   final taskDetails = Rxn<Map<String, dynamic>>();
-//   final reportData = Rxn<Map<String, dynamic>>();
-//
-//   final isLoading = false.obs;
-//   final isTaskDetailsLoading = false.obs;
-//   final isMaintenanceModeLoading = false.obs;
-//   final errorMessage = ''.obs;
-//   final selectedTaskId = 0.obs;
-//
-//   final taskStatus = ''.obs;
-//   final maintenanceETA = 120.obs; // Default 120 minutes
-//   final remainingETA = 0.obs; // Remaining ETA in seconds
-//   final isMaintenanceModeEnabled = false.obs;
-//   final isETAActive = false.obs;
-//   final elapsedETA = 0.obs; // Elapsed time in seconds (ascending)
-//
-//
-//   // Timer and SharedPreferences
-//   Timer? _etaTimer;
-//   SharedPreferences? _prefs;
-//
-//   // SharedPreferences keys
-//   static const String _etaStartTimeKey = 'eta_start_time';
-//   static const String _etaDurationKey = 'eta_duration';
-//   static const String _taskIdKey = 'current_task_id';
-//   static const String _etaActiveKey = 'eta_active';
-//
-//   // 1. FILTER METHODS - These should return correct counts based on API response
-//   List<Map<String, dynamic>> get pendingCleanups {
-//     if (todaysSchedules.value == null) return [];
-//     print('All schedules: ${todaysSchedules.value?.map((s) => {
-//       'id': s['id'],
-//       'status': s['status']
-//     }).toList()}');
-//
-//     final pending = todaysSchedules.value!
-//         .where((schedule) => schedule['status'] == 'pending')
-//         .toList();
-//
-//     print('Pending cleanups: ${pending.length} items');
-//     return pending;
-//   }
-//
-//   String? uuid;
-//
-//   void setUuid(String? newUuid) {
-//     uuid = newUuid;
-//     print("UUID set to: $uuid");
-//   }
-//
-//   void printUuidInfo() {
-//     print("=== UUID Information ===");
-//     print("UUID: ${uuid ?? 'NULL'}");
-//     print("Is UUID null: ${uuid == null}");
-//     print("Is UUID empty: ${uuid?.isEmpty ?? true}");
-//     print("UUID length: ${uuid?.length ?? 0}");
-//     print("========================");
-//   }
-//
-//   void clearData() {
-//     try {
-//       print('🧹 Clearing CleaningManagementController data...');
-//
-//       // Reset UUID
-//       uuid = null;
-//
-//       // Clear reactive data
-//       todaysSchedules.value = null;
-//       taskDetails.value = null;
-//       reportData.value = null;
-//
-//       // Reset loading states
-//       isLoading.value = false;
-//       isTaskDetailsLoading.value = false;
-//       isMaintenanceModeLoading.value = false;
-//
-//       // Clear error messages
-//       errorMessage.value = '';
-//
-//       // Reset task-related data
-//       selectedTaskId.value = 0;
-//       taskStatus.value = '';
-//       currentScheduleId.value = 0;
-//       currentReportId = null;
-//
-//       // Reset maintenance mode and ETA data
-//       isMaintenanceModeEnabled.value = false;
-//       isETAActive.value = false;
-//       maintenanceETA.value = 120; // Reset to default
-//       remainingETA.value = 0;
-//       elapsedETA.value = 0;
-//
-//       // Cancel and cleanup timer
-//       _etaTimer?.cancel();
-//       _etaTimer = null;
-//
-//       // Clear MQTT-related data
-//       currentImei.value = '';
-//       currentTopic.value = '';
-//       numberOfBoxes.value = 0;
-//
-//       // Clear SharedPreferences ETA data
-//       _clearETAData();
-//
-//       print('✅ CleaningManagementController data cleared successfully');
-//
-//     } catch (e) {
-//       print('⚠️ Error clearing CleaningManagementController data: $e');
-//     }
-//   }
-//
-//   List<Map<String, dynamic>> get ongoingCleanups {
-//     if (todaysSchedules.value == null) return [];
-//
-//     final ongoing = todaysSchedules.value!
-//         .where((schedule) => schedule['status'] == 'cleaning')
-//         .toList();
-//
-//     print('Ongoing cleanups: ${ongoing.length} items');
-//     return ongoing;
-//   }
-//
-//   List<Map<String, dynamic>> get completedCleanups {
-//     if (todaysSchedules.value == null) return [];
-//
-//     final completed = todaysSchedules.value!
-//         .where((schedule) => schedule['status'] == 'done')
-//         .toList();
-//
-//     print('Completed cleanups: ${completed.length} items');
-//     return completed;
-//   }
-//
-//   int get totalPanels {
-//     return taskDetails.value?['plant_total_panels'] ?? 0;
-//   }
-//
-//   double get plantCapacity {
-//     return (taskDetails.value?['plant_capacity_w'] ?? 0.0).toDouble();
-//   }
-//
-//   String get plantLocation {
-//     return taskDetails.value?['plant_location'] ?? 'Unknown Location';
-//   }
-//
-//   String get cleaningStartTime {
-//     return taskDetails.value?['cleaning_start_time'] ?? '08:00 AM';
-//   }
-//
-//   @override
-//   void onInit() {
-//     super.onInit();
-//     _initSharedPreferences();
-//     fetchTodaysSchedules();
-//   }
-//
-//   @override
-//   void onClose() {
-//     _etaTimer?.cancel();
-//     super.onClose();
-//   }
-//
-//   // Initialize SharedPreferences
-//   Future<void> _initSharedPreferences() async {
-//     _prefs = await SharedPreferences.getInstance();
-//     await _restoreETAState();
-//   }
-//
-//   // Restore ETA state when app reopens
-// // Restore ETA state when app reopens
-//   Future<void> _restoreETAState() async {
-//     if (_prefs == null) return;
-//
-//     final isActive = _prefs!.getBool(_etaActiveKey) ?? false;
-//     final savedTaskId = _prefs!.getInt(_taskIdKey) ?? 0;
-//     final startTime = _prefs!.getInt(_etaStartTimeKey) ?? 0;
-//     final duration = _prefs!.getInt(_etaDurationKey) ?? 0;
-//
-//     if (isActive && savedTaskId > 0 && startTime > 0) {
-//       // Only restore if the saved task matches the current selected task
-//       if (savedTaskId == selectedTaskId.value) {
-//         final currentTime = DateTime.now().millisecondsSinceEpoch;
-//         final elapsedSeconds = ((currentTime - startTime) / 1000).floor();
-//         final remainingSeconds = (duration * 60) - elapsedSeconds;
-//
-//         if (remainingSeconds > 0) {
-//           remainingETA.value = remainingSeconds;
-//           isETAActive.value = true;
-//           isMaintenanceModeEnabled.value = true;
-//           taskStatus.value = 'cleaning';
-//           _startETATimer();
-//         } else {
-//           await _clearETAData();
-//         }
-//       }
-//     }
-//   }
-//
-//   final currentImei = ''.obs;
-//   final currentTopic = ''.obs;
-//   final numberOfBoxes = 0.obs;
-//
-//
-//   void parseCleanerMessage(String topic, Uint8List payloadBytes) {
-//     try {
-//       developer.log('parseCleanerMessage called - START', name: 'MQTT');
-//
-//       // Extract IMEI from topic
-//       currentImei.value = ModbusDataParser.extractImei(topic);
-//       currentTopic.value = topic;
-//       developer.log('IMEI and topic set', name: 'MQTT');
-//
-//       // Parse all parameters using the real parser
-//       final allParameters = ModbusDataParser.parseParameters(payloadBytes);
-//       developer.log('Parameters parsed, length: ${allParameters.length}', name: 'MQTT');
-//
-//       // Check the condition explicitly
-//       developer.log(
-//         'Condition check: 561 < ${allParameters.length} = ${561 < allParameters.length}',
-//         name: 'MQTT',
-//       );
-//
-//       if (561 < allParameters.length) {
-//         developer.log('About to set numberOfBoxes.value', name: 'MQTT');
-//         numberOfBoxes.value = allParameters[561];
-//         developer.log('numberOfBoxes.value set to: ${numberOfBoxes.value}', name: 'MQTT');
-//         developer.log('Parsed number of boxes: ${numberOfBoxes.value}', name: 'MQTT');
-//       } else {
-//         developer.log(
-//           'Condition failed - array length: ${allParameters.length}',
-//           name: 'MQTT',
-//           level: 900, // Warning level
-//         );
-//       }
-//
-//       developer.log('parseCleanerMessage completed - END', name: 'MQTT');
-//     } catch (e, stackTrace) {
-//       developer.log(
-//         'Exception caught: $e',
-//         name: 'MQTT',
-//         error: e,
-//         stackTrace: stackTrace,
-//         level: 1000, // Error level
-//       );
-//       errorMessage.value = 'Error parsing MQTT message: $e';
-//       Get.snackbar('Parse Error', errorMessage.value);
-//     }
-//   }
-//
-//   bool get isCurrentTaskETAActive {
-//     return isETAActive.value &&
-//         _prefs?.getInt(_taskIdKey) == selectedTaskId.value;
-//   }
-//
-//   // Update the timer logic in _startETATimer()
-//   void _startETATimer() {
-//     _etaTimer?.cancel();
-//
-//     _etaTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-//       elapsedETA.value++; // Count UP instead of down
-//
-//       // Check if we've reached the estimated time
-//       if (elapsedETA.value >= maintenanceETA.value * 60) {
-//         // ETA reached but don't stop - let it continue counting
-//         // Just show a notification once
-//         if (elapsedETA.value == maintenanceETA.value * 60) {
-//           Get.snackbar(
-//             'ETA Reached',
-//             'Estimated cleaning time completed. Task still in progress.',
-//             snackPosition: SnackPosition.TOP,
-//             backgroundColor: Colors.orange,
-//             colorText: Colors.white,
-//           );
-//         }
-//       }
-//     });
-//   }
-//   // Update the formatted time display
-//   String get formattedElapsedTime {
-//     final hours = (elapsedETA.value / 3600).floor();
-//     final minutes = ((elapsedETA.value % 3600) / 60).floor();
-//     final seconds = elapsedETA.value % 60;
-//
-//     return "${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}";
-//   }
-//
-//   // Handle ETA completion
-//   void _onETACompleted() async {
-//     isETAActive.value = false;
-//     await _clearETAData();
-//
-//     // Show completion notification
-//     Get.snackbar(
-//       'ETA Completed',
-//       'Estimated cleaning time has finished. Please complete the task.',
-//       snackPosition: SnackPosition.TOP,
-//       backgroundColor: Colors.orange,
-//       colorText: Colors.white,
-//       duration: const Duration(seconds: 5),
-//     );
-//   }
-//
-//   // Save ETA data
-//   Future<void> _saveETAState() async {
-//     if (_prefs == null) return;
-//
-//     await _prefs!
-//         .setInt(_etaStartTimeKey, DateTime.now().millisecondsSinceEpoch);
-//     await _prefs!.setInt(_etaDurationKey, maintenanceETA.value);
-//     await _prefs!.setInt(_taskIdKey, selectedTaskId.value);
-//     await _prefs!.setBool(_etaActiveKey, true);
-//   }
-//
-//   // Clear ETA data
-//   Future<void> _clearETAData() async {
-//     if (_prefs == null) return;
-//
-//     await _prefs!.remove(_etaStartTimeKey);
-//     await _prefs!.remove(_etaDurationKey);
-//     await _prefs!.remove(_taskIdKey);
-//     await _prefs!.setBool(_etaActiveKey, false);
-//
-//     isETAActive.value = false;
-//     remainingETA.value = 0;
-//   }
-//
-//   // Format time for display
-//   String get formattedRemainingTime {
-//     if (remainingETA.value <= 0) return "00:00:00";
-//
-//     final hours = (remainingETA.value / 3600).floor();
-//     final minutes = ((remainingETA.value % 3600) / 60).floor();
-//     final seconds = remainingETA.value % 60;
-//
-//     return "${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}";
-//   }
-//
-//   RxInt currentScheduleId = 0.obs;
-//
-//   Future<void> fetchTodaysSchedules() async {
-//     try {
-//       isLoading.value = true;
-//       errorMessage.value = '';
-//
-//       final inspectorId = await ApiService.getUid();
-//
-//       if (inspectorId == null) {
-//         throw Exception('Inspector ID not found');
-//       }
-//
-//       await Future.delayed(const Duration(seconds: 1));
-//
-//       final response = await ApiService.get<List<dynamic>>(
-//         endpoint: getTodayScheduleCleaner(int.parse(inspectorId)),
-//         fromJson: (json) {
-//           if (json['success'] == true) {
-//             return List<dynamic>.from(json['data'] ?? []);
-//           } else {
-//             throw Exception('Failed to load schedules');
-//           }
-//         },
-//       );
-//
-//       if (response.success && response.data != null) {
-//         todaysSchedules.value = List<Map<String, dynamic>>.from(response.data!);
-//         if (todaysSchedules.value!.isNotEmpty) {
-//           // Update taskStatus based on selected task if any
-//           final selectedTask = todaysSchedules.value!.firstWhere(
-//                 (schedule) => schedule['id'] == selectedTaskId.value,
-//             orElse: () => <String, dynamic>{},
-//           );
-//           if (selectedTask.isNotEmpty) {
-//             taskStatus.value = selectedTask['status'] ?? 'pending';
-//           }
-//
-//           final status = todaysSchedules.value?.first['status'] ?? 'pending';
-//           print('Fetched schedules with status: $status');
-//         }
-//       } else {
-//         throw Exception(response.errorMessage ?? 'Failed to fetch schedules');
-//       }
-//     } catch (e) {
-//       errorMessage.value = e.toString();
-//       Get.snackbar(
-//         'Error',
-//         'Failed to fetch today\'s schedules: ${e.toString()}',
-//         snackPosition: SnackPosition.BOTTOM,
-//         backgroundColor: Colors.red,
-//         colorText: Colors.white,
-//       );
-//     } finally {
-//       isLoading.value = false;
-//     }
-//   }
-//
-//   Future<void> fetchTaskDetails(int scheduleId) async {
-//     try {
-//       isTaskDetailsLoading.value = true;
-//       selectedTaskId.value = scheduleId;
-//
-//       final taskData = todaysSchedules.value?.firstWhere(
-//             (schedule) => schedule['id'] == scheduleId,
-//         orElse: () => <String, dynamic>{},
-//       );
-//
-//       if (taskData != null && taskData.isNotEmpty) {
-//         taskDetails.value = taskData;
-//         // Update task status from the schedule data
-//         taskStatus.value = taskData['status'] ?? 'pending';
-//         await fetchReportData(scheduleId);
-//       }
-//     } catch (e) {
-//       errorMessage.value = e.toString();
-//       Get.snackbar(
-//         'Error',
-//         'Failed to fetch task details: ${e.toString()}',
-//         snackPosition: SnackPosition.BOTTOM,
-//         backgroundColor: Colors.red,
-//         colorText: Colors.white,
-//       );
-//     } finally {
-//       isTaskDetailsLoading.value = false;
-//     }
-//   }
-//
-//   int? currentReportId;
-//
-//   Future<void> fetchReportData(int scheduleId) async {
-//     try {
-//       String endpoint = getTodayReport(scheduleId);
-//
-//       final response = await ApiService.get<Map<String, dynamic>>(
-//         endpoint: endpoint,
-//         fromJson: (json) {
-//           if (json['success'] == true) {
-//             return json['data'] as Map<String, dynamic>;
-//           } else {
-//             throw Exception('Failed to load report');
-//           }
-//         },
-//       );
-//
-//       if (response.success && response.data != null) {
-//         reportData.value = response.data!;
-//         // Keep the status from todaysSchedules as primary source
-//         final scheduleStatus = todaysSchedules.value?.firstWhere(
-//               (schedule) => schedule['id'] == scheduleId,
-//           orElse: () => <String, dynamic>{},
-//         )['status'];
-//
-//         if (scheduleStatus != null) {
-//           taskStatus.value = scheduleStatus;
-//         } else {
-//           taskStatus.value = reportData.value?['status'] ?? 'pending';
-//         }
-//         currentReportId = reportData.value?['id'];
-//       } else {
-//         throw Exception(response.errorMessage ?? 'Failed to fetch report data');
-//       }
-//     } catch (e) {
-//       errorMessage.value = e.toString();
-//     }
-//   }
-//
-//   Future<void> updateTaskStatus(String newStatus) async {
-//     try {
-//       isLoading.value = true;
-//
-//       await Future.delayed(const Duration(seconds: 1));
-//
-//       // Update the status in todaysSchedules
-//       if (todaysSchedules.value != null && selectedTaskId.value > 0) {
-//         final scheduleIndex = todaysSchedules.value!.indexWhere(
-//               (schedule) => schedule['id'] == selectedTaskId.value,
-//         );
-//
-//         if (scheduleIndex != -1) {
-//           todaysSchedules.value![scheduleIndex]['status'] = newStatus;
-//           todaysSchedules.refresh(); // Trigger reactive update
-//         }
-//       }
-//
-//       if (reportData.value != null) {
-//         final updatedReport = Map<String, dynamic>.from(reportData.value!);
-//         updatedReport['status'] = newStatus;
-//         reportData.value = updatedReport;
-//       }
-//
-//       taskStatus.value = newStatus;
-//
-//       Get.snackbar(
-//         'Success',
-//         'Task status updated to ${newStatus.toUpperCase()}',
-//         snackPosition: SnackPosition.BOTTOM,
-//         backgroundColor: Colors.green,
-//         colorText: Colors.white,
-//       );
-//     } catch (e) {
-//       errorMessage.value = e.toString();
-//       Get.snackbar(
-//         'Error',
-//         'Failed to update task status: ${e.toString()}',
-//         snackPosition: SnackPosition.BOTTOM,
-//         backgroundColor: Colors.red,
-//         colorText: Colors.white,
-//       );
-//     } finally {
-//       isLoading.value = false;
-//     }
-//   }
-//
-//   void _showCompletionDialog() {
-//     Get.dialog(
-//       AlertDialog(
-//         shape: RoundedRectangleBorder(
-//           borderRadius: BorderRadius.circular(12),
-//         ),
-//         title: Text(
-//           'Complete Cleaning Task',
-//           style: TextStyle(
-//             fontSize: 18,
-//             fontWeight: FontWeight.bold,
-//             color: Colors.black,
-//           ),
-//         ),
-//         content: Text(
-//           'How would you like to mark this cleaning task?',
-//           style: TextStyle(
-//             fontSize: 14,
-//             color: Colors.grey.shade600,
-//           ),
-//         ),
-//         actions: [
-//           TextButton(
-//             onPressed: () =>
-//                 Navigator.of(Get.context!).pop(), // Try this instead
-//             child: Text(
-//               'Cancel',
-//               style: TextStyle(
-//                 color: Colors.grey.shade600,
-//                 fontSize: 14,
-//               ),
-//             ),
-//           ),
-//           TextButton(
-//             onPressed: () {
-//               Navigator.of(Get.context!).pop(); // And here
-//               _updateTaskStatusToFinal('failed');
-//             },
-//             style: TextButton.styleFrom(
-//               backgroundColor: Colors.red.shade50,
-//               shape: RoundedRectangleBorder(
-//                 borderRadius: BorderRadius.circular(8),
-//               ),
-//             ),
-//             child: Text(
-//               'Failed',
-//               style: TextStyle(
-//                 color: Colors.red.shade600,
-//                 fontSize: 14,
-//                 fontWeight: FontWeight.w600,
-//               ),
-//             ),
-//           ),
-//           ElevatedButton(
-//             onPressed: () {
-//               Navigator.of(Get.context!).pop(); // And here
-//               _updateTaskStatusToFinal('done');
-//             },
-//             style: ElevatedButton.styleFrom(
-//               backgroundColor: Colors.green.shade500,
-//               shape: RoundedRectangleBorder(
-//                 borderRadius: BorderRadius.circular(8),
-//               ),
-//             ),
-//             child: Text(
-//               'Completed',
-//               style: TextStyle(
-//                 color: Colors.white,
-//                 fontSize: 14,
-//                 fontWeight: FontWeight.w600,
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//       barrierDismissible: false,
-//     );
-//   }
-//
-//   // Add this new method to handle maintenance mode when task is completed/failed
-//   Future<void> _updateMaintenanceModeOnCompletion(String finalStatus) async {
-//     print(
-//         "🔧 _updateMaintenanceModeOnCompletion called with status: $finalStatus");
-//
-//     try {
-//       // For completed/failed tasks, we want to send 0 (inactive) to turn off maintenance mode
-//       int maintenanceValue = 0; // Always 0 for completed/failed tasks
-//
-//       print("🔧 Maintenance value to send for completion: $maintenanceValue");
-//
-//       // Prepare the request body for maintenance mode
-//       final requestBody = {
-//         "type": "control",
-//         "id": 1,
-//         "key": 1,
-//         "value": maintenanceValue,
-//       };
-//
-//       // Check if UUID is valid
-//       if (uuid == null || uuid!.isEmpty) {
-//         print("🔧 ⚠️ UUID is null or empty. Skipping maintenance mode update.");
-//         return; // Don't throw error, just skip this step
-//       }
-//
-//       final endpoint = mqttCleanerPost(uuid!);
-//       print("🔧 API endpoint for completion: $endpoint");
-//
-//       // Make the POST request using ApiService
-//       final response = await ApiService.post<Map<String, dynamic>>(
-//         endpoint: endpoint,
-//         body: requestBody,
-//         fromJson: (json) => json as Map<String, dynamic>,
-//         includeToken: true,
-//       );
-//
-//       if (response.success) {
-//         print("🔧 ✅ Success - Maintenance mode disabled after task completion");
-//       } else {
-//         print(
-//             "🔧 ❌ Failed to disable maintenance mode: ${response.errorMessage}");
-//         // Don't throw error, just log it since task completion is more important
-//       }
-//     } catch (e) {
-//       print("🔧 ❌ Exception in _updateMaintenanceModeOnCompletion: $e");
-//       // Don't rethrow - we don't want to fail task completion if maintenance mode update fails
-//     }
-//   }
-//
-// // Update the existing _updateTaskStatusToFinal method
-//   Future<void> _updateTaskStatusToFinal(String finalStatus) async {
-//     try {
-//       isMaintenanceModeLoading.value = true;
-//
-//       if (currentReportId == null) {
-//         throw Exception('Report ID not found');
-//       }
-//
-//       final response = await ApiService.put<Map<String, dynamic>>(
-//         endpoint: putTodayReport(currentReportId!),
-//         body: {
-//           'status': finalStatus,
-//         },
-//         fromJson: (json) {
-//           if (json['success'] == true) {
-//             return json['data'] as Map<String, dynamic>;
-//           } else {
-//             throw Exception(json['message'] ?? 'Failed to update status');
-//           }
-//         },
-//       );
-//
-//       if (response.success) {
-//         // FIRST: Update maintenance mode to inactive (0) before clearing local state
-//         await _updateMaintenanceModeOnCompletion(finalStatus);
-//
-//         // THEN: Clear ETA and local state
-//         _etaTimer?.cancel();
-//         await _clearETAData();
-//
-//         // Set maintenance mode to false after API call
-//         isMaintenanceModeEnabled.value = false;
-//
-//         // Update the status in todaysSchedules
-//         if (todaysSchedules.value != null && selectedTaskId.value > 0) {
-//           final scheduleIndex = todaysSchedules.value!.indexWhere(
-//                 (schedule) => schedule['id'] == selectedTaskId.value,
-//           );
-//
-//           if (scheduleIndex != -1) {
-//             todaysSchedules.value![scheduleIndex]['status'] = finalStatus;
-//             todaysSchedules.refresh(); // Trigger reactive update
-//           }
-//         }
-//
-//         await fetchReportData(selectedTaskId.value);
-//
-//         String title =
-//         finalStatus == 'done' ? 'Cleaning Completed' : 'Cleaning Failed';
-//         String message = finalStatus == 'done'
-//             ? 'Task has been completed successfully'
-//             : 'Task has been marked as failed';
-//         Color backgroundColor =
-//         finalStatus == 'done' ? Colors.green : Colors.red;
-//
-//         Get.snackbar(
-//           title,
-//           message,
-//           snackPosition: SnackPosition.BOTTOM,
-//           backgroundColor: backgroundColor,
-//           colorText: Colors.white,
-//           duration: const Duration(seconds: 3),
-//         );
-//       } else {
-//         throw Exception(response.errorMessage ?? 'Failed to update status');
-//       }
-//     } catch (e) {
-//       errorMessage.value = e.toString();
-//       Get.snackbar(
-//         'Error',
-//         'Failed to update task status: ${e.toString()}',
-//         snackPosition: SnackPosition.BOTTOM,
-//         backgroundColor: Colors.red,
-//         colorText: Colors.white,
-//       );
-//     } finally {
-//       isMaintenanceModeLoading.value = false;
-//     }
-//   }
-//
-// // Method to handle maintenance mode toggle (UI logic) - renamed to avoid conflict
-//   void toggleMaintenanceMode() async {
-//     print("🔧 toggleMaintenanceMode triggered");
-//
-//     try {
-//       // Toggle the maintenance mode status
-//       isMaintenanceModeEnabled.value = !isMaintenanceModeEnabled.value;
-//
-//       // Call both API methods separately
-//       await Future.wait([
-//         updateCleaningStatus(), // PUT request for cleaning status
-//         saveMaintenanceModeParameters(), // POST request for maintenance mode
-//       ]);
-//     } catch (e) {
-//       // Revert UI state if any API call fails
-//       isMaintenanceModeEnabled.value = !isMaintenanceModeEnabled.value;
-//       print("🔧 ❌ toggleMaintenanceMode failed: $e");
-//     }
-//   }
-//
-//   Future<void> updateCleaningStatus() async {
-//     try {
-//       if (currentReportId == null) {
-//         throw Exception('Report ID not found');
-//       }
-//
-//       if (taskStatus.value == 'pending') {
-//         isMaintenanceModeLoading.value = true;
-//
-//         final response = await ApiService.put<Map<String, dynamic>>(
-//           endpoint: putTodayReport(currentReportId!),
-//           body: {
-//             'status': 'cleaning',
-//           },
-//           fromJson: (json) {
-//             if (json['success'] == true) {
-//               return json['data'] as Map<String, dynamic>;
-//             } else {
-//               throw Exception(json['message'] ?? 'Failed to update status');
-//             }
-//           },
-//         );
-//
-//         if (response.success) {
-//           // Set these IMMEDIATELY for instant UI update
-//           taskStatus.value = 'cleaning'; // This triggers _buildETAContainer to show
-//           isMaintenanceModeEnabled.value = true;
-//           isETAActive.value = true;
-//           elapsedETA.value = 0; // Start from 0x
-//           // Start timer immediately
-//           _startETATimer();
-//
-//           await saveMaintenanceModeParameters();
-//
-//           // Save ETA state
-//           await _saveETAState();
-//
-//           // Start timer
-//           _startETATimer();
-//
-//           // Update the status in todaysSchedules
-//           if (todaysSchedules.value != null && selectedTaskId.value > 0) {
-//             final scheduleIndex = todaysSchedules.value!.indexWhere(
-//                   (schedule) => schedule['id'] == selectedTaskId.value,
-//             );
-//
-//             if (scheduleIndex != -1) {
-//               todaysSchedules.value![scheduleIndex]['status'] = 'cleaning';
-//               todaysSchedules.refresh(); // Trigger reactive update
-//             }
-//           }
-//
-//           await fetchReportData(selectedTaskId.value);
-//
-//           Get.snackbar(
-//             'Cleaning Started',
-//             'Task is now in progress. ',
-//             snackPosition: SnackPosition.BOTTOM,
-//             backgroundColor: Colors.blue,
-//             colorText: Colors.white,
-//             duration: const Duration(seconds: 3),
-//           );
-//         } else {
-//           throw Exception(response.errorMessage ?? 'Failed to update status');
-//         }
-//       } else if (taskStatus.value == 'cleaning') {
-//         _showCompletionDialog();
-//         return;
-//       } else {
-//         return;
-//       }
-//     } catch (e) {
-//       errorMessage.value = e.toString();
-//       Get.snackbar(
-//         'Error',
-//         'Failed to update maintenance status: ${e.toString()}',
-//         snackPosition: SnackPosition.BOTTOM,
-//         backgroundColor: Colors.red,
-//         colorText: Colors.white,
-//       );
-//     } finally {
-//       isMaintenanceModeLoading.value = false;
-//     }
-//   }
-//
-// // Update the existing saveMaintenanceModeParameters method to handle different scenarios
-//   Future<void> saveMaintenanceModeParameters({bool? forceValue}) async {
-//     print("🔧 saveMaintenanceModeParameters called");
-//     print("🔧 Current UUID: $uuid");
-//     print(
-//         "🔧 Current maintenance mode status: ${isMaintenanceModeEnabled.value}");
-//     print("🔧 Force value parameter: $forceValue");
-//
-//     try {
-//       isMaintenanceModeLoading.value = true;
-//       errorMessage.value = '';
-//
-//       // Use forceValue if provided, otherwise use current maintenance mode status
-//       int maintenanceValue;
-//       if (forceValue != null) {
-//         maintenanceValue = forceValue ? 1 : 0;
-//         print("🔧 Using forced maintenance value: $maintenanceValue");
-//       } else {
-//         maintenanceValue = isMaintenanceModeEnabled.value ? 1 : 0;
-//         print("🔧 Using current maintenance value: $maintenanceValue");
-//       }
-//
-//       // Prepare the request body for maintenance mode
-//       final requestBody = {
-//         "type": "control",
-//         "id": 1,
-//         "key": 1,
-//         "value": maintenanceValue,
-//       };
-//       print("🔧 Request body: $requestBody");
-//
-//       // Check if UUID is valid
-//       if (uuid == null || uuid!.isEmpty) {
-//         throw Exception("UUID is null or empty. Cannot make API call.");
-//       }
-//
-//       final endpoint = mqttCleanerPost(uuid!);
-//       print("🔧 API endpoint: $endpoint");
-//
-//       // Make the POST request using ApiService
-//       print("🔧 Making API call...");
-//       final response = await ApiService.post<Map<String, dynamic>>(
-//         endpoint: endpoint,
-//         body: requestBody,
-//         fromJson: (json) => json as Map<String, dynamic>,
-//         includeToken: true,
-//       );
-//
-//       print("🔧 API response received:");
-//       print("🔧 Success: ${response.success}");
-//       print("🔧 Status Code: ${response.statusCode}");
-//       print("🔧 Data: ${response.data}");
-//       print("🔧 Error Message: ${response.errorMessage}");
-//
-//       if (response.success) {
-//         print(
-//             "🔧 ✅ Success - Maintenance mode ${maintenanceValue == 1 ? 'enabled' : 'disabled'} successfully");
-//
-//         // Only show success message if not forced (i.e., user-initiated)
-//         if (forceValue == null) {
-//           Get.snackbar(
-//             'Success',
-//             'Maintenance mode ${maintenanceValue == 1 ? 'enabled' : 'disabled'} successfully',
-//             snackPosition: SnackPosition.BOTTOM,
-//             backgroundColor: Colors.green,
-//             colorText: Colors.white,
-//             duration: Duration(seconds: 3),
-//           );
-//         }
-//       } else {
-//         // Handle error response from ApiService
-//         String errorMsg =
-//             response.errorMessage ?? 'Failed to update maintenance mode';
-//
-//         // Customize error message based on status code
-//         if (response.statusCode == 401) {
-//           errorMsg = 'Authentication failed. Please login again.';
-//         } else if (response.statusCode == 400) {
-//           errorMsg =
-//           'Invalid maintenance mode request: ${response.errorMessage}';
-//         } else if (response.statusCode == 404) {
-//           errorMsg = 'Device not found. Please check the UUID.';
-//         }
-//
-//         print("🔧 ❌ API Error: $errorMsg");
-//         throw Exception(errorMsg);
-//       }
-//     } catch (e) {
-//       // Handle any errors (network, timeout, etc.)
-//       String errorMsg = e.toString();
-//       print("🔧 ❌ Exception caught: $errorMsg");
-//
-//       // Clean up error message if it contains 'Exception: '
-//       if (errorMsg.startsWith('Exception: ')) {
-//         errorMsg = errorMsg.substring(11);
-//       }
-//
-//       errorMessage.value = errorMsg;
-//
-//       // Only revert the maintenance mode status on error if it's user-initiated (no forceValue)
-//       if (forceValue == null) {
-//         isMaintenanceModeEnabled.value = !isMaintenanceModeEnabled.value;
-//
-//         Get.snackbar(
-//           'Maintenance Mode Error',
-//           errorMsg,
-//           snackPosition: SnackPosition.BOTTOM,
-//           backgroundColor: Colors.red,
-//           colorText: Colors.white,
-//           duration: const Duration(seconds: 5),
-//         );
-//       }
-//
-//       rethrow;
-//     } finally {
-//       isMaintenanceModeLoading.value = false;
-//       print(
-//           "🔧 saveMaintenanceModeParameters completed, isMaintenanceModeLoading set to false");
-//     }
-//   }
-//
-//   Future<void> navigateToTaskDetails(Map<String, dynamic> taskData) async {
-//     // Clear ETA if switching to a different task
-//     if (selectedTaskId.value != taskData['id'] && isETAActive.value) {
-//       _etaTimer?.cancel();
-//       isETAActive.value = false;
-//       remainingETA.value = 0;
-//     }
-//     // // Get UUID from the selected plant
-//     final uuid = taskData['plant_uuid']?.toString();
-//
-//     if (uuid != null) {
-//       print('Initializing MQTT for plant UUID: $uuid');
-//       // Initialize/reinitialize MQTT with the selected plant's UUID
-//       await AppInitializer.reinitializeWithUUID(uuid);
-//       print('✅ MQTT successfully initialized for UUID: $uuid');
-//     } else {
-//       print('⚠️ No UUID found for selected plant');
-//     }
-//
-//     taskDetails.value = taskData;
-//     selectedTaskId.value = taskData['id'];
-//     taskStatus.value = taskData['status'] ?? 'pending';
-//
-//     // Restore ETA state for this specific task
-//     _restoreETAState();
-//
-//     fetchReportData(taskData['id']);
-//     Get.toNamed(AppRoutes.clenupDetailsPage, arguments: taskData);
-//   }
-//
-//   Future<void> refreshData() async {
-//     await fetchTodaysSchedules();
-//   }
-//
-//   Color getStatusColor(String status) {
-//     switch (status.toLowerCase()) {
-//       case 'pending':
-//         return Colors.orange;
-//       case 'cleaning':
-//         return Colors.blue;
-//       case 'done':
-//         return Colors.green;
-//       case 'failed':
-//         return Colors.red;
-//       default:
-//         return Colors.grey;
-//     }
-//   }
-//
-//   Color getStatusCardColor(String cardType) {
-//     final currentStatus = taskStatus.value;
-//
-//     switch (cardType.toLowerCase()) {
-//       case 'pending':
-//         return currentStatus == 'pending'
-//             ? Colors.orange.shade400
-//             : Colors.red.shade400;
-//       case 'cleaning':
-//         return currentStatus == 'cleaning'
-//             ? Colors.blue.shade400
-//             : Colors.grey.shade400;
-//       case 'completed':
-//         return currentStatus == 'done'
-//             ? Colors.green.shade400
-//             : Colors.green.shade300;
-//       default:
-//         return Colors.grey.shade400;
-//     }
-//   }
-//
-//   Map<String, int> getPanelCounts() {
-//     final total = totalPanels;
-//     int completed = 0;
-//
-//     if (taskStatus.value == 'done') {
-//       completed = total;
-//     } else if (taskStatus.value == 'cleaning') {
-//       completed = (total * 0.5).round();
-//     }
-//
-//     final pending = total - completed;
-//
-//     return {
-//       'total': total,
-//       'completed': completed,
-//       'pending': pending,
-//     };
-//   }
-//
-//   bool get isTaskDataValid {
-//     return taskDetails.value != null &&
-//         taskDetails.value!.containsKey('id') &&
-//         taskDetails.value!.containsKey('plant_location');
-//   }
-//
-//   bool get shouldShowMaintenanceButton {
-//     return taskStatus.value == 'pending' || taskStatus.value == 'cleaning';
-//   }
-//
-//   String get maintenanceButtonText {
-//     switch (taskStatus.value) {
-//       case 'pending':
-//         return 'Start Cleaning';
-//       case 'cleaning':
-//         if (isETAActive.value) {
-//           return 'Complete Cleaning (${formattedElapsedTime})';
-//         }
-//         return 'Complete Cleaning';
-//       default:
-//         return 'Task Completed';
-//     }
-//   }
-//
-//   Color get maintenanceButtonColor {
-//     switch (taskStatus.value) {
-//       case 'pending':
-//         return Colors.blue.shade500;
-//       case 'cleaning':
-//         return Colors.green.shade500;
-//       default:
-//         return Colors.grey.shade400;
-//     }
-//   }
-//
-//   String formatTime(String timeString) {
-//     try {
-//       final parts = timeString.split(':');
-//       final hour = int.parse(parts[0]);
-//       final minute = int.parse(parts[1]);
-//
-//       final period = hour >= 12 ? 'PM' : 'AM';
-//       final displayHour = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
-//
-//       return '${displayHour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')} $period';
-//     } catch (e) {
-//       return timeString;
-//     }
-//   }
-// }
 
 
 import 'dart:typed_data';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -1236,6 +136,38 @@ class CleaningManagementController extends GetxController {
 
   String get cleaningStartTime {
     return taskDetails.value?['cleaning_start_time'] ?? '08:00 AM';
+  }
+
+  String get plantName {
+    return taskDetails.value?['plant_name']?.toString() ?? 'N/A';
+  }
+
+  String get plantAddress {
+    return taskDetails.value?['plant_address']?.toString() ?? 'N/A';
+  }
+
+  String get talukaName {
+    return taskDetails.value?['taluka_name']?.toString() ?? 'N/A';
+  }
+
+  String get areaName {
+    return taskDetails.value?['area_name']?.toString() ?? 'N/A';
+  }
+
+  int get plantTotalPanels {
+    return taskDetails.value?['plant_total_panels'] ?? 0;
+  }
+
+  double get plantAreaSqM {
+    final value = taskDetails.value?['plant_area_squrM'];
+    if (value == null) return 0.0;
+    return value is int ? value.toDouble() : (value as num).toDouble();
+  }
+
+  double get plantCapacityW {
+    final value = taskDetails.value?['plant_capacity_w'];
+    if (value == null) return 0.0;
+    return value is int ? value.toDouble() : (value as num).toDouble();
   }
 
   @override
@@ -1587,79 +519,213 @@ class CleaningManagementController extends GetxController {
 
   void _showCompletionDialog(context) {
     Get.dialog(
-      AlertDialog(
+      Dialog(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(20.r),
         ),
-        title: Text(
-          'Complete Cleaning Task',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
+        elevation: 8,
+        backgroundColor: Colors.white,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20.r),
+          ),
+          padding: EdgeInsets.all(20.w),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Animated Icon Header
+              Container(
+                padding: EdgeInsets.all(16.w),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.blue.shade400, Colors.blue.shade600],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.blue.withOpacity(0.3),
+                      blurRadius: 12,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.task_alt_rounded,
+                  size: 40.w,
+                  color: Colors.white,
+                ),
+              ),
+
+              SizedBox(height: 20.h),
+
+              // Title
+              Text(
+                'Complete Cleaning Task',
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              SizedBox(height: 10.h),
+
+              // Subtitle
+              Text(
+                'How would you like to mark this task?',
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  color: Colors.grey.shade600,
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              SizedBox(height: 24.h),
+
+              // Action Buttons
+              Row(
+                children: [
+                  // Failed Button
+                  Expanded(
+                    child: _buildActionButton(
+                      context: context,
+                      label: 'Failed',
+                      icon: Icons.cancel_rounded,
+                      gradient: LinearGradient(
+                        colors: [Colors.red.shade400, Colors.red.shade600],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      shadowColor: Colors.red,
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _updateTaskStatusToFinal('failed');
+                      },
+                    ),
+                  ),
+
+                  SizedBox(width: 12.w),
+
+                  // Completed Button
+                  Expanded(
+                    child: _buildActionButton(
+                      context: context,
+                      label: 'Completed',
+                      icon: Icons.check_circle_rounded,
+                      gradient: LinearGradient(
+                        colors: [Colors.green.shade400, Colors.green.shade600],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      shadowColor: Colors.green,
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _updateTaskStatusToFinal('done');
+                      },
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 12.h),
+
+              // Cancel Button
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 24.w),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.close_rounded,
+                      size: 16.w,
+                      color: Colors.grey.shade600,
+                    ),
+                    SizedBox(width: 6.w),
+                    Text(
+                      'Cancel',
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
-        content: Text(
-          'How would you like to mark this cleaning task?',
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey.shade600,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () =>  Navigator.of(context).pop(),
-            child: Text(
-              'Cancel',
-              style: TextStyle(
-                color: Colors.grey.shade600,
-                fontSize: 14,
-              ),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _updateTaskStatusToFinal('failed');
-            },
-            style: TextButton.styleFrom(
-              backgroundColor: Colors.red.shade50,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: Text(
-              'Failed',
-              style: TextStyle(
-                color: Colors.red.shade600,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _updateTaskStatusToFinal('done');
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green.shade500,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: Text(
-              'Completed',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+      ),
+      barrierDismissible: false,
+    );
+  }
+
+  Widget _buildActionButton({
+    required BuildContext context,
+    required String label,
+    required IconData icon,
+    required Gradient gradient,
+    required Color shadowColor,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12.r),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor.withOpacity(0.3),
+            blurRadius: 8,
+            offset: Offset(0, 4),
           ),
         ],
       ),
-      barrierDismissible: false,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(12.r),
+          child: Ink(
+            decoration: BoxDecoration(
+              gradient: gradient,
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    icon,
+                    color: Colors.white,
+                    size: 28.w,
+                  ),
+                  SizedBox(height: 6.h),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -2017,12 +1083,10 @@ class CleaningManagementController extends GetxController {
     final uuid = taskData['plant_uuid']?.toString();
 
     if (uuid != null) {
-      developer.log(
-          'Initializing MQTT for plant UUID: $uuid', name: 'Navigation');
+      developer.log('Initializing MQTT for plant UUID: $uuid', name: 'Navigation');
       setUuid(uuid);
       await AppInitializer.reinitializeWithUUID(uuid);
-      developer.log(
-          'MQTT successfully initialized for UUID: $uuid', name: 'Navigation');
+      developer.log('MQTT successfully initialized for UUID: $uuid', name: 'Navigation');
     } else {
       developer.log('No UUID found for selected plant', name: 'Navigation');
     }

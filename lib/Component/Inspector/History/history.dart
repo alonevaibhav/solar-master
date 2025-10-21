@@ -232,6 +232,7 @@ class HistoryInspector extends StatelessWidget {
 
     controller.setPlantId(plantID);
     controller.printUuidInfo(plantUUID);
+    controller.clearData;
 
     if (plantID != null && plantID.isNotEmpty) {
       controller.loadMqttHistoryByYearMonth();

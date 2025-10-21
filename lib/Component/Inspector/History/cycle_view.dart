@@ -139,9 +139,8 @@ class CycleGroupWidget extends StatelessWidget {
                 SizedBox(height: 8),
                 _buildSummaryItem(
                     'Start Method', summary.startMethod, Icons.touch_app),
-                SizedBox(height: 8),
-                _buildSummaryItem(
-                    'Stop Method', summary.stopMethod, Icons.stop_circle),
+                // SizedBox(height: 8),
+                // _buildSummaryItem('Stop Method', summary.stopMethod, Icons.stop_circle),
                 SizedBox(height: 8),
                 _buildSummaryItem(
                   'Solenoid Range',

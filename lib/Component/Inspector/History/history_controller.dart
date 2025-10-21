@@ -1,39 +1,50 @@
-//
-// import 'package:get/get_state_manager/src/simple/get_controllers.dart';
-// import 'package:get/get.dart';
 // import 'package:flutter/foundation.dart';
-// import 'dart:convert';
+// import 'package:flutter/material.dart';
+// import 'package:get/get.dart';
 // import '../../../API Service/api_service.dart';
+// import '../../../Model/Inspector/history_model.dart';
 // import '../../../utils/constants.dart';
 //
 // class InspectorHistoryController extends GetxController {
-//   // Observable variables for state management
 //   var isLoading = false.obs;
-//   var historyData = <dynamic>[].obs;
+//   var cycles = <CycleData>[].obs;
 //   var errorMessage = ''.obs;
 //   var hasError = false.obs;
 //
-//   String? uuid;
+//   var selectedYear = DateTime.now().year.obs;
+//   var selectedMonth = DateTime.now().month.obs;
 //
-//   void setUuid(String? newUuid) {
-//     uuid = newUuid;
-//     print("UUID set to: $uuid");
+//   String? plantID;
+//   String? plantUuid;
+//
+//   void setPlantId(String? newUuid) {
+//     plantID = newUuid;
+//     print("ID set to: $plantID");
 //   }
 //
-//   void printUuidInfo() {
-//     print("UUID: ${uuid ?? 'NULL'}");
+//   void printUuidInfo(plantUUID) {
+//     plantUuid = plantUUID;
+//     print("Plant UUID: ${plantUUID ?? 'NULL'}");
 //   }
 //
 //   @override
 //   void onInit() {
 //     super.onInit();
-//     // Removed automatic loading - let the widget control when to load
 //   }
 //
-//   /// Fetches MQTT history data for a given UUID
-//   Future<void> loadMqttHistory() async {
-//     if (uuid == null || uuid!.isEmpty) {
-//       _setError('ID cannot be empty');
+//   /// Formats year and month to YYYYMM format (e.g., 2025 & 09 = 2509)
+//   String _formatYearMonth(int year, int month) {
+//     String yearStr =
+//         year.toString().substring(2); // Get last 2 digits (25 from 2025)
+//     String monthStr =
+//         month.toString().padLeft(2, '0'); // Pad month with 0 if needed
+//     return '$yearStr$monthStr'; // Returns 2509
+//   }
+//
+//   /// Fetches MQTT history data for selected year and month
+//   Future<void> loadMqttHistoryByYearMonth() async {
+//     if (plantID == null || plantID!.isEmpty) {
+//       _setError('Plant ID cannot be empty');
 //       return;
 //     }
 //
@@ -41,163 +52,201 @@
 //       _setLoading(true);
 //       _clearError();
 //
-//       // Make the GET API call using ApiService
-//       // Changed to expect Map<String, dynamic> since API now returns paginated response
+//       // Format year and month (e.g., 2025, 09 -> 2509)
+//       String yrmn = _formatYearMonth(selectedYear.value, selectedMonth.value);
+//
+//       if (kDebugMode) {
+//         print('Fetching MQTT history for Plant: $plantID, YearMonth: $yrmn');
+//       }
+//
+//       // Make the GET API call using the formatted year-month
 //       final response = await ApiService.get<Map<String, dynamic>>(
-//         endpoint: mqttHistoryGet(uuid!),
+//         endpoint: deviceLogAsPerMonth(int.parse(yrmn), plantID!),
 //         fromJson: (data) => data as Map<String, dynamic>,
 //         includeToken: true,
 //       );
 //
 //       if (response.success && response.data != null) {
-//         // Handle successful response
 //         _handleSuccessResponse(response.data!);
 //       } else {
-//         // Handle API error
-//         _setError(response.errorMessage ?? 'Failed to load MQTT history');
+//         // Check if it's a 404 error (table doesn't exist) or empty data
+//         if (response.statusCode == 404) {
+//           // Table doesn't exist - treat as "no logs available"
+//           _handleNoLogsScenario('No data available for the selected month');
+//         } else {
+//           // Other errors - show as actual error
+//           _setError(response.errorMessage ?? 'Failed to load MQTT history');
+//         }
 //       }
 //     } catch (e) {
-//       // Handle unexpected errors
 //       _setError('An unexpected error occurred: ${e.toString()}');
 //       if (kDebugMode) {
-//         print('Error in loadMqttHistory: $e');
+//         print('Error in loadMqttHistoryByYearMonth: $e');
 //       }
 //     } finally {
 //       _setLoading(false);
 //     }
 //   }
 //
-//   /// Refreshes the MQTT history data
-//   Future<void> refreshMqttHistory() async {
-//     await loadMqttHistory();
+//   var isCollectingData = false.obs;
+//
+//   /// Triggers data collection for the plant using UUID
+//   Future<void> triggerDataCollection() async {
+//     if (plantUuid == null || plantUuid!.isEmpty) {
+//       if (kDebugMode) {
+//         print('Plant UUID is null or empty, cannot trigger data collection');
+//       }
+//       Get.snackbar(
+//         'Error',
+//         'Plant UUID is not available',
+//         backgroundColor: Colors.red[100],
+//         colorText: Colors.red[800],
+//         snackPosition: SnackPosition.BOTTOM,
+//       );
+//       return;
+//     }
+//
+//     try {
+//       isCollectingData.value = true; // Start loading
+//
+//       if (kDebugMode) {
+//         print('Triggering data collection for Plant UUID: $plantUuid');
+//       }
+//
+//       // Make the POST API call
+//       final response = await ApiService.post<Map<String, dynamic>>(
+//         endpoint: deviceDataCollectionCommand(plantUuid!),
+//         body: {},
+//         fromJson: (data) => data as Map<String, dynamic>,
+//         includeToken: true,
+//       );
+//
+//       if (response.success) {
+//         if (kDebugMode) {
+//           print('Data collection triggered successfully');
+//           print('Response: ${response.data}');
+//         }
+//         Get.snackbar(
+//           'Success',
+//           'Data collected successfully',
+//           backgroundColor: Colors.green[100],
+//           colorText: Colors.green[800],
+//           snackPosition: SnackPosition.BOTTOM,
+//           icon: Icon(Icons.check_circle, color: Colors.green[800]),
+//         );
+//       } else {
+//         if (kDebugMode) {
+//           print('Failed to trigger data collection: ${response.errorMessage}');
+//         }
+//         Get.snackbar(
+//           'Failed',
+//           response.errorMessage ?? 'Failed to collect data',
+//           backgroundColor: Colors.orange[100],
+//           colorText: Colors.orange[800],
+//           snackPosition: SnackPosition.BOTTOM,
+//         );
+//       }
+//     } catch (e) {
+//       if (kDebugMode) {
+//         print('Error triggering data collection: $e');
+//       }
+//       Get.snackbar(
+//         'Error',
+//         'An error occurred while collecting data',
+//         backgroundColor: Colors.red[100],
+//         colorText: Colors.red[800],
+//         snackPosition: SnackPosition.BOTTOM,
+//       );
+//     } finally {
+//       isCollectingData.value = false; // Stop loading
+//     }
 //   }
 //
-//   /// Handles successful API response
+//   /// Updates selected year
+//   void updateYear(int year) {
+//     selectedYear.value = year;
+//   }
+//
+//   /// Updates selected month
+//   void updateMonth(int month) {
+//     selectedMonth.value = month;
+//   }
+//
 //   void _handleSuccessResponse(Map<String, dynamic> responseData) {
-//     // Extract the data array from the response
-//     List<dynamic> data = [];
+//     try {
+//       List<CycleData> processedCycles = [];
 //
-//     // Check if response contains 'data' field (pagination structure)
-//     if (responseData.containsKey('data')) {
-//       data = responseData['data'] as List<dynamic>? ?? [];
-//     }
-//     // If no 'data' field, check if it's directly an array
-//     else if (responseData is List<dynamic>) {
-//       data = responseData as List;
-//     }
-//     // Otherwise, treat the entire response as data
-//     else {
-//       data = [responseData];
-//     }
+//       List<dynamic>? cyclesData = responseData['cycles'] as List<dynamic>?;
 //
-//     // Process each cleaning cycle item
-//     List<Map<String, dynamic>> processedData = [];
+//       if (cyclesData == null || cyclesData.isEmpty) {
+//         // Empty cycles array - not an error, just no logs
+//         _handleNoLogsScenario(
+//             'No cleaning cycles found for the selected month');
+//         return;
+//       }
 //
-//     for (var item in data) {
-//       if (item is Map<String, dynamic>) {
-//         Map<String, dynamic> processedItem = {
-//           'id': item['id'],
-//           'topic': item['topic'],
-//           'timestamp': item['timestamp'],
-//           'plant_id': item['plant_id'],
-//           'raw_cleaning_data': item['cleaning_data'],
-//         };
-//
-//         // Parse the cleaning_data JSON string
-//         try {
-//           if (item['cleaning_data'] != null) {
-//             var cleaningData = jsonDecode(item['cleaning_data']);
-//
-//             // Extract cleaning cycle information
-//             processedItem['cycle'] = cleaningData['cycle'] ?? 'Unknown';
-//             processedItem['time'] = cleaningData['time'] ?? 'Unknown time';
-//             processedItem['complete'] = cleaningData['complete'] ?? 0;
-//             processedItem['status'] = cleaningData['status'] ?? 'Unknown status';
-//             processedItem['solenoid'] = cleaningData['solenoid'] ?? 'Unknown';
-//
-//             // Create a user-friendly message
-//             String completionText = (cleaningData['complete'] == 1) ? 'Completed' : 'Incomplete';
-//             processedItem['display_message'] =
-//             'Cycle ${cleaningData['cycle'] ?? 'Unknown'} - ${cleaningData['status'] ?? 'Unknown status'} ($completionText)';
-//           } else {
-//             processedItem['cycle'] = 'Unknown';
-//             processedItem['time'] = 'Unknown time';
-//             processedItem['complete'] = 0;
-//             processedItem['status'] = 'No data';
-//             processedItem['solenoid'] = 'Unknown';
-//             processedItem['display_message'] = 'No cleaning data available';
-//           }
-//         } catch (e) {
-//           processedItem['cycle'] = 'Unknown';
-//           processedItem['time'] = 'Unknown time';
-//           processedItem['complete'] = 0;
-//           processedItem['status'] = 'Parse error';
-//           processedItem['solenoid'] = 'Unknown';
-//           processedItem['display_message'] = 'Invalid data format';
-//
-//           if (kDebugMode) {
-//             print('Error parsing cleaning_data: $e');
-//           }
+//       for (var cycleJson in cyclesData) {
+//         if (cycleJson is Map<String, dynamic>) {
+//           CycleData cycle = CycleData.fromJson(cycleJson);
+//           processedCycles.add(cycle);
 //         }
+//       }
 //
-//         processedData.add(processedItem);
+//       processedCycles.sort((a, b) => b.cycleNumber.compareTo(a.cycleNumber));
+//       cycles.value = processedCycles;
+//
+//       if (kDebugMode) {
+//         print('MQTT History loaded successfully: ${cycles.length} cycles');
+//       }
+//     } catch (e) {
+//       _setError('Error processing cycle data: ${e.toString()}');
+//       if (kDebugMode) {
+//         print('Error parsing response: $e');
 //       }
 //     }
+//   }
 //
-//     // Sort by timestamp (newest first)
-//     processedData.sort((a, b) {
-//       try {
-//         DateTime aTime = DateTime.parse(a['timestamp'] ?? '');
-//         DateTime bTime = DateTime.parse(b['timestamp'] ?? '');
-//         return bTime.compareTo(aTime);
-//       } catch (e) {
-//         return 0;
-//       }
-//     });
-//
-//     historyData.value = processedData;
+//   /// Handles the scenario where no logs are available (not an error)
+//   void _handleNoLogsScenario(String message) {
+//     cycles.clear();
+//     hasError.value = false;
+//     errorMessage.value = '';
 //
 //     if (kDebugMode) {
-//       print('MQTT History loaded successfully: ${historyData.length} items');
+//       print('No logs available: $message');
 //     }
 //   }
 //
-//   /// Sets loading state
 //   void _setLoading(bool loading) {
 //     isLoading.value = loading;
 //   }
 //
-//   /// Sets error state and message
 //   void _setError(String message) {
 //     hasError.value = true;
 //     errorMessage.value = message;
-//     historyData.clear();
+//     cycles.clear();
 //     if (kDebugMode) {
 //       print('Error in InspectorHistoryController: $message');
 //     }
 //   }
 //
-//   /// Clears error state
 //   void _clearError() {
 //     hasError.value = false;
 //     errorMessage.value = '';
 //   }
 //
-//   /// Clears all data and resets state
 //   void clearData() {
-//     historyData.clear();
+//     cycles.clear();
 //     _clearError();
 //     _setLoading(false);
 //   }
 //
 //   @override
 //   void onClose() {
-//     // Clean up resources when controller is destroyed
 //     clearData();
 //     super.onClose();
 //   }
 // }
-
 
 
 import 'package:flutter/foundation.dart';
@@ -209,6 +258,7 @@ import '../../../utils/constants.dart';
 
 class InspectorHistoryController extends GetxController {
   var isLoading = false.obs;
+  var isLoadingMore = false.obs;
   var cycles = <CycleData>[].obs;
   var errorMessage = ''.obs;
   var hasError = false.obs;
@@ -217,14 +267,22 @@ class InspectorHistoryController extends GetxController {
   var selectedMonth = DateTime.now().month.obs;
 
   String? plantID;
+  String? plantUuid;
 
-  void setUuid(String? newUuid) {
+  // Pagination variables
+  var currentPage = 1.obs;
+  var itemsPerPage = 10;
+  var hasMoreData = true.obs;
+  List<CycleData> allCycles = [];
+
+  void setPlantId(String? newUuid) {
     plantID = newUuid;
     print("ID set to: $plantID");
   }
 
-  void printUuidInfo() {
-    print("ID: ${plantID ?? 'NULL'}");
+  void printUuidInfo(plantUUID) {
+    plantUuid = plantUUID;
+    print("Plant UUID: ${plantUUID ?? 'NULL'}");
   }
 
   @override
@@ -234,9 +292,9 @@ class InspectorHistoryController extends GetxController {
 
   /// Formats year and month to YYYYMM format (e.g., 2025 & 09 = 2509)
   String _formatYearMonth(int year, int month) {
-    String yearStr = year.toString().substring(2); // Get last 2 digits (25 from 2025)
-    String monthStr = month.toString().padLeft(2, '0'); // Pad month with 0 if needed
-    return '$yearStr$monthStr'; // Returns 2509
+    String yearStr = year.toString().substring(2);
+    String monthStr = month.toString().padLeft(2, '0');
+    return '$yearStr$monthStr';
   }
 
   /// Fetches MQTT history data for selected year and month
@@ -250,16 +308,19 @@ class InspectorHistoryController extends GetxController {
       _setLoading(true);
       _clearError();
 
-      // Format year and month (e.g., 2025, 09 -> 2509)
+      // Reset pagination
+      currentPage.value = 1;
+      hasMoreData.value = true;
+      allCycles.clear();
+
       String yrmn = _formatYearMonth(selectedYear.value, selectedMonth.value);
 
       if (kDebugMode) {
         print('Fetching MQTT history for Plant: $plantID, YearMonth: $yrmn');
       }
 
-      // Make the GET API call using the formatted year-month
       final response = await ApiService.get<Map<String, dynamic>>(
-        endpoint: deviceLogAsPerMonth(int.parse(yrmn), plantID! as String),
+        endpoint: deviceLogAsPerMonth(int.parse(yrmn), plantID!),
         fromJson: (data) => data as Map<String, dynamic>,
         includeToken: true,
       );
@@ -267,7 +328,11 @@ class InspectorHistoryController extends GetxController {
       if (response.success && response.data != null) {
         _handleSuccessResponse(response.data!);
       } else {
-        _setError(response.errorMessage ?? 'Failed to load MQTT history');
+        if (response.statusCode == 404) {
+          _handleNoLogsScenario('No data available for the selected month');
+        } else {
+          _setError(response.errorMessage ?? 'Failed to load MQTT history');
+        }
       }
     } catch (e) {
       _setError('An unexpected error occurred: ${e.toString()}');
@@ -279,12 +344,126 @@ class InspectorHistoryController extends GetxController {
     }
   }
 
-  /// Updates selected year
+  /// Load more cycles (pagination)
+  Future<void> loadMoreCycles() async {
+    if (isLoadingMore.value || !hasMoreData.value) return;
+
+    try {
+      isLoadingMore.value = true;
+
+      // Calculate start and end index for pagination
+      int startIndex = currentPage.value * itemsPerPage;
+      int endIndex = startIndex + itemsPerPage;
+
+      if (startIndex >= allCycles.length) {
+        hasMoreData.value = false;
+        return;
+      }
+
+      // Get next batch of cycles
+      List<CycleData> nextBatch = allCycles.sublist(
+        startIndex,
+        endIndex > allCycles.length ? allCycles.length : endIndex,
+      );
+
+      // Add to displayed cycles
+      cycles.addAll(nextBatch);
+      currentPage.value++;
+
+      // Check if there's more data
+      if (endIndex >= allCycles.length) {
+        hasMoreData.value = false;
+      }
+
+      if (kDebugMode) {
+        print('Loaded more cycles: ${cycles.length}/${allCycles.length}');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error loading more cycles: $e');
+      }
+    } finally {
+      isLoadingMore.value = false;
+    }
+  }
+
+  var isCollectingData = false.obs;
+
+  /// Triggers data collection for the plant using UUID
+  Future<void> triggerDataCollection() async {
+    if (plantUuid == null || plantUuid!.isEmpty) {
+      if (kDebugMode) {
+        print('Plant UUID is null or empty, cannot trigger data collection');
+      }
+      Get.snackbar(
+        'Error',
+        'Plant UUID is not available',
+        backgroundColor: Colors.red[100],
+        colorText: Colors.red[800],
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    try {
+      isCollectingData.value = true;
+
+      if (kDebugMode) {
+        print('Triggering data collection for Plant UUID: $plantUuid');
+      }
+
+      final response = await ApiService.post<Map<String, dynamic>>(
+        endpoint: deviceDataCollectionCommand(plantUuid!),
+        body: {},
+        fromJson: (data) => data as Map<String, dynamic>,
+        includeToken: true,
+      );
+
+      if (response.success) {
+        if (kDebugMode) {
+          print('Data collection triggered successfully');
+          print('Response: ${response.data}');
+        }
+        Get.snackbar(
+          'Success',
+          'Data collected successfully',
+          backgroundColor: Colors.green[100],
+          colorText: Colors.green[800],
+          snackPosition: SnackPosition.BOTTOM,
+          icon: Icon(Icons.check_circle, color: Colors.green[800]),
+        );
+      } else {
+        if (kDebugMode) {
+          print('Failed to trigger data collection: ${response.errorMessage}');
+        }
+        Get.snackbar(
+          'Failed',
+          response.errorMessage ?? 'Failed to collect data',
+          backgroundColor: Colors.orange[100],
+          colorText: Colors.orange[800],
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error triggering data collection: $e');
+      }
+      Get.snackbar(
+        'Error',
+        'An error occurred while collecting data',
+        backgroundColor: Colors.red[100],
+        colorText: Colors.red[800],
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isCollectingData.value = false;
+    }
+  }
+
   void updateYear(int year) {
     selectedYear.value = year;
   }
 
-  /// Updates selected month
   void updateMonth(int month) {
     selectedMonth.value = month;
   }
@@ -296,7 +475,7 @@ class InspectorHistoryController extends GetxController {
       List<dynamic>? cyclesData = responseData['cycles'] as List<dynamic>?;
 
       if (cyclesData == null || cyclesData.isEmpty) {
-        _setError('No cycle data available for selected month');
+        _handleNoLogsScenario('No cleaning cycles found for the selected month');
         return;
       }
 
@@ -308,10 +487,19 @@ class InspectorHistoryController extends GetxController {
       }
 
       processedCycles.sort((a, b) => b.cycleNumber.compareTo(a.cycleNumber));
-      cycles.value = processedCycles;
+
+      // Store all cycles
+      allCycles = processedCycles;
+
+      // Load first page
+      int endIndex = itemsPerPage > allCycles.length ? allCycles.length : itemsPerPage;
+      cycles.value = allCycles.sublist(0, endIndex);
+
+      // Set hasMoreData flag
+      hasMoreData.value = allCycles.length > itemsPerPage;
 
       if (kDebugMode) {
-        print('MQTT History loaded successfully: ${cycles.length} cycles');
+        print('MQTT History loaded: ${cycles.length}/${allCycles.length} cycles (Page 1)');
       }
     } catch (e) {
       _setError('Error processing cycle data: ${e.toString()}');
@@ -321,7 +509,17 @@ class InspectorHistoryController extends GetxController {
     }
   }
 
+  void _handleNoLogsScenario(String message) {
+    cycles.clear();
+    allCycles.clear();
+    hasError.value = false;
+    errorMessage.value = '';
+    hasMoreData.value = false;
 
+    if (kDebugMode) {
+      print('No logs available: $message');
+    }
+  }
 
   void _setLoading(bool loading) {
     isLoading.value = loading;
@@ -331,6 +529,7 @@ class InspectorHistoryController extends GetxController {
     hasError.value = true;
     errorMessage.value = message;
     cycles.clear();
+    allCycles.clear();
     if (kDebugMode) {
       print('Error in InspectorHistoryController: $message');
     }
@@ -343,8 +542,11 @@ class InspectorHistoryController extends GetxController {
 
   void clearData() {
     cycles.clear();
+    allCycles.clear();
     _clearError();
     _setLoading(false);
+    currentPage.value = 1;
+    hasMoreData.value = true;
   }
 
   @override

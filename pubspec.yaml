@@ -53,6 +53,8 @@ dependencies:
   flutter_launcher_icons: ^0.14.4
   flutter_local_notifications: ^19.4.2
 
+  infinite_scroll_pagination: ^5.1.1
+
 
 dev_dependencies:
   flutter_test:

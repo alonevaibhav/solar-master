@@ -60,6 +60,10 @@ String mqttHistoryGet(String id) => "/api/mqtt/inspector/device-logs/$id";
 
 String deviceLogAsPerMonth(int yrmn, String id) => "/api/mqtt/inspector/device-logs/$id?month=$yrmn";
 
+
+String deviceDataCollectionCommand(String uuid) => "/api/mqtt/inspector/trigger-data-collection/$uuid";
+
+
 String raiseTicket = "/api/tickets/create/inspector";
 
 

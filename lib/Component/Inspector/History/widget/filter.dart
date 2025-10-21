@@ -1,19 +1,16 @@
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:intl/intl.dart';
-
 import '../history_controller.dart';
-
 
 class MqttHistoryDateFilter extends StatelessWidget {
   final InspectorHistoryController controller;
 
   const MqttHistoryDateFilter({
-    Key? key,
+    super.key,
     required this.controller,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +40,7 @@ class MqttHistoryDateFilter extends StatelessWidget {
             ),
           ),
           SizedBox(height: 16),
+          // Year and Month in Row
           Row(
             children: [
               Expanded(
@@ -55,10 +53,29 @@ class MqttHistoryDateFilter extends StatelessWidget {
             ],
           ),
           SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: _buildFetchButton(),
+          Row(
+            children: [
+              Expanded(
+                child: _buildFetchButton(),
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: _buildGetAllDataButton(),
+              ),
+            ],
           ),
+          // SizedBox(height: 16),
+          // // Fetch History Button
+          // SizedBox(
+          //   width: double.infinity,
+          //   child: _buildFetchButton(),
+          // ),
+          // SizedBox(height: 12),
+          // // Get All Data Button
+          // SizedBox(
+          //   width: double.infinity,
+          //   child: _buildGetAllDataButton(),
+          // ),
         ],
       ),
     );
@@ -95,8 +112,18 @@ class MqttHistoryDateFilter extends StatelessWidget {
 
   Widget _buildMonthDropdown() {
     const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
     ];
 
     return Obx(
@@ -150,10 +177,48 @@ class MqttHistoryDateFilter extends StatelessWidget {
             valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
           ),
         )
-            : Icon(Icons.search),
+            : Icon(Icons.search,            color: Colors.white,),
         label: Text(
           controller.isLoading.value ? 'Fetching...' : 'Fetch History',
           style: TextStyle(
+            color: Colors.white,
+
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGetAllDataButton() {
+    return Obx(
+          () => ElevatedButton.icon(
+        onPressed: controller.isCollectingData.value
+            ? null
+            : () => controller.triggerDataCollection(),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green[700],
+          disabledBackgroundColor: Colors.grey[300],
+          padding: EdgeInsets.symmetric(vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        icon: controller.isCollectingData.value
+            ? SizedBox(
+          width: 16,
+          height: 16,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          ),
+        )
+            : Icon(Icons.download, color: Colors.white),
+        label: Text(
+          controller.isCollectingData.value ? 'Collecting...' : 'Get Data',
+          style: TextStyle(
+            color: Colors.white,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
